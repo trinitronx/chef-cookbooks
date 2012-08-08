@@ -2,7 +2,8 @@ dbpath = /srv/mongodb
 port = 27017
 bind_ip = <%= @node.ipaddress %>
 logpath = /var/log/mongodb/mongodb.log
-auth = true
+keyfile = /srv/<%= "replkey_#{@node.chef_environment}" %>
+#auth = true ##Implied by keyfile
 nohttpinterface = true
 replSet = <%= "biola_#{@node.chef_environment}" %>
 journal = true
