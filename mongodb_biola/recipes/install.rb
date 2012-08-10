@@ -7,4 +7,10 @@ template "/etc/mongodb.conf" do
   owner "root"
   group "root"
   mode 0755
+  notifies :restart, "service[mongodb]"
+end
+
+service "mongodb" do
+  supports :restart => true
+  action :enable
 end
