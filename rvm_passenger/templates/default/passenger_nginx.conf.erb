@@ -1,2 +1,4 @@
 passenger_root <%= node[:rvm_passenger][:root_path] %>;
 passenger_ruby <%= node[:rvm_passenger][:ruby_wrapper] %>;
+passenger_spawn_method <%= node[:rvm_passenger][:spawn_method] %>;
+passenger_max_pool_size <%= node[:rvm_passenger][:max_pool_size] %>;
