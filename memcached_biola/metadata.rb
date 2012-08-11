@@ -1,9 +1,9 @@
-maintainer        "Opscode, Inc."
-maintainer_email  "cookbooks@opscode.com"
+maintainer        "Biola University"
+maintainer_email  "jeff.silzer@biola.edu"
 license           "Apache 2.0"
-description       "Installs memcached and provides a define to set up an instance of memcache via runit"
+description       "Originally from Opscode Cookbooks. Installs memcached and provides a define to set up an instance of memcache via runit"
 long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           "1.0.2"
+version           "1.0.0"
 depends           "runit"
 
 recipe "memcached", "Installs and configures memcached"
@@ -30,4 +30,9 @@ attribute "memcached/user",
 attribute "memcached/listen",
   :display_name => "Memcached IP Address",
   :description => "IP address to use for memcached instance",
-  :default => "0.0.0.0"
+  :default => "127.0.0.1"
+
+attribute "memcached/verbose",
+  :display_name => "Memcached Verbose On|Off",
+  :description => "True or False to set -v in the memcached conf file",
+  :default => "false"
