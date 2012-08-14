@@ -1,0 +1,51 @@
+user                            <%= @user %>;
+worker_processes                <%= @worker_processes %>;
+pid                             /var/run/nginx.pid;
+error_log                       /var/log/nginx/error.log warn;
+events {
+ worker_connections             <%= @worker_connections %>;
+}
+
+http {
+ passenger_root                 <%= @passenger_root %>;
+ passenger_ruby                 <%= @passenger_ruby %>;
+ rack_env                       <%= @rack_env %>;
+ passenger_spawn_method         <%= @passenger_spawn_method %>;
+ passenger_max_pool_size        <%= @passenger_max_pool_size %>;
+ include                        mime.types;
+ default_type                   application/octet-stream;
+ sendfile                       on;
+ keepalive_timeout              <%= @keepalive_timeout %>;
+
+ log_format                     main '$remote_addr - $host $remote_user [$time_local] '
+                                     '"$request" $status $body_bytes_sent '
+                                     '"$http_referer" "$http_user_agent"';
+
+ access_log                     /var/log/nginx/access.log;
+
+ ssl_certificate                <%= @ssl_certificate %>;
+ ssl_certificate_key            <%= @ssl_certificate_key %>;
+
+ client_max_body_size           <%= @client_max_body_size %>;
+
+ server {
+  listen                        80;
+  listen                        443 ssl;
+  server_name                   <%= node['fqdn'] %>;
+  <% @server_names.each do |server_name| %>
+  server_name                   <%= server_name %>;
+  <% end %>
+  error_page                    500 502 503 504 /50x.html;
+  root                          /srv/www;
+
+  passenger_set_cgi_param       HTTP_X_FORWARDED_PROTO $scheme;
+
+  include                       ./sites/*.location.conf;
+
+  location = /50x.html {
+   root                         /opt/nginx/html;
+  }
+ }
+
+ include                        ./sites/*.server.conf;
+}
