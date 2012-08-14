@@ -3,6 +3,7 @@ include_recipe 'rvm::system'
 rvm_ruby = node['rvm']['default_ruby']
 passenger_version = node['passenger_biola']['passenger']['version']
 passenger_prefix = node['passenger_biola']['passenger']['prefix']
+nginx_user = node['passenger_biola']['nginx']['user']
 
 passenger_root = "/usr/local/rvm/gems/#{rvm_ruby}/gems/passenger-#{passenger_version}"
 passenger_ruby = "/usr/local/rvm/wrappers/#{rvm_ruby}/ruby"
@@ -25,6 +26,13 @@ end
 rvm_gem 'passenger' do
   ruby_string rvm_ruby
   version passenger_version
+end
+
+directory '/var/log/nginx' do
+  user nginx_user
+  group 'root'
+  mode '0755'
+  action :create
 end
 
 rvm_shell 'install passenger_nginx_module' do
