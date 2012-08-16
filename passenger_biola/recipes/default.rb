@@ -40,7 +40,7 @@ rvm_shell 'install passenger_nginx_module' do
 
   code "passenger-install-nginx-module --auto --prefix=#{passenger_prefix} --auto-download"
 
-  notifies :restart, resources(:service => 'nginx')
+  notifies :reload, resources(:service => 'nginx')
 
   not_if "#{passenger_prefix}/sbin/nginx -V 2>&1 | grep passenger-#{passenger_version}"
 end
@@ -60,7 +60,7 @@ template "#{passenger_prefix}/conf/nginx.conf" do
   mode      '0644'
   variables node['passenger_biola']['nginx'].to_hash.merge 'passenger_root' => passenger_root, 'passenger_ruby' => passenger_ruby
 
-  notifies  :restart, resources(:service => 'nginx')
+  notifies  :reload, resources(:service => 'nginx')
 end
 
 directory "#{passenger_prefix}/conf/sites" do
