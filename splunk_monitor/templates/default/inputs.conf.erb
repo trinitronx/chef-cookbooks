@@ -1,0 +1,15 @@
+<% @splunk_monitors.sort.each do |monitor| -%>
+# Begin new monitor stanza
+#
+<% monitor.each_key do |monitor_name| -%>
+
+[monitor://<%= monitor[monitor_name]['location'] %>]
+disabled = false
+<%= "sourcetype = " + monitor[monitor_name]['sourcetype'] if monitor[monitor_name]['sourcetype'] %>
+<%= "index = " + monitor[monitor_name]['index'] if monitor[monitor_name]['index'] %>
+
+<% end -%>
+<% end -%>
+# End monitor stanza
+
+

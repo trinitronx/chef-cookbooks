@@ -1,0 +1,23 @@
+#default[:inspircd][:dir]       = "/etc/redis"
+#default[:inspircd][:data_dir]  = "/var/lib/redis"
+#default[:inspircd][:log_dir]   = "/var/log/redis"
+## one of: debug, verbose, notice, warning
+#default[:inspircd][:loglevel]  = "notice"
+#default[:inspircd][:user]      = "redis"
+#default[:inspircd][:port]      = 6379
+#default[:inspircd][:bind]      = "127.0.0.1"
+default[:inspircd][:description] = "My IRC Server"
+default[:inspircd][:network] = "Localnet"
+default[:inspircd][:dns_server] = "127.0.0.1"
+default[:inspircd][:log_type] = "* -USERINPUT -USEROUTPUT"
+default[:inspircd][:admin_name] = "Server Admin"
+default[:inspircd][:admin_nick] = "ServerAdmin"
+default[:inspircd][:admin_email] = "root@irc.local"
+default[:inspircd][:root_oper_password] = "12345"
+default[:inspircd][:binary_location] = "/usr/sbin/inspircd"
+default[:inspircd][:LD_LIBRARY_PATH] = "/usr/lib/inspircd"
+default[:inspircd][:motd_location] = "/etc/inspircd/inspircd.motd"
+default[:inspircd][:rules_location] = "/etc/inspircd/inspircd.rules"
+default[:inspircd][:conf_location] = "/etc/inspircd/inspircd.conf"
+default[:inspircd][:disabled_commands_stanza] = "<disabled commands=\"NICK MODE\" usermodes=\"\" chanmodes=\"\" fakenonexistant=\"yes\">"
+

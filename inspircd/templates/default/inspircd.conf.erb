@@ -1,0 +1,170 @@
+# Examples found in /usr/share/doc/inspircd/examples/
+
+<server name="<%= node[:fqdn] %>"
+        description="<%= node[:inspircd][:description] %>"
+        network="<%= node[:inspircd][:network] %>">
+
+<admin name="<%= node[:inspircd][:admin_name] %>"
+       nick="<%= node[:inspircd][:admin_nick] %>"
+       email="<%= node[:inspircd][:admin_email] %>">
+
+<% unless node[:inspircd][:ssl_port] -%>
+# Non-ssl IRC configuration in use
+<bind address="" port="6667" type="clients">
+<% else -%>
+# Because SSL port is specified, only SSL listening is enabled
+<module name="m_ssl_gnutls.so">
+
+<bind address="" port="<%= node[:inspircd][:ssl_port] %>" type="clients" ssl="gnutls">
+
+<gnutls certfile="<%= node[:inspircd][:ssl_cert_location] %>" keyfile="<%= node[:inspircd][:ssl_key_location] %>">
+
+# End SSL Options
+<% end -%>
+
+<power diepass="3456" restartpass="7890" pause="2">
+
+<connect allow="*"
+         timeout="60"
+         flood="20"
+         threshold="1"
+         pingfreq="120"
+         sendq="262144"
+         recvq="8192"
+         localmax="3"
+         globalmax="3">
+
+<class name="Shutdown"
+       commands="DIE RESTART REHASH LOADMODULE UNLOADMODULE RELOAD">
+<class name="ServerLink"
+       commands="CONNECT SQUIT RCONNECT MKPASSWD MKSHA256">
+<class name="BanControl"
+       commands="KILL GLINE KLINE ZLINE QLINE ELINE">
+<class name="OperChat"
+       commands="WALLOPS GLOBOPS SETIDLE SPYLIST SPYNAMES">
+<class name="HostCloak"
+       commands="SETHOST SETIDENT SETNAME CHGHOST CHGIDENT">
+
+<type name="NetAdmin"
+      classes="OperChat BanControl HostCloak Shutdown ServerLink">
+#<type name="GlobalOp"
+#      classes="OperChat BanControl HostCloak ServerLink"
+#      host="ircop.omega.org.za">
+#<type name="Helper"
+#      classes="HostCloak"
+#      host="helper.omega.org.za">
+#
+
+<% unless node[:inspircd][:ldap_binduserdn] -%>
+# Non-ldap configuration in use
+<oper name="root"
+      password="<%= node[:inspircd][:root_oper_password] %>"
+      host="*@localhost"
+      type="NetAdmin">
+<% else -%>
+# Because ldap bind user is specified, enabling ldapd modules
+<module name="m_ldapauth.so">
+
+<ldapauth baserdn="<%= node[:inspircd][:ldap_basedn] %>"
+          attribute="<%= node[:inspircd][:ldap_searchattribute] %>"
+          server="<%= node[:inspircd][:ldap_server] %>"
+          killreason="Access denied"
+          searchscope="subtree"
+          binddn="<%= node[:inspircd][:ldap_binduserdn] %>"
+          bindauth="<%= node[:inspircd][:ldap_bindpass] %>"
+          verbose="yes"
+          userfield="no">
+# See http://85.13.254.50/index.php/Modules/1.1/ldapauth 
+
+# Need to change this to actually reference ldap
+<oper name="root"
+      password="<%= node[:inspircd][:root_oper_password] %>"
+      host="*@localhost"
+      type="NetAdmin">
+
+<module name="m_ldapoper.so">
+<ldapoper baserdn="<%= node[:inspircd][:ldap_basedn_oper] %>"
+          server="<%= node[:inspircd][:ldap_server] %>"
+          searchscope="subtree"
+          binddn="<%= node[:inspircd][:ldap_binduserdn] %>"
+          bindauth="<%= node[:inspircd][:ldap_bindpass] %>">
+# See http://85.13.254.50/index.php/Modules/1.1/ldapoper 
+
+# End LDAP Options
+<% end -%>
+
+<files motd="<%= node[:inspircd][:motd_location] %>"
+       rules="<%= node[:inspircd][:rules_location] %>">
+
+<channels users="20"
+          opers="60">
+
+<dns server="<%= node[:inspircd][:dns_server] %>" timeout="5">
+
+<pid file="/var/run/inspircd.pid">
+
+<options prefixquit="Quit: "
+         noservices="no"
+         qaprefixes="no"
+         deprotectself="no"
+         deprotectothers="no"
+         flatlinks="no"
+         hideulines="no"
+         syntaxhints="no"
+         cyclehosts="yes"
+         ircumsgprefix="no"
+         announcets="yes"
+         disablehmac="no"
+         hostintopic="yes"
+         quietbursts="yes"
+         pingwarning="15"
+         allowhalfop="yes"
+         exemptchanops="">
+
+<security hidewhois=""
+          userstats="Pu"
+          customversion=""
+          hidesplits="no"
+          hidebans="no"
+          operspywhois="no"
+          hidemodes="eI"
+          maxtargets="20">
+
+<performance nouserdns="no"
+             maxwho="128"
+             softlimit="1024"
+             somaxconn="128"
+             netbuffersize="10240">
+
+# Normal logging is commented out here
+# as it is handled by the init script
+#<log method="file"
+#     type="* -USERINPUT -USEROUTPUT"
+#     level="default"
+#     target="/var/log/inspircd.log">
+
+<% if node[:inspircd][:chatlog_location] -%>
+# chatlog_location set -- chatlogging is enabled
+
+<module name="m_chatlog.so">
+
+<log method="file"
+     type="m_chatlog"
+     level="default"
+     target="<%= node[:inspircd][:chatlog_location] %>">
+<% else -%>c
+# No chatlog_location attribute set - chatlogging disabled
+<% end -%>
+
+<whowas groupsize="10"
+        maxgroups="100000"
+        maxkeep="3d">
+
+<timesync enable="no" master="no">
+
+<badnick nick="ChanServ" reason="Reserved For Services">
+<badnick nick="NickServ" reason="Reserved For Services">
+<badnick nick="OperServ" reason="Reserved For Services">
+<badnick nick="MemoServ" reason="Reserved For Services">
+
+<%= node[:inspircd][:disabled_commands_stanza] %>

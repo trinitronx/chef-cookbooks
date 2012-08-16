@@ -1,0 +1,7 @@
+override[:inspircd][:binary_location] = "/srv/inspircd/inspircd"
+override[:inspircd][:LD_LIBRARY_PATH] = "/srv/inspircd/lib"
+override[:inspircd][:inspircd_directory] = "/srv/inspircd"
+override[:inspircd][:motd_location] = "/srv/inspircd/conf/inspircd.motd"
+override[:inspircd][:rules_location] = "/srv/inspircd/conf/inspircd.rules"
+override[:inspircd][:conf_location] = "/srv/inspircd/conf/inspircd.conf"
+override[:inspircd][:start_option] = "start"
