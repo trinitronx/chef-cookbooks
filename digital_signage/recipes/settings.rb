@@ -190,8 +190,35 @@ execute "disable-software-update" do
   end
 end
 
-# TODO: Turn off wireless
+# Turn off wireless
+## Assumes wireless is always en1. If you need to get the device id then you'll need to run something like -- `networksetup -listallhardwareports` and find "Wi-Fi" for OS X 10.7 or "Airport" for OS X 10.6.
+execute "turn-off-wireless" do
+  command "networksetup -setairportpower en1 off"
+  only_if { `networksetup -getairportpower en1`.strip =~ /On$/ }
+end
 
-# TODO: Set VNC Access
+# Set VNC Access
+# See file:///System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart
+execute "turn-on-vnc-remote-access" do
+  command "sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -users digsig -privs -all -allowAccessFor -specifiedUsers -restart -agent -menu"
+  only_if { `launchctl list | grep "com.apple.Remote"`.split(" ").first.to_i > 0 } 
+  #TODO: Fix the assumption that if remote access is running then it's configured properly
+end
 
-# TODO: Set Dig Sig user to automatically login
+# Set Dig Sig user to automatically login
+execute "turn-on-autologin" do
+  command "defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser 'digsig'"
+  not_if { `defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser`.strip == "digsig"}
+end
+
+# Set background image to black
+cookbook_file "/Library/Desktop Pictures/Solid Colors/Solid Black.png" do
+  owner "root"
+  group "admin"
+  mode 0664
+end
+
+execute "set-desktop-background" do
+  command "osascript -e 'tell application \"Finder\" to set desktop picture to (POSIX file \"/Library/Desktop Pictures/Solid Colors/Solid White.png\")'"
+  not_if { File.exists? "/Library/Desktop Pictures/Solid Colors/Solid Black.png"}
+end
