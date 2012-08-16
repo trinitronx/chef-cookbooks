@@ -1,3 +1,0 @@
-[submodule "splunk"]
-	path = splunk
-	url = https://github.com/bestbuycom/splunk_cookbook
