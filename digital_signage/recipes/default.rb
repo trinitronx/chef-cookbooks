@@ -10,6 +10,8 @@
 include_recipe "digital_signage::settings"
 include_recipe "digital_signage::adobe_air"
 
+# TODO: Create digsig user and set password
+
 # Install the Digital Signage Client from node['digital_signage']['client']['url']
 remote_file "#{Chef::Config['file_cache_path']}/DigitalSignage.air" do
   source node['digital_signage']['client']['url'] # Note this downloads every time in order to run a checksum
@@ -64,11 +66,28 @@ cookbook_file "/Applications/stop_digital_signage.command" do
   mode 0755
 end
 
-# TODO: Add /Applications/start_digital_signage.command to Dig Sig's start up items
+# Add /Applications/start_digital_signage.command to Dig Sig's start up items
+# See http://hints.macworld.com/article.php?story=20111226075701552
+execute "add-digital-signage-startup-item" do
+  command "osascript -e 'tell application \"System Events\" to make login item at end with properties {path:\"/Applications/start_digital_signage.command\", hidden:true}'"
+  not_if { `osascript -e 'tell application "System Events" to get the name of every login item'`.strip == "start_digital_signage.command" }  
+end
 
 # This disables Adobe Air from auto updating
 cookbook_file "/Users/digsig/Library/Application Support/Adobe/Air/updateDisabled" do
   source "updateDisabled"
   owner "digsig"
   group "staff"
+end
+
+# TODO: Add items to dock
+# Example: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Safari.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+# followed by `killall Dock`
+
+# TODO: Test out `defaults write com.apple.dock single-app -bool true; killall Dock` -- see if this shows digital signage better
+
+# Hide the dock
+execute "hide-the-dock" do
+  command "osascript -e 'tell application \"System Events\" to set the autohide of the dock preferences to true'"
+  not_if { `defaults read /Users/digsig/Library/Preferences/com.apple.Dock autohide`.strip == "1" }
 end
