@@ -58,6 +58,7 @@ end
 execute "InstallInspircdFromCookbookPackage" do
 	command "tar -jxf " + Chef::Config[:file_cache_path] + "/inspircd_2.0.8.tar.bz2 --directory=" + node[:inspircd][:inspircd_directory]
 	creates node[:inspircd][:binary_location]
+	notifies :restart, "service[inspircd]"
 	end
 
 
