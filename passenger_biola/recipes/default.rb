@@ -10,6 +10,8 @@ passenger_ruby = "/usr/local/rvm/wrappers/#{rvm_ruby}/ruby"
 
 rvm_environment rvm_ruby
 
+package 'libcurl4-openssl-dev'
+
 template '/etc/init.d/nginx' do
   source    'nginx.init.d.erb'
   owner     'root'
