@@ -38,7 +38,9 @@ Same dependencies as the splunk::forwarder recipe:
 >          "thisistheshortlogname": {
 >            "location": "/var/log/fileordirectory",
 >            "index": "couldomitthis",
->            "sourcetype": "canalsobeomiited"
+>            "sourcetype": "", #optional
+>            "whitelist": "", #optional
+>            "blacklist": "" #optional
 >          }
 >        }
 >      ],
