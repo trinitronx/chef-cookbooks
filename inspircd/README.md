@@ -8,6 +8,7 @@ Requirements
 
 * Currently only tested on Ubuntu.
 * LDAP authentication options require the use of inspircd packaged with Ubuntu 12.10+, so this is backported for use on 12.04 with the ::default recipe
+* Depends on the Opscode logrotate cookbook (https://github.com/cookbooks/logrotate)
 
 Attributes
 ==========

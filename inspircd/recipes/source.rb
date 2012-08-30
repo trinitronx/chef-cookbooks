@@ -136,4 +136,15 @@ file node[:inspircd][:ssl_key_location] do
 
 end	
 
+# Setup logrotate
+include_recipe "logrotate::default"
+
+logrotate_app "inspircd" do
+  cookbook "logrotate"
+  path [ "/var/log/inspircd.log", "/var/log/inspircd_chat.log" ]
+  frequency "daily"
+  rotate 7
+  create "600 root adm"
+end
+
 
