@@ -57,13 +57,13 @@ end
 cookbook_file "/Applications/start_digital_signage.command" do
   owner "root"
   group "wheel"
-  mode 0755
+  mode '4755'
 end
 
 cookbook_file "/Applications/stop_digital_signage.command" do
   owner "root"
   group "wheel"
-  mode 0755
+  mode '4755'
 end
 
 # Add /Applications/start_digital_signage.command to Dig Sig's start up items

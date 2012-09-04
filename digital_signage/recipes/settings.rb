@@ -219,6 +219,7 @@ cookbook_file "/Library/Desktop Pictures/Solid Colors/Solid Black.png" do
 end
 
 execute "set-desktop-background" do
-  command "osascript -e 'tell application \"Finder\" to set desktop picture to (POSIX file \"/Library/Desktop Pictures/Solid Colors/Solid White.png\")'"
-  not_if { File.exists? "/Library/Desktop Pictures/Solid Colors/Solid Black.png"}
+  command "osascript -e 'tell application \"Finder\" to set desktop picture to (POSIX file \"/Library/Desktop Pictures/Solid Colors/Solid Black.png\")'"
+  only_if { File.exists? "/Library/Desktop Pictures/Solid Colors/Solid Black.png"}
+  #TODO: keep this from running every time
 end
