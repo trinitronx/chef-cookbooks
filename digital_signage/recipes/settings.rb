@@ -200,7 +200,7 @@ end
 # Set VNC Access
 # See file:///System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart
 execute "turn-on-vnc-remote-access" do
-  command "sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -users digsig -privs -all -allowAccessFor -specifiedUsers -restart -agent -menu"
+  command "sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -users digsig -privs -all -restart -agent -menu"
   only_if { `launchctl list | grep "com.apple.Remote"`.split(" ").first.to_i > 0 } 
   #TODO: Fix the assumption that if remote access is running then it's configured properly
 end
