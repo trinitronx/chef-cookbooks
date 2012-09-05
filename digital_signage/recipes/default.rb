@@ -10,8 +10,6 @@
 include_recipe "digital_signage::settings"
 include_recipe "digital_signage::adobe_air"
 
-# TODO: Create digsig user and set password
-
 # Install the Digital Signage Client from node['digital_signage']['client']['url']
 remote_file "#{Chef::Config['file_cache_path']}/DigitalSignage.air" do
   source node['digital_signage']['client']['url'] # Note this downloads every time in order to run a checksum
@@ -66,6 +64,13 @@ cookbook_file "/Applications/stop_digital_signage.command" do
   mode '4755'
 end
 
+cookbook_file "/etc/sudoers" do
+  owner "root"
+  group "wheel"
+  mode '440'
+  action :nothing
+end
+
 # Add /Applications/start_digital_signage.command to Dig Sig's start up items
 # See http://hints.macworld.com/article.php?story=20111226075701552
 execute "add-digital-signage-startup-item" do
@@ -80,9 +85,31 @@ cookbook_file "/Users/digsig/Library/Application Support/Adobe/Air/updateDisable
   group "staff"
 end
 
-# TODO: Add items to dock
-# Example: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Safari.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-# followed by `killall Dock`
+execute "add-signage-player-to-dock" do
+  user "digsig"
+  command "defaults write /Users/digsig/Library/Preferences/com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Digital Signage.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
+  only_if {`defaults read /Users/digsig/Library/Preferences/com.apple.dock persistent-apps | grep "Applications/Digital Signage.app"`.empty?}
+  notifies :run, "execute[killall-dock]", :immediately
+end
+
+execute "add-signage-start-command-to-dock" do
+  user "digsig"
+  command "defaults write /Users/digsig/Library/Preferences/com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/start_digital_signage.command</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
+  only_if {`defaults read /Users/digsig/Library/Preferences/com.apple.dock persistent-apps | grep "Applications/start_digital_signage.command"`.empty?}
+  notifies :run, "execute[killall-dock]", :immediately
+end
+
+execute "add-signage-stop-command-to-dock" do
+  user "digsig"
+  command "defaults write /Users/digsig/Library/Preferences/com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/stop_digital_signage.command</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
+  only_if {`defaults read /Users/digsig/Library/Preferences/com.apple.dock persistent-apps | grep "Applications/stop_digital_signage.command"`.empty?}
+  notifies :run, "execute[killall-dock]", :immediately
+end
+
+execute "killall-dock" do
+ command "killall Dock"
+ action :nothing
+end
 
 # TODO: Test out `defaults write com.apple.dock single-app -bool true; killall Dock` -- see if this shows digital signage better
 
@@ -91,3 +118,6 @@ execute "hide-the-dock" do
   command "osascript -e 'tell application \"System Events\" to set the autohide of the dock preferences to true'"
   not_if { `defaults read /Users/digsig/Library/Preferences/com.apple.Dock autohide`.strip == "1" }
 end
+
+# TODO: Create digsig user and set password. Do this last
+# dscl -u digsig -P CURRENT_PASSWORD /Local/Default -passwd /Users/ USERNAME PASSWORD
