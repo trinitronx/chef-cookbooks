@@ -20,3 +20,4 @@
 
 # Digital Signage Client
 default['digital_signage']['client']['url'] = nil # Set with a role or node attribute
+default['digital_signage']['client']['feed_url'] = "" # Set with a role or node attribute
