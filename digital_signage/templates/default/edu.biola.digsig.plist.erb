@@ -6,8 +6,13 @@
   <string>edu.biola.digsig</string>
   <key>KeepAlive</key>
   <true/>
-  <key>Program</key>
-  <string>/Applications/Digital Signage.app/Contents/MacOS/Digital Signage</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Applications/Digital Signage.app/Contents/MacOS/Digital Signage</string>
+    <% unless node['digital_signage']['client']['feed_url'].empty? %>
+    <string><%= node['digital_signage']['client']['feed_url'] %></string>
+    <% end %>
+  </array>
   <key>UserName</key>
   <string>digsig</string>
 </dict>
