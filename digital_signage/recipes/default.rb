@@ -119,5 +119,14 @@ execute "hide-the-dock" do
   not_if { `defaults read /Users/digsig/Library/Preferences/com.apple.Dock autohide`.strip == "1" }
 end
 
+if (node['digital_signage']['client']['installed_version'].nil? || node['digital_signage']['client']['installed_version'].length == 0)
+  ruby_block "save-digital-signage-player-version" do
+    block do
+      node['digital_signage']['client']['installed_version'] = `defaults read "/Applications/Digital Signage.app/Contents/Info" CFBundleShortVersionString`.strip
+    end
+    action :create
+    only_if { File.exists? "/Applications/Digital Signage.app" }
+  end
+end
 # TODO: Create digsig user and set password. Do this last
 # dscl -u digsig -P CURRENT_PASSWORD /Local/Default -passwd /Users/ USERNAME PASSWORD
