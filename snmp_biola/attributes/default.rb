@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: snmp 
+# Cookbook Name:: snmp_biola 
 # Attributes:: default 
 #
 # Copyright 2010, Eric G. Wolfe 

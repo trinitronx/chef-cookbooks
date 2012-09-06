@@ -1,3 +1,12 @@
+METADESCRIPTION
+===============
+This is Biola University's fork of the snmp cookbook from http://github.com/atomic-penguin/cookbook-snmp 
+
+Primary changes:
+* Correcting snmp package installation on Debian/Ubuntu (installing smnpd package instead)
+* Removing perl dependency
+
+
 DESCRIPTION
 ===========
 

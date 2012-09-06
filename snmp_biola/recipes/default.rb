@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: snmp
-# Recipe:: extendbind 
+# Cookbook Name:: snmp_biola
+# Recipe:: default
 #
-# Copyright 2012, Eric G. Wolfe
+# Copyright 2010, Eric G. Wolfe
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,20 +17,27 @@
 # limitations under the License.
 #
 
-node.set['snmp']['is_dnsserver'] = true
+node['snmp']['packages'].each do |snmppkg|
+  package snmppkg
+end
 
-if node['snmp']['is_dnsserver']
-  include_recipe "perl"
-  %w{ version Getopt::Declare }.each do |pm|
-    cpan_module pm
-  end
-
-  cookbook_file "/usr/local/bin/snmp_rndc_stats.pl" do
-    mode 0755
-    owner "root"
-    group "root"
-    source node['snmp']['rndc_stats_script']
+if not node['snmp']['cookbook_files'].empty?
+  node['snmp']['cookbook_files'].each do |snmpfile|
+    cookbook_file snmpfile do
+      mode 0644
+      owner "root"
+      group "root"
+    end
   end
 end
 
-include_recipe "snmp::default"
+service node['snmp']['service'] do
+  action [ :start, :enable ]
+end
+
+template "/etc/snmp/snmpd.conf" do
+  mode 0644
+  owner "root"
+  group "root"
+  notifies :restart, resources(:service => node['snmp']['service'])
+end
