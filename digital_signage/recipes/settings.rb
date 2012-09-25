@@ -172,12 +172,14 @@ execute "install-audio-switcher" do
   end
 end
  
-## 2. Select HDMI
-execute "select-audio-output" do
-  path [node['digital_signage']['audio_switcher']['install_path']]
-  command "SwitchAudioSource -s #{node['digital_signage']['audio_switcher']['output']}"
-  not_if do
-    `SwitchAudioSource -c`.strip == node['digital_signage']['audio_switcher']['output']
+## 2. Select HDMI but only if HDMI is a valid option
+if `SwitchAudioSource -a | grep HDMI`.length > 0
+  execute "select-audio-output" do
+    path [node['digital_signage']['audio_switcher']['install_path']]
+    command "SwitchAudioSource -s #{node['digital_signage']['audio_switcher']['output']}"
+    not_if do
+      `SwitchAudioSource -c`.strip == node['digital_signage']['audio_switcher']['output']
+    end
   end
 end
 
