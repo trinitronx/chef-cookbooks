@@ -47,3 +47,8 @@ Same dependencies as the splunk::forwarder recipe:
 > ...
 
 * Finally, apply the splunk_monitor::default recipe to the role/node.
+
+# Additional Recipes #
+
+* The [splunk\_monitor::biolasecuritymonitoring] recipe will install the "TA-biola\_security\_monitoring" technology add-on into splunk. See the [technology add-on's homepage](https://github.com/biola/ta-biola_security_monitoring) for more information.
+
