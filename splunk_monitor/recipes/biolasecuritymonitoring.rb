@@ -21,9 +21,9 @@ ta_url = "https://github.com/biola/ta-biola_security_monitoring/tarball/v1.0"
 ta_filename = "TA-biola_security_monitoring-v1.0.tar.gz"
 ta_checksum = "699a2e0c8dc96e2c32726a14cf8edc1999f04564ce1d743bbd24aa0082557935"
 
-if File.exists?("#{node['splunk']['forwarder_home']}/bin/splunk") do
+if File.exists?("#{node['splunk']['forwarder_home']}/bin/splunk") 
 	splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
-	if not File.directory?("#{node['splunk']['forwarder_home']}/etc/apps/TA-biola_security_monitoring") do
+	if not File.directory?("#{node['splunk']['forwarder_home']}/etc/apps/TA-biola_security_monitoring") 
 		remote_file /opt/ + ta_filename do 
 			source ta_url
 			checksum ta_checksum
@@ -32,17 +32,17 @@ if File.exists?("#{node['splunk']['forwarder_home']}/bin/splunk") do
 			command splunk_cmd + "install app /opt/" + ta_filename + " -auth " + node['splunk']['auth']
 		end
 	end
-else
-	if File.exists?("#{node['splunk']['server_home']}/bin/splunk") do
+else 
+	if File.exists?("#{node['splunk']['server_home']}/bin/splunk") 
 		splunk_cmd = "#{node['splunk']['server_home']}/bin/splunk"
-		if not File.directory?("#{node['splunk']['server_home']}/etc/apps/TA-biola_security_monitoring") do
-		remote_file /opt/ + ta_filename do 
-			source ta_url
-			checksum ta_checksum
-		end
+		if not File.directory?("#{node['splunk']['server_home']}/etc/apps/TA-biola_security_monitoring") 
+			remote_file /opt/ + ta_filename do 
+				source ta_url
+				checksum ta_checksum
+			end
 		execute "installsecta" do
 			command splunk_cmd + "install app /opt/" + ta_filename + " -auth " + node['splunk']['auth']
 		end
 	end
 end
-
+end
