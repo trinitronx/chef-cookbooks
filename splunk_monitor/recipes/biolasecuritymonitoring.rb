@@ -24,7 +24,7 @@ ta_checksum = "699a2e0c8dc96e2c32726a14cf8edc1999f04564ce1d743bbd24aa0082557935"
 if File.exists?("#{node['splunk']['forwarder_home']}/bin/splunk") 
 	splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
 	if not File.directory?("#{node['splunk']['forwarder_home']}/etc/apps/TA-biola_security_monitoring") 
-		remote_file /opt/ + ta_filename do 
+		remote_file "/opt/" + ta_filename do 
 			source ta_url
 			checksum ta_checksum
 		end
@@ -36,7 +36,7 @@ else
 	if File.exists?("#{node['splunk']['server_home']}/bin/splunk") 
 		splunk_cmd = "#{node['splunk']['server_home']}/bin/splunk"
 		if not File.directory?("#{node['splunk']['server_home']}/etc/apps/TA-biola_security_monitoring") 
-			remote_file /opt/ + ta_filename do 
+			remote_file "/opt/" + ta_filename do 
 				source ta_url
 				checksum ta_checksum
 			end
