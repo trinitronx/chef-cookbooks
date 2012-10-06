@@ -29,7 +29,7 @@ if File.exists?("#{node['splunk']['forwarder_home']}/bin/splunk")
 			checksum ta_checksum
 		end
 		execute "installsecta" do
-			command splunk_cmd + "install app /opt/" + ta_filename + " -auth " + node['splunk']['auth']
+			command splunk_cmd + " install app /opt/" + ta_filename + " -auth " + node['splunk']['auth']
 		end
 	end
 else 
@@ -41,7 +41,7 @@ else
 				checksum ta_checksum
 			end
 		execute "installsecta" do
-			command splunk_cmd + "install app /opt/" + ta_filename + " -auth " + node['splunk']['auth']
+			command splunk_cmd + " install app /opt/" + ta_filename + " -auth " + node['splunk']['auth']
 		end
 	end
 end
