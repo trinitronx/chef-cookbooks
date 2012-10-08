@@ -20,15 +20,30 @@
 ta_url = "https://github.com/biola/ta-biola_security_monitoring/tarball/v1.0"
 ta_filename = "TA-biola_security_monitoring-v1.0.tar.gz"
 ta_checksum = "699a2e0c8dc96e2c32726a14cf8edc1999f04564ce1d743bbd24aa0082557935"
+# When grabbing tarballs directly from github, repo's contents are tar'd up inside 
+# an additional directory with a user prefix and commit suffix. This needs to be stripped for
+# the splunk install to work correctly; specify the directory name here so that Chef
+# will do it automatically.
+ta_tardirectory = "biola-ta-biola_security_monitoring-694f88f"
+
+
 
 if File.exists?("#{node['splunk']['forwarder_home']}/bin/splunk") 
 	splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
 	if not File.directory?("#{node['splunk']['forwarder_home']}/etc/apps/TA-biola_security_monitoring") 
-		remote_file "/opt/" + ta_filename do 
+		remote_file "/tmp/" + ta_filename do 
 			source ta_url
 			checksum ta_checksum
 		end
-		execute "installsecta" do
+		execute "extract_ta_download" do
+			command "tar -zxf /tmp/" + ta_filename
+			cwd "/tmp"
+		end
+		execute "repack_ta_download" do
+			command "tar -zcf /opt/" + ta_filename + " ./*" 
+			cwd "/tmp/" + ta_tardirectory
+		end
+		execute "install_ta" do
 			command splunk_cmd + " install app /opt/" + ta_filename + " -auth " + node['splunk']['auth']
 		end
 	end
@@ -36,11 +51,19 @@ else
 	if File.exists?("#{node['splunk']['server_home']}/bin/splunk") 
 		splunk_cmd = "#{node['splunk']['server_home']}/bin/splunk"
 		if not File.directory?("#{node['splunk']['server_home']}/etc/apps/TA-biola_security_monitoring") 
-			remote_file "/opt/" + ta_filename do 
+			remote_file "/tmp/" + ta_filename do 
 				source ta_url
 				checksum ta_checksum
 			end
-		execute "installsecta" do
+		execute "extract_ta_download" do
+			command "tar -zxf /tmp/" + ta_filename
+			cwd "/tmp"
+		end
+		execute "repack_ta_download" do
+			command "tar -zcf /opt/" + ta_filename + " ./*" 
+			cwd "/tmp/" + ta_tardirectory
+		end
+		execute "install_ta" do
 			command splunk_cmd + " install app /opt/" + ta_filename + " -auth " + node['splunk']['auth']
 		end
 	end
