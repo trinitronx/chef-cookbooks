@@ -24,7 +24,9 @@ ta_checksum = "699a2e0c8dc96e2c32726a14cf8edc1999f04564ce1d743bbd24aa0082557935"
 # an additional directory with a user prefix and commit suffix. This needs to be stripped for
 # the splunk install to work correctly; specify the directory name here so that Chef
 # will do it automatically.
-ta_tardirectory = "biola-ta-biola_security_monitoring-694f88f"
+#
+# This ta_tardirectory corresponds to the v1.0 version (git tag)
+ta_tardirectory = "biola-ta-biola_security_monitoring-60b1f9c"
 
 
 
