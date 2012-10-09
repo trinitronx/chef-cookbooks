@@ -19,7 +19,8 @@
 
 ta_url = "https://github.com/biola/ta-biola_security_monitoring/tarball/v1.0"
 ta_filename = "TA-biola_security_monitoring-v1.0.tar.gz"
-ta_checksum = "699a2e0c8dc96e2c32726a14cf8edc1999f04564ce1d743bbd24aa0082557935"
+# SHA256 checksum
+ta_checksum = "a90c7d131e224fd4f52896e447f16364b929b92208fbc9e0b705836471e4af5b"
 # When grabbing tarballs directly from github, repo's contents are tar'd up inside 
 # an additional directory with a user prefix and commit suffix. This needs to be stripped for
 # the splunk install to work correctly; specify the directory name here so that Chef
