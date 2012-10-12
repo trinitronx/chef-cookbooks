@@ -3,6 +3,8 @@ Description
 
 This cookbook extends the splunk cookbook to add variables for controlling which data sources are monitored and forwarded. It is dependent on the splunk cookbook.
 
+One default change of note to splunk behavior: to better distinguish servers, the hostname of each system will be changed to the Chef node name (likely the FQDN of the node). By extension, this means that the server's $SPLUNKHOME\etc\system\inputs.conf is managed by this cookbook.
+
 Requirements
 ============
 
