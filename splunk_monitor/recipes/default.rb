@@ -19,25 +19,29 @@
 
 include_recipe "splunk::forwarder"
 
-# Update splunk default hostname in system inputs.conf
 
-template "/opt/splunkforwarder/etc/system/local/inputs.conf" do
-	source "system-inputs.conf.erb"
-	owner "root"
-	group "root"
-	mode "0600"
-	notifies :restart, resources(:service => "splunk")
+unless node[:splunk][:disable_fqdn_hostname]
+
+	# Update splunk default hostname in system inputs.conf
+
+	template "/opt/splunkforwarder/etc/system/local/inputs.conf" do
+		source "system-inputs.conf.erb"
+		owner "root"
+		group "root"
+		mode "0600"
+		notifies :restart, resources(:service => "splunk")
+	end
+
+	# Update splunk servername just before splunk is to be restarted
+
+	splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
+	execute "update_splunk_servername" do
+		command splunk_cmd + " set servername $(hostname -f) -auth " + node['splunk']['auth'] 
+		subscribes :run, resources(:template => "/opt/splunkforwarder/etc/system/local/inputs.conf"), :immediately
+	        action :nothing
+	end
+
 end
-
-# Update splunk servername just before splunk is to be restarted
-
-splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
-execute "update_splunk_servername" do
-	command splunk_cmd + " set servername $(hostname -f) -auth " + node['splunk']['auth'] 
-	subscribes :run, resources(:template => "/opt/splunkforwarder/etc/system/local/inputs.conf"), :immediately
-        action :nothing
-end
-
 
 if node[:splunk][:monitors] 
 
