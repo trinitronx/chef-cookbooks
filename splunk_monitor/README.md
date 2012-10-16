@@ -3,8 +3,6 @@ Description
 
 This cookbook extends the splunk cookbook to add variables for controlling which data sources are monitored and forwarded. It is dependent on the splunk cookbook.
 
-One default change of note to splunk behavior: to better distinguish servers, the Splunk reported hostname of each system will be by default changed to the Chef node name (likely the FQDN of the node). By extension, this means that the server's $SPLUNKHOME\etc\system\inputs.conf is managed by this cookbook.
-
 Requirements
 ============
 
@@ -15,6 +13,8 @@ Attributes
 
 \[splunk\]\[monitors\] : The default recipe will look for this attribute as an array, with each index formatted as a hash. Each hashes key serves as a short name for a monitor to configure, and its value should be a hash of attributes for the monitor. In these "sub-hashes", a 'location' hash (specificying the file or directory to be monitored) is required; an 'index' and/or 'sourcetype' hash[s] are optional.
 
+\[splunk\]\[hostname\_source\] : Optional attribute to override the host field forwarded by splunk. Set the atribute to the value 'node\_name' to use the node's node name (by default the node's fqdn) as the default host field in Splunk forwarded events.
+
 Usage
 =====
 
@@ -22,18 +22,17 @@ Same dependencies as the splunk::forwarder recipe:
 
 * One or more splunk servers (that will be receiving the data) need to have the "splunk-server" role attached to them (the role can be empty; simply used by the forwarders to programatically find splunk servers)
 * Attributes for the splunk cookbook need to be defined; minimally:
->     \[splunk\]\[server\_config\_folder\] (e.g. prod)
->     \[splunk\]\[forwarder\_config\_folder\] (e.g. prod)
->     \[splunk\]\[auth\] (e.g. admin:securepassword)
->     \[splunk\]\[forwarder\_role\] (e.g. whatever template folder name)
->     \[splunk\]\[indexer\_name\] (e.g. name for the indexer splunk.biola.edu)
+>     [splunk][server_config_folder] (e.g. prod)
+>     [splunk][forwarder_config_folder] (e.g. prod)
+>     [splunk][auth] (e.g. admin:securepassword)
+>     [splunk][forwarder_role] (e.g. whatever template folder name)
+>     [splunk][indexer_name] (e.g. name for the indexer splunk.biola.edu)
 
 * Add a 'monitors' array to node[splunk]. Populate it with 1 or more values. The following is an example from a knife role edit:
-
->  "override\_attributes": {
+>  "override_attributes": {
 >    "splunk": {
->      "server\_config\_folder": "prod",
->      "forwarder\_config\_folder": "prod",
+>      "server_config_folder": "prod",
+>      "forwarder_config_folder": "prod",
 >      "monitors": [
 >        {
 >          "thisistheshortlogname": {
@@ -48,8 +47,6 @@ Same dependencies as the splunk::forwarder recipe:
 > ...
 
 * Finally, apply the splunk\_monitor::default recipe to the role/node.
-
-* If you optionally wish to disable the cookbook's behavior of setting the Splunk default hostname to the node's FQDN, set the \[splunk\]\[disable\_fqdn\_hostname\] attribute to "true".
 
 # Additional Recipes #
 
