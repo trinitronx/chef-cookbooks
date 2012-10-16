@@ -26,11 +26,24 @@ ta_checksum = "f7b7d6bbe8457f3cf500349649ade7240dc51b677ada36cf725a99d0ab02f71b"
 # the splunk install to work correctly; specify the directory name here so that Chef
 # will do it automatically.
 #
-# This ta_tardirectory corresponds to the v1.0 version (git tag)
 ta_tardirectory = "biola-ta-biola_security_monitoring-e2471b1"
 
 
+# Setup pre-req packages
+case node['platform']
+when "centos","redhat"
+  package "yum-security" do
+    not_if "test -f /usr/lib/yum-plugins/security.py"	
+    action :install
+  end
+when "ubuntu"
+  package "update-notifier-common" do
+    not_if "test -f /usr/lib/update-notifier/apt-check"	
+    action :install
+  end
+end
 
+# Deploy app if it doesn't appear to already be installed
 if File.exists?("#{node['splunk']['forwarder_home']}/bin/splunk") 
 	splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
 	if not File.directory?("#{node['splunk']['forwarder_home']}/etc/apps/TA-biola_security_monitoring") 
