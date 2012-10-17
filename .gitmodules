@@ -1,3 +1,3 @@
 [submodule "logrotate"]
 	path = logrotate
-	url = git://github.com/opscode-cookbooks/logrotate.git
+	url = git://github.com/jschneiderhan/logrotate.git 
