@@ -3,6 +3,9 @@ Description
 
 This cookbook extends the splunk cookbook to add variables for controlling which data sources are monitored and forwarded. It is dependent on the splunk cookbook.
 
+Notes:
+* Splunk universal forwarder package installation creates a "splunk" user with a uid incremented by one above the highest existing uid. If you are managing uid's with another system (e.g. a chef-user's cookbook), this can conflict with existing or future uid's.  Accordingly, this cookbook will systematically delete the "splunk" user each time it is run, and is hardcoded to run the Splunk Universal Forwarder as root.
+
 Requirements
 ============
 

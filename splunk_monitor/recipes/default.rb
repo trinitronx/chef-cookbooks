@@ -19,6 +19,11 @@
 
 include_recipe "splunk::forwarder"
 
+# Splunk forwarder package installation will generate a new user
+user "splunk" do
+  action :remove
+  ignore_failure true
+end
 
 if node[:splunk][:hostname_source] == "node_name"
 	splunk_hostname = node.name
@@ -51,8 +56,8 @@ if node[:splunk][:monitors]
 
 
 	directory "/opt/splunkforwarder/etc/apps/search/local" do
-	  owner "splunk"
-	  group "splunk"
+	  owner "root"
+	  group "root"
 	  action :create
 	end
 
