@@ -7,3 +7,30 @@
 [submodule "chef_handler"]
 	path = chef_handler
 	url = git://github.com/opscode-cookbooks/chef_handler.git
+[submodule "java"]
+	path = java
+	url = git://github.com/opscode-cookbooks/java.git
+[submodule "daemontools"]
+	path = daemontools
+	url = git://github.com/opscode-cookbooks/daemontools.git
+[submodule "couchdb"]
+	path = couchdb
+	url = git://github.com/opscode-cookbooks/couchdb.git
+[submodule "zlib"]
+	path = zlib
+	url = git://github.com/opscode-cookbooks/zlib.git
+[submodule "xml"]
+	path = xml
+	url = git://github.com/opscode-cookbooks/xml.git
+[submodule "gecode"]
+	path = gecode
+	url = git://github.com/opscode-cookbooks/gecode.git
+[submodule "ucspi-tcp"]
+	path = ucspi-tcp
+	url = git://github.com/opscode-cookbooks/ucspi-tcp.git
+[submodule "erlang"]
+	path = erlang
+	url = git://github.com/opscode-cookbooks/erlang.git
+[submodule "chef-server"]
+	path = chef-server
+	url = git://github.com/opscode-cookbooks/chef-server.git
