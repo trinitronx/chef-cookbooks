@@ -225,3 +225,12 @@ execute "set-desktop-background" do
   only_if {File.exists? "/Library/Desktop Pictures/Solid Colors/Solid Black.png"}
   #TODO: keep this from running every time
 end
+
+# Turn off the "unexpectedly quit" dialog boxes
+execute "turn-of-crash-reporter-dialog" do
+  user "digsig"
+  command "defaults write com.apple.CrashReporter DialogType none"
+  not_if do
+    `defaults read com.apple.CrashReporter DialogType`.strip == "none"
+  end
+end
