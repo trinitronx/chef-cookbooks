@@ -34,3 +34,6 @@
 [submodule "chef-server"]
 	path = chef-server
 	url = git://github.com/opscode-cookbooks/chef-server.git
+[submodule "chef-client"]
+	path = chef-client
+	url = git://github.com/opscode-cookbooks/chef-client.git
