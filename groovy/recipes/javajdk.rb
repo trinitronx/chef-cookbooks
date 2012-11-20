@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: groovy 
-# Recipe:: default
+# Recipe:: javajdk 
 #
 # Copyright 2012, Biola University 
 #
@@ -18,21 +18,8 @@
 #
 
 
-#Install git to support code management
-package "git" do
-	action :install
-end
-
-# Install groovy from upstream PPA
-apt_repository "groovy" do
-	uri "http://ppa.launchpad.net/groovy-dev/groovy/ubuntu"
-	components ["main"]
-	distribution node['lsb']['codename']
-	key "53D38EDBBF34743E0CDBD834E354FBD902A9EC29"
-	keyserver "keyserver.ubuntu.com"
-end
-
-package "groovy-2.0.5" do
+#Install the OpenJDK JDK
+package "openjdk-6-jdk" do
 	action :install
 end
 
