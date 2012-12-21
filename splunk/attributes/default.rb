@@ -56,7 +56,7 @@ default['splunk']['forwarder_build']              = "123586"
 
 # Unix app version number 
 default['splunk']['unix_app_file']                = "unix.tar.gz"
-default['splunk']['unix_app_version']             = "4.5"
+default['splunk']['unix_app_version']             = "4.6"
 
 # PDF Server version number
 default['splunk']['pdf_server_file']              = "pdfserver.tar.gz"
