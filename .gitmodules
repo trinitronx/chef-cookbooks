@@ -37,3 +37,6 @@
 [submodule "chef-client"]
 	path = chef-client
 	url = git://github.com/opscode-cookbooks/chef-client.git
+[submodule "smbfs"]
+	path = smbfs
+	url = https://github.com/realityforge/chef-smbfs
