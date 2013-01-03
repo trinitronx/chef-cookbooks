@@ -1,0 +1,3 @@
+# Setting all RALUS files in this folder to be ignored, so proprietary agents are not added to public dvcs #
+RALUS*
+ralus*
