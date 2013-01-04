@@ -19,15 +19,16 @@
 
 include_recipe "nfs::default"
 
-# First, check attributes for mounts to remove
-if node['nfs']['mounts_to_remove']  != nil 
-  node['nfs']['mounts_to_remove'].each_pair do |path,config| 
-    mount path.to_s do
-      action [:umount, :disable]
-      ignore_failure true
-    end    
-  end
-end
+# TODO fix the ability to programatically remove nfs mounts
+## First, check attributes for mounts to remove
+#if node['nfs']['mounts_to_remove']  != nil 
+#  node['nfs']['mounts_to_remove'].each_pair do |path,config| 
+#    mount path.to_s do
+#      action [:umount, :disable]
+#      ignore_failure true
+#    end    
+#  end
+#end
 
 
 # Read the attributes for the node's specified mount points and create the appropriate directory
