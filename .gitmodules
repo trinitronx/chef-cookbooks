@@ -40,3 +40,9 @@
 [submodule "smbfs"]
 	path = smbfs
 	url = https://github.com/realityforge/chef-smbfs
+[submodule "line"]
+	path = line
+	url = https://github.com/someara/line-cookbook
+[submodule "nfs"]
+	path = nfs
+	url = git://github.com/atomic-penguin/cookbook-nfs.git
