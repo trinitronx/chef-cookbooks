@@ -46,3 +46,6 @@
 [submodule "nfs"]
 	path = nfs
 	url = git://github.com/atomic-penguin/cookbook-nfs.git
+[submodule "htpasswd"]
+	path = htpasswd
+	url = git://github.com/Youscribe/htpasswd-cookbook.git
