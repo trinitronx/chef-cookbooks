@@ -49,3 +49,6 @@
 [submodule "htpasswd"]
 	path = htpasswd
 	url = git://github.com/Youscribe/htpasswd-cookbook.git
+[submodule "postfix"]
+	path = postfix
+	url = git://github.com/opscode-cookbooks/postfix.git

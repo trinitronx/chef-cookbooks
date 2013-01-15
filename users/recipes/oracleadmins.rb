@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: users
-# Recipe:: beoper 
+# Recipe:: oracleadmins 
 #
 # Copyright 2013, Biola University
 #
@@ -20,7 +20,8 @@
 
 chef_gem "ruby-shadow"
 
-users_manage "beoper" do
-  group_id 2304
+
+users_manage "oracleadmins" do
+  group_id 2305
   action [ :remove, :create ]
 end
