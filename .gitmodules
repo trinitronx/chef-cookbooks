@@ -52,3 +52,6 @@
 [submodule "postfix"]
 	path = postfix
 	url = git://github.com/opscode-cookbooks/postfix.git
+[submodule "rsyslog"]
+	path = rsyslog
+	url = git://github.com/opscode-cookbooks/rsyslog.git
