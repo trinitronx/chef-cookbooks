@@ -1,0 +1,9 @@
+<% @splunk_props.each_with_index do |parameters, index| -%>
+# Begin new prop stanza
+#
+<% parameters.each_key do |prop_name| -%>
+[<%= parameters.keys[0] %>]
+TRANSFORMS-<%= parameters[prop_name]['class'] %>=<%=  parameters[prop_name]['transforms_stanza'] %>
+
+<% end -%>
+<% end -%>

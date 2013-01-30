@@ -1,0 +1,11 @@
+<% @splunk_transforms.each_with_index do |parameters, index| -%>
+# Begin new transform stanza
+#
+<% parameters.each_key do |transform_name| -%>
+[<%= parameters.keys[0] %>]
+<%= "REGEX = " + parameters[transform_name]['regex'] if parameters[transform_name]['regex'] %>
+<%= "FORMAT = " + parameters[transform_name]['format'] if parameters[transform_name]['format'] %>
+<%= "DEST_KEY = " + parameters[transform_name]['dest_key'] if parameters[transform_name]['dest_key'] %>
+
+<% end -%>
+<% end -%>

@@ -53,16 +53,11 @@ end
 
 
 if node[:splunk][:monitors] 
-
-
 	directory "/opt/splunkforwarder/etc/apps/search/local" do
 	  owner "root"
 	  group "root"
 	  action :create
 	end
-
-
-
 	template "/opt/splunkforwarder/etc/apps/search/local/inputs.conf" do
 		source "inputs.conf.erb"
 		owner "root"
@@ -72,5 +67,33 @@ if node[:splunk][:monitors]
 			:splunk_monitors => node[:splunk][:monitors]
 		})
 		notifies :restart, resources(:service => "splunk")
+	end
+	# Now check and apply transforms as well
+	if node[:splunk][:transforms]
+		directory "/opt/splunkforwarder/etc/system/local" do
+		  owner "root"
+		  group "root"
+		  action :create
+		end
+		template "/opt/splunkforwarder/etc/system/local/transforms.conf" do
+			source "system-transforms.conf.erb"
+			owner "root"
+			group "root"
+			mode "0600"
+			variables ({
+				:splunk_transforms => node[:splunk][:transforms]
+			})
+			notifies :restart, resources(:service => "splunk")
+		end
+		template "/opt/splunkforwarder/etc/system/local/props.conf" do
+			source "system-props.conf.erb"
+			owner "root"
+			group "root"
+			mode "0600"
+			variables ({
+				:splunk_props => node[:splunk][:props]
+			})
+			notifies :restart, resources(:service => "splunk")
+		end
 	end
 end
