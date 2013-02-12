@@ -1,0 +1,6 @@
+maintainer       'Biola'
+maintainer_email 'adam.crownoble@biola.edu'
+description      'Copies SSL certificates from an encrypted data bag to the server'
+version          '0.1.0'
+recipe           'ssl_certs_biola', 'Copies SSL certs from an encrypted data bag'
+supports         'ubuntu'
