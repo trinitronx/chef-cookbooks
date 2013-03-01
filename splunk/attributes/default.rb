@@ -51,8 +51,8 @@ default['splunk']['server_version']               = "4.3.2"
 default['splunk']['server_build']                 = "123586"
 #Forwarder
 default['splunk']['forwarder_root']               = "http://download.splunk.com/releases"
-default['splunk']['forwarder_version']            = "4.3.2"
-default['splunk']['forwarder_build']              = "123586"
+default['splunk']['forwarder_version']            = "5.0.2"
+default['splunk']['forwarder_build']              = "149561"
 
 # Unix app version number 
 default['splunk']['unix_app_file']                = "unix.tar.gz"
