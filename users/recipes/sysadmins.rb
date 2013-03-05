@@ -26,6 +26,8 @@ chef_gem "ruby-shadow"
 case node['platform']
 when 'ubuntu', 'debian'
   package "bash-completion"
+  package "vim"
+  package "nano"
 end
 
 users_manage "sysadmin" do
