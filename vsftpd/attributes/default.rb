@@ -29,8 +29,6 @@ default['vsftpd']['write_enable'] = "YES"
 default['vsftpd']['local_umask'] = "022"
 # Path to the list of users allowed to use FTP
 default['vsftpd']['userlist_file'] = "/etc/vsftpd.user_list"
-# Path to the directory to chroot to by default
-default['vsftpd']['local_root'] = "/srv/ftp"
 # The group to pull a list of allowed users from
 # The default recipe will search the "users" databag for any user that has the following group specified
 default['vsftpd']['userlist_group'] = "netopsftp"

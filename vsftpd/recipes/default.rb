@@ -28,14 +28,6 @@ service "vsftpd" do
   action [ :enable, :start ]
 end
 
-# Create an upload directory with write permissions
-directory "#{node['vsftpd']['anon_root']}/upload" do
-  user "root"
-  group "ftp"
-  mode '0777'
-  action :create
-end
-
 # Collect a list of users that are allowed to log in
 users = []
 
@@ -65,8 +57,7 @@ template node['vsftpd']['conf_file'] do
     :local_enable => node['vsftpd']['local_enable'],
     :write_enable => node['vsftpd']['write_enable'],
     :local_umask => node['vsftpd']['local_umask'],
-    :userlist_file => node['vsftpd']['userlist_file'],
-    :local_root => node['vsftpd']['local_root']
+    :userlist_file => node['vsftpd']['userlist_file']
   )
   notifies :restart, resources(:service => "vsftpd")
 end
