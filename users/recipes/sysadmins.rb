@@ -28,6 +28,9 @@ when 'ubuntu', 'debian'
   package "bash-completion"
   package "vim"
   package "nano"
+  package "screen"
+when 'redhat'
+  package "screen"
 end
 
 users_manage "sysadmin" do
