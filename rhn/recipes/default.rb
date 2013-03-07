@@ -1,14 +1,14 @@
 #
-# Cookbook Name:: sudo
-# Attribute File:: default
+# Cookbook Name:: rhn
+# Recipe:: default
 #
-# Copyright 2008-2011, Opscode, Inc.
+# Copyright 2013, Biola University 
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,4 @@
 # limitations under the License.
 #
 
-default['authorization']['sudo']['groups'] = Array.new
-default['authorization']['sudo']['users'] = Array.new
-default['authorization']['sudo']['passwordless'] = false
-default['authorization']['sudo']['include_sudoers_d'] = false
+include_recipe "rhn::rhel5"
