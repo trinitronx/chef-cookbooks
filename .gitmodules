@@ -61,3 +61,6 @@
 [submodule "sudo"]
 	path = sudo
 	url = git://github.com/opscode-cookbooks/sudo.git
+[submodule "splunk"]
+	path = splunk
+	url = git://github.com/biola/splunk_cookbook.git
