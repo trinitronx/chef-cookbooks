@@ -64,3 +64,6 @@
 [submodule "splunk"]
 	path = splunk
 	url = git://github.com/biola/splunk_cookbook.git
+[submodule "sysctl"]
+	path = sysctl
+	url = git://github.com/spheromak/sysctl-cookbook.git
