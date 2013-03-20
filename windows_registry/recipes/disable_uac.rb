@@ -22,6 +22,6 @@ include_recipe "windows"
 
 # Change the appropriate Windows registry key
 windows_registry 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' do
-  values 'ConsentPromptBehaviorAdmin' => 0
+  values 'EnableLUA' => 0
   type :dword
 end

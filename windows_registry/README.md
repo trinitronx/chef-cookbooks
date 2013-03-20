@@ -11,10 +11,10 @@ Windows Server 2008 and above is supported.
 Recipes
 =======
 
-disable_uac_admin
+disable_uac
 -------
 
-This recipe updates the 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' registry key with a value of 0, disabling UAC prompts for administrators. The default value is 5.
+This recipe updates the 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\EnableLUA' registry key with a value of 0, disabling UAC on the system. The default value is 1.
 
 Usage
 =====
