@@ -29,6 +29,7 @@ when 'ubuntu', 'debian'
   package "vim"
   package "nano"
   package "screen"
+  package "curl"
 when 'redhat'
   package "screen"
 end
