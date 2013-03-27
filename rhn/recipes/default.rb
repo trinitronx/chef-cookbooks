@@ -17,4 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe "rhn::rhel5"
+if node['platform'] == 'redhat'
+  include_recipe "rhn::rhel5"
+end
