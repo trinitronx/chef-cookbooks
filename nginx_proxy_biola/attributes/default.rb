@@ -1,0 +1,1 @@
+default['nginx_proxy_biola']['git_repo_url'] = nil
