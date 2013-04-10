@@ -73,3 +73,15 @@
 [submodule "sudo"]
 	path = sudo
 	url = git://github.com/biola/sudo_cookbook.git
+[submodule "nginx_simplecgi"]
+	path = nginx_simplecgi
+	url = git://github.com/heavywater/chef-nginx_simplecgi.git
+[submodule "perl"]
+	path = perl
+	url = git://github.com/opscode-cookbooks/perl.git
+[submodule "php"]
+	path = php
+	url = git://github.com/opscode-cookbooks/php.git
+[submodule "nagios"]
+	path = nagios
+	url = git://github.com/opscode-cookbooks/nagios.git
