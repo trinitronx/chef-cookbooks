@@ -82,6 +82,3 @@
 [submodule "nagios"]
 	path = nagios
 	url = git://github.com/opscode-cookbooks/nagios.git
-[submodule "splunk"]
-	path = splunk
-	url = git://github.com/biola/splunk_cookbook.git
