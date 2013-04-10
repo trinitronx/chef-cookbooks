@@ -24,3 +24,7 @@ apt_repository "dataonstorage" do
   key node['nexenta']['dataon']['repokey']
   deb_src node['nexenta']['dataon']['includesourcerepo']
 end
+
+# Data-on diagnostic script requires the following package
+# (http://apt.dataonstorage.com/support.sh)
+apt_package "sg3-utils"
