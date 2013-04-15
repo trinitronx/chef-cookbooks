@@ -20,10 +20,6 @@
 #servicename will depend on the OS
 case node[:os]
 when "windows"
-  service "SplunkForwarder" do
-    action [ :nothing ]
-    supports :status => true, :start => true, :stop => true, :restart => true
-  end
   servicename = "SplunkForwarder"
 when "linux"
   servicename = "splunk"
@@ -49,6 +45,15 @@ end
 if node["os"] == "windows"
   include_recipe "splunk_windows::default"
 end
+
+case node[:os]
+when "windows"
+  service "SplunkForwarder" do
+    action [ :nothing ]
+    supports :status => true, :start => true, :stop => true, :restart => true
+  end
+end
+
 
 if node[:splunk][:hostname_source] == "node_name"
 	splunk_hostname = node.name
