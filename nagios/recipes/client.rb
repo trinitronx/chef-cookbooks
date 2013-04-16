@@ -64,6 +64,14 @@ template "#{node['nagios']['nrpe']['conf_dir']}/nrpe.cfg" do
   notifies :restart, "service[#{node['nagios']['nrpe']['service_name']}]"
 end
 
+# Add any custom NRPE plugins
+remote_directory node['nagios']['plugin_dir'] do
+  source "plugins"
+  files_owner "root"
+  files_group "root"
+  files_mode 00755
+end
+
 # Add any NRPE checks defined for node
 if node.nagios.attribute?("checks")
   node["nagios"]["checks"].each do |check_name, check_values|
