@@ -12,6 +12,7 @@ server.rb
 client.rb
 ---------
 
+* Installs custom NRPE plugins contained in the plugins directory
 * Recipe updated to add custom NRPE checks defined in node attributes
 
 commands.cfg.erb
