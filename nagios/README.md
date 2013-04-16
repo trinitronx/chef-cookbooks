@@ -5,20 +5,26 @@ Installs and configures Nagios server and NRPE client. This cookbook has been mo
 
 server.rb
 ---------
-* Line 123, 132: host_name_attribute is ignored; all Nagios hosts are named using the node name
-* Line 172, 176: Search-defined hostgroups use the node name instead of the hostname
+* host_name_attribute is ignored; all Nagios hosts are named using the node name
+* Search-defined hostgroups use the node name instead of the hostname
+* Custom timeperiods are pulled from databags and inserted into timeperiods template
 
 client.rb
 ---------
 
-* Line 67: Recipe updated to add custom NRPE checks defined in node attributes
+* Recipe updated to add custom NRPE checks defined in node attributes
 
 hosts.cfg.erb
 -------------
 
-* Line 9, 32: host_name_attribute is ignored; all Nagios hosts are named using the node name
+* host_name_attribute is ignored; all Nagios hosts are named using the node name
 
 services.cfg.erb
 ----------------
 
-* Line 17: Removed checks for existing hostgroups to allow a comma separated list of hostgroups
+* Removed checks for existing hostgroups to allow a comma separated list of hostgroups
+
+timeperiods.cfg.erb
+----------------
+
+* Template updated to allow custom timeperiods defined in databags

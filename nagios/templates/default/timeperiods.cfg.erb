@@ -12,3 +12,18 @@ define timeperiod {
   friday          00:00-24:00
   saturday        00:00-24:00
 }
+
+<% @timeperiods.each do |timeperiod| -%>
+define timeperiod {
+  timeperiod_name <%= timeperiod['id'] %>
+  alias           <%= timeperiod['description'] %>
+  sunday          <%= timeperiod['sunday'].nil? ? "00:00-24:00" : timeperiod['sunday'] %>
+  monday          <%= timeperiod['monday'].nil? ? "00:00-24:00" : timeperiod['monday'] %>
+  tuesday         <%= timeperiod['tuesday'].nil? ? "00:00-24:00" : timeperiod['tuesday'] %>
+  wednesday       <%= timeperiod['wednesday'].nil? ? "00:00-24:00" : timeperiod['wednesday'] %>
+  thursday        <%= timeperiod['thursday'].nil? ? "00:00-24:00" : timeperiod['thursday'] %>
+  friday          <%= timeperiod['friday'].nil? ? "00:00-24:00" : timeperiod['friday'] %>
+  saturday        <%= timeperiod['saturday'].nil? ? "00:00-24:00" : timeperiod['saturday'] %>
+}
+
+<% end -%>
