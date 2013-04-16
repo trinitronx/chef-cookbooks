@@ -71,6 +71,7 @@ if node.nagios.attribute?("checks")
       command "#{node['nagios']['plugin_dir']}/check_#{check_name}"
       warning_condition node['nagios']['checks'][check_name]['warning']
       critical_condition node['nagios']['checks'][check_name]['critical']
+      parameters node['nagios']['checks'][check_name]['parameters']
       action :add
     end
   end
