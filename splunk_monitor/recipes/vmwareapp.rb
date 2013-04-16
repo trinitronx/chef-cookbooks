@@ -30,7 +30,10 @@ if not File.exists?("/opt/" + vmwareappfile)
       checksum node['splunk']['apps']['vmwareapp_checksum']
     end
     execute "install_vmware_app" do
-      command splunk_cmd + " install app /opt/" + vmwareappfile + " -auth " + node['splunk']['auth']
+      command "unzip -d \'#{node['splunk']['server_home']}\' /opt/" + vmwareappfile
+    end
+    execute "restart_splunk" do
+      command splunk_cmd + ' restart'
     end
   end
 end
