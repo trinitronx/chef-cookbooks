@@ -20,6 +20,14 @@
 # Setting the file to download locally and install, so that version upgrades (or
 # downgrades) will trigger app reinstallation
 
+case node[:os]
+when "windows"
+  service "SplunkForwarder" do
+    action [ :nothing ]
+    supports :status => true, :start => true, :stop => true, :restart => true
+  end
+end
+
 vcenter_tafile = node['splunk']['apps']['vcenter_ta_url'].split('/').last
 
 if not File.exists?("c:/chef/" + vcenter_tafile) 
@@ -32,5 +40,15 @@ if not File.exists?("c:/chef/" + vcenter_tafile)
     execute "install_vcenter_ta" do
       command "\"" + splunk_cmd + "\" install app c:/chef/" + vcenter_tafile + " -auth " + node['splunk']['auth']
     end
+    directory "#{node['splunk']['forwarder_home']}/etc/apps/Splunk_TA_vcenter/local" do
+      action :create
+    end
+    # Updating template once, as splunk appears to overwrite it afterward
+    template "#{node['splunk']['forwarder_home']}/etc/apps/Splunk_TA_vcenter/local/inputs.conf" do
+      source "vcenter_ta_local-inputs.conf.erb"
+      notifies :restart, resources(:service => "SplunkForwarder")
+    end
   end
 end
+
+

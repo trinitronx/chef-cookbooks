@@ -20,6 +20,11 @@
 # Setting the file to download locally and install, so that version upgrades (or
 # downgrades) will trigger app reinstallation
 
+service "splunk" do
+  action [ :nothing ]
+  supports :status => true, :start => true, :stop => true, :restart => true
+end
+
 vmwareappfile = node['splunk']['apps']['vmwareapp_url'].split('/').last
 
 if not File.exists?("/opt/" + vmwareappfile) 
@@ -31,9 +36,24 @@ if not File.exists?("/opt/" + vmwareappfile)
     end
     execute "install_vmware_app" do
       command "unzip -d \'#{node['splunk']['server_home']}\' /opt/" + vmwareappfile
-    end
-    execute "restart_splunk" do
-      command splunk_cmd + ' restart'
+      notifies :restart, resources(:service => "SplunkForwarder")
     end
   end
 end
+
+directory "#{node['splunk']['server_home']}/etc/apps/Splunk_TA_vcenter/local" do
+  action :create
+end
+
+# Look for the vCenter host nodes
+vcenternodes = search(:node, "role:vcenter_host")
+
+template "#{node['splunk']['server_home']}/etc/apps/Splunk_TA_vcenter/local/props.conf" do
+  source "vcenter_ta_local-props.conf.erb"
+  variables ({
+    :vcenter_nodes => vcenternodes
+  })
+  notifies :restart, resources(:service => "splunk")
+end
+
+

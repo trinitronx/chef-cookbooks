@@ -60,4 +60,5 @@ Same dependencies as the splunk::forwarder recipe:
 # Additional Recipes #
 
 \* The [splunk\_monitor::biolasecuritymonitoring] recipe will install the "TA-biola\_security\_monitoring" technology add-on into splunk. See the [technology add-on's homepage](https://github.com/biola/ta-biola_security_monitoring) for more information.
-
+\* The [splunk\_monitor::vmwareapp] recipe will install and configure the [Splunk App for VMware](http://splunk-base.splunk.com/apps/28423/splunk-app-for-vmware). Apply this to your indexers, and apply attributes to them to indicate a URL for downloading the app zip/tgz
+\* The [splunk\_monitor::vcenter\_ta] recipe accompanies the vmwareapp recipe. Apply it to your vCenter host nodes to run after the Splunk UF is installed

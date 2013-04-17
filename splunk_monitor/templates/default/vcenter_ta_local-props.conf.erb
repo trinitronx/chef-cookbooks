@@ -1,0 +1,7 @@
+<% @vcenter_nodes.each do |vcenter_node| -%>
+# Begin new node stanza
+#
+[host::<%= vcenter_node['fqdn'] %>]
+TZ = America/Los_Angeles
+
+<% end -%>
