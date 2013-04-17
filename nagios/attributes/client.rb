@@ -42,7 +42,7 @@ when 'debian'
 when 'rhel','fedora'
   default['nagios']['client']['install_method']  = 'source'
   default['nagios']['nrpe']['pidfile']           = '/var/run/nrpe.pid'
-  default['nagios']['nrpe']['packages']          = %w{ nrpe nagios-plugins-disk nagios-plugins-load nagios-plugins-procs nagios-plugins-users }
+  default['nagios']['nrpe']['packages']          = %w{ nrpe nagios-plugins-disk nagios-plugins-load nagios-plugins-swap }
   if node['kernel']['machine'] == "i686"
     default['nagios']['nrpe']['home']            = '/usr/lib/nagios'
     default['nagios']['nrpe']['ssl_lib_dir']     = '/usr/lib'

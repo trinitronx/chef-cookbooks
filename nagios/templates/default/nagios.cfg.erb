@@ -90,22 +90,26 @@ accept_passive_host_checks=1
 enable_notifications=<%= node['nagios']['notifications_enabled'] %>
 enable_event_handlers=1
 
-#process_performance_data=1
-process_performance_data=0
+process_performance_data=1
+#process_performance_data=0
 
 #service_perfdata_command=ngraph-process-service-perfdata-pipe
+service_perfdata_command=nagios-process-service-perfdata
 #host_perfdata_command=process-host-perfdata
+host_perfdata_command=nagios-process-host-perfdata
 #service_perfdata_command=process-service-perfdata
 #host_perfdata_file=/tmp/host-perfdata
 #service_perfdata_file=/tmp/service-perfdata
 #host_perfdata_file_template=[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$
 #service_perfdata_file_template=[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$
-#host_perfdata_file_mode=a
-#service_perfdata_file_mode=a
-#host_perfdata_file_processing_interval=0
-#service_perfdata_file_processing_interval=0
+host_perfdata_file_mode=a
+service_perfdata_file_mode=a
+host_perfdata_file_processing_interval=86400
+service_perfdata_file_processing_interval=86400
 #host_perfdata_file_processing_command=process-host-perfdata-file
+host_perfdata_file_processing_command=nagios-process-host-perfdata-file
 #service_perfdata_file_processing_command=process-service-perfdata-file
+service_perfdata_file_processing_command=nagios-process-service-perfdata-file
 
 obsess_over_services=0
 #ocsp_command=somecommand

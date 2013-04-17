@@ -42,6 +42,30 @@ define command {
   command_line    /usr/bin/printf "%b" "$LONGDATETIME$ - $SERVICEDESC$ $SERVICESTATE$\n\n$HOSTALIAS$  $NOTIFICATIONTYPE$\n\n$SERVICEOUTPUT$\n\nLogin: ssh://$HOSTNAME$" | <%=node['nagios']['server']['mail_command']%> -s "** $NOTIFICATIONTYPE$ - $HOSTALIAS$ - $SERVICEDESC$ - $SERVICESTATE$" $CONTACTEMAIL$
 }
 
+# 'nagios-process-host-perfdata' command definition
+define command{
+  command_name    nagios-process-host-perfdata
+  command_line    /usr/bin/printf "%b" "$TIMET$ src_host=\"$HOSTNAME$\" perfdata=\"HOSTPERFDATA\" hoststate=\"$HOSTSTATE$\" attempt=\"$HOSTATTEMPT$\" statetype=\"$HOSTSTATETYPE$\" executiontime=\"$HOSTEXECUTIONTIME$\" reason=\"$HOSTOUTPUT$\" result=\"$HOSTPERFDATA$\"\n" >> <%= node['nagios']['log_dir'] %>/host-perfdata
+}
+
+# 'nagios-process-service-perfdata' command definition
+define command{
+  command_name    nagios-process-service-perfdata
+  command_line    /usr/bin/printf "%b" "$TIMET$ src_host=\"$HOSTNAME$\" perfdata=\"SERVICEPERFDATA\" name=\"$SERVICEDESC$\" severity=\"$SERVICESTATE$\" attempt=\"$SERVICEATTEMPT$\" statetype=\"$SERVICESTATETYPE$\" executiontime=\"$SERVICEEXECUTIONTIME$\" latency=\"$SERVICELATENCY$\" reason=\"$SERVICEOUTPUT$\" result=\"$SERVICEPERFDATA$\"\n" >> <%= node['nagios']['log_dir'] %>/service-perfdata
+}
+
+# 'nagios-process-host-perfdata-file' command definition
+define command{
+  command_name    nagios-process-host-perfdata-file
+  command_line    /bin/cat /dev/null > <%= node['nagios']['log_dir'] %>/host-perfdata
+}
+
+# 'nagios-process-service-perfdata-file' command definition
+define command{
+  command_name    nagios-process-service-perfdata-file
+  command_line    /bin/cat /dev/null > <%= node['nagios']['log_dir'] %>/service-perfdata
+}
+
 # Commands added through nagios_services data bags
 <% @services.each do |service| -%>
 <% unless service['use_existing_command'] -%>
