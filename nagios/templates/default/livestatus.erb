@@ -15,6 +15,6 @@ service livestatus
   user = nagios
   server = /usr/bin/unixcat
   server_args = /var/lib/nagios3/rw/live
-  only_from = <%= @mon_host.join(',') %>
+  only_from = <%= @splunk_host.join(',') %>
   disable = no
 }
