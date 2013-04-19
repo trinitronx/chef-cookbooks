@@ -70,6 +70,7 @@ end
     variables(
       :nagios_ip => nagios_ip.last
     )
+    notifies :restart, resources(:service => "splunk")
   end
 end
 
@@ -79,9 +80,5 @@ template "#{node['splunk']['server_home']}/etc/apps/SplunkForNagios/default/data
   variables(
     :nagios_host => nagios_host.last
   )
-end
-
-# Restart the Splunk service
-service "splunk" do
-  action :restart
+  notifies :restart, resources(:service => "splunk")
 end

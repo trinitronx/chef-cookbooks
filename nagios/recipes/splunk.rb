@@ -33,6 +33,11 @@ if node['platform_family'] == 'debian'
 	  package pkg
 	end
 
+  service "xinetd" do
+    action [ :nothing ]
+    supports :status => true, :start => true, :stop => true, :restart => true
+  end
+
   # Determine hosts to allow connections from
   splunk_host = ['127.0.0.1']
 
@@ -47,10 +52,6 @@ if node['platform_family'] == 'debian'
     variables(
       :splunk_host => splunk_host
     )
-  end
-
-  # Restart the xinetd service
-  service "xinetd" do
-    action :restart
+    notifies :restart, resources(:service => "xinetd")
   end
 end
