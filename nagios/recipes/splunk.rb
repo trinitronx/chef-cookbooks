@@ -19,9 +19,9 @@
 
 # Assign default attributes for Splunk inputs to node
 node.default["splunk"]["monitors"] = [
-	"nagios_log" => {"location" => node['nagios']['log_dir'] + "/nagios.log", "index" => "nagios"},
-	"host_perfdata" => {"location" => node['nagios']['log_dir'] + "/host-perfdata", "index" => "nagios"},
-	"service_perfdata" => {"location" => node['nagios']['log_dir'] + "/service-perfdata", "index" => "nagios"},
+	"nagios_log" => {"location" => node['nagios']['log_dir'] + "/nagios.log", "index" => "nagios", "sourcetype" => "nagios-log"},
+	"host_perfdata" => {"location" => node['nagios']['log_dir'] + "/host-perfdata", "index" => "nagios", "sourcetype" => "host-perfdata"},
+	"service_perfdata" => {"location" => node['nagios']['log_dir'] + "/service-perfdata", "index" => "nagios", "sourcetype" => "service-perfdata"},
 ]
 
 # Install the MK Livestatus plugin if using a Debian-based system
