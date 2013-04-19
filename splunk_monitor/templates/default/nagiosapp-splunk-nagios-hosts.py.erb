@@ -1,0 +1,3 @@
+# Display all devices in nagios
+import os
+os.system("/usr/bin/nc <%= @nagios_ip %> 6557 < nagios-hosts")

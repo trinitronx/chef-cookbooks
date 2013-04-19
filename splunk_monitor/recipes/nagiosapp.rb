@@ -25,8 +25,10 @@ service "splunk" do
   supports :status => true, :start => true, :stop => true, :restart => true
 end
 
+# Get the filename
 nagiosappfile = node['splunk']['apps']['nagiosapp_url'].split('/').last
 
+# If the app is not installed, extract it to the apps directory
 if not File.directory?("#{node['splunk']['server_home']}/etc/apps/SplunkForNagios")
   remote_file "#{node['splunk']['server_home']}/etc/apps/" + nagiosappfile do
     source node['splunk']['apps']['nagiosapp_url']
@@ -40,4 +42,46 @@ if not File.directory?("#{node['splunk']['server_home']}/etc/apps/SplunkForNagio
   file "#{node['splunk']['server_home']}/etc/apps/" + nagiosappfile do
     action :delete
   end
+end
+
+# Find all Nagios servers in Chef
+nagios_ip = ['127.0.0.1']
+nagios_host = ["#{node['fqdn']}"]
+search(:node, "role:#{node['nagios']['server_role']}") do |n|
+  nagios_ip << n['ipaddress']
+  nagios_host << n['fqdn']
+end
+
+# Update the Livestatus scripts with the Nagios server IP
+%w{ 
+  livehostsdownstatus.py
+  livehostsunreachablestatus.py
+  livehostsupstatus.py
+  liveservicecriticalstatus.py
+  liveserviceokstatus.py
+  liveservicestate.py
+  liveserviceunknownstatus.py
+  liveservicewarningstatus.py
+  splunk-nagios-hosts.py
+  splunk-nagios-servicegroupmembers.sh
+}.each do |script|
+  template "#{node['splunk']['server_home']}/etc/apps/SplunkForNagios/bin/#{script}" do
+    source "nagiosapp-#{script}.erb"
+    variables(
+      :nagios_ip => nagios_ip.last
+    )
+  end
+end
+
+# Update the Livestatus XML with the Nagios server fqdn
+template "#{node['splunk']['server_home']}/etc/apps/SplunkForNagios/default/data/ui/views/NagiosLivestatus.xml" do
+  source "nagiosapp-NagiosLivestatus.xml.erb"
+  variables(
+    :nagios_host => nagios_host.last
+  )
+end
+
+# Restart the Splunk service
+service "splunk" do
+  action :restart
 end
