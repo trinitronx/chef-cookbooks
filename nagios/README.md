@@ -8,6 +8,7 @@ server.rb
 * host_name_attribute is ignored; all Nagios hosts are named using the node name
 * Search-defined hostgroups use the node name instead of the hostname
 * Custom timeperiods are pulled from databags and inserted into timeperiods template
+* Custom server plugins can be installed
 
 client.rb
 ---------

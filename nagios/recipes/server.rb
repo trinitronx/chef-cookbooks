@@ -296,3 +296,11 @@ nagios_nrpecheck "check_nagios" do
   parameters "-F #{node["nagios"]["cache_dir"]}/status.dat -e 4 -C /usr/sbin/#{nagios_service_name}"
   action :add
 end
+
+# Add any custom server plugins
+remote_directory node['nagios']['plugin_dir'] do
+  source "server_plugins"
+  files_owner "root"
+  files_group "root"
+  files_mode 00755
+end
