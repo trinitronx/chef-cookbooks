@@ -40,6 +40,7 @@ hosts.cfg.erb
 -------------
 
 * host_name_attribute is ignored; all Nagios hosts are named using the node name
+* Unmanaged hosts are named using the "host_name" attribute instead of the ID, since Chef does not allow dots in the ID
 
 hostextinfo.cfg.erb
 -------------

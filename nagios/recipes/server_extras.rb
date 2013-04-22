@@ -18,8 +18,9 @@
 #
 
 service "nagios" do
+  service_name node['nagios']['server']['service_name']
   action [ :nothing ]
-  supports :status => true, :start => true, :stop => true, :restart => true
+  supports :status => true, :restart => true, :reload => true
 end
 
 # Install the "exfoliation" Nagios theme (now the default for Nagios Core)
@@ -57,5 +58,5 @@ template "#{node['nagios']['config_dir']}/hostextinfo.cfg" do
   variables(
     :hosts => nodes
   )
-  notifies :restart, resources(:service => "nagios")
+  notifies :reload, resources(:service => "nagios")
 end
