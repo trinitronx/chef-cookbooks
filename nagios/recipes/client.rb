@@ -66,7 +66,7 @@ end
 
 # Add any custom NRPE plugins
 remote_directory node['nagios']['plugin_dir'] do
-  source "plugins"
+  source "client_plugins"
   files_owner "root"
   files_group "root"
   files_mode 00755

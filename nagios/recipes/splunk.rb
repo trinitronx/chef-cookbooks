@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: splunk_windows
-# Recipe:: default
+# Cookbook Name:: nagios
+# Recipe:: splunk
 #
 # Copyright 2013, Biola University 
 #
@@ -19,9 +19,9 @@
 
 # Assign default attributes for Splunk inputs to node
 node.default["splunk"]["monitors"] = [
-	"nagios_log" => {"location" => node['nagios']['log_dir'] + "/nagios.log", "index" => "nagios"},
-	"host_perfdata" => {"location" => node['nagios']['log_dir'] + "/host-perfdata", "index" => "nagios"},
-	"service_perfdata" => {"location" => node['nagios']['log_dir'] + "/service-perfdata", "index" => "nagios"},
+	"nagios_log" => {"location" => node['nagios']['log_dir'] + "/nagios.log", "index" => "nagios", "sourcetype" => "nagios"},
+	"host_perfdata" => {"location" => node['nagios']['log_dir'] + "/host-perfdata", "index" => "nagios", "sourcetype" => "nagioshostperf"},
+	"service_perfdata" => {"location" => node['nagios']['log_dir'] + "/service-perfdata", "index" => "nagios", "sourcetype" => "nagiosserviceperf"},
 ]
 
 # Install the MK Livestatus plugin if using a Debian-based system

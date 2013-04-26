@@ -52,7 +52,7 @@ define host {
 define host {
   use server
   address <%= n['address'] %>
-  host_name <%= node['nagios']['server']['normalize_hostname'] ? n['id'].downcase : n['id'] %>
+  host_name <%= node['nagios']['server']['normalize_hostname'] ? n['host_name'].downcase : n['host_name'] %>
   hostgroups all,<%= n['hostgroups'].join(",") %>
   notifications_enabled <%= n['notifications'] %>
 }

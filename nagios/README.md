@@ -8,12 +8,28 @@ server.rb
 * host_name_attribute is ignored; all Nagios hosts are named using the node name
 * Search-defined hostgroups use the node name instead of the hostname
 * Custom timeperiods are pulled from databags and inserted into timeperiods template
+* Custom server plugins can be installed
 
 client.rb
 ---------
 
 * Installs custom NRPE plugins contained in the plugins directory
 * Recipe updated to add custom NRPE checks defined in node attributes
+
+client_windows.rb
+---------
+
+* New recipe for installing and configuring NSClient++ on Windows
+
+server_extras.rb
+---------
+
+* New recipe for installing Exfoliation theme and host platform logos
+
+splunk.rb
+---------
+
+* New recipe for configuring Splunk forwarder and installing MK Livestatus
 
 commands.cfg.erb
 ----------------
@@ -24,11 +40,27 @@ hosts.cfg.erb
 -------------
 
 * host_name_attribute is ignored; all Nagios hosts are named using the node name
+* Unmanaged hosts are named using the "host_name" attribute instead of the ID, since Chef does not allow dots in the ID
+
+hostextinfo.cfg.erb
+-------------
+
+* New template for extended host information, used by the server_extras.rb recipe
+
+livestatus.erb
+-------------
+
+* New template for livestatus xinet daemon configuration
 
 nagios.cfg.erb
 ----------------
 
-* Template updated with performance data options needed for Splunk app
+* Template updated with options needed for Splunk app
+
+nsclient.ini.erb
+----------------
+
+* New template for NSClient++ configuration file, used by the client_windows.rb recipe
 
 services.cfg.erb
 ----------------
