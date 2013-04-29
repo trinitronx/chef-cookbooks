@@ -1,0 +1,5 @@
+# Lists of servers for whitelist
+#
+<% @postfix_whitelist.each do |n| -%>
+<%= n['ipaddress'] %> 	OK #<%= n['fqdn'] %>
+<% end -%>
