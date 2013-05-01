@@ -43,6 +43,9 @@ define host {
   hostgroups all,<%= (n.roles & @hostgroups).join(",") %>,<%= n['os'] %>
   <% end -%>
   <% end -%>
+  <% unless n['nagios']['notification_period'].nil? -%>
+  notification_period <%= n['nagios']['notification_period'] %>
+  <% end -%>
 }
 <% end -%>
 <% end -%>
