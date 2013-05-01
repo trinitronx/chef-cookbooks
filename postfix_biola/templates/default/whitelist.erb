@@ -3,3 +3,6 @@
 <% @postfix_whitelist.each do |n| -%>
 <%= n['ipaddress'] %> 	OK #<%= n['fqdn'] %>
 <% end -%>
+<% @device_whitelist.each do |d| -%>
+<%= d['device_ip'] %>	OK #<%= d['id'] %>
+<% end -%>
