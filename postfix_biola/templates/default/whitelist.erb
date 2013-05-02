@@ -1,8 +1,8 @@
 # Lists of servers for whitelist
 #
-<% @postfix_whitelist.each do |n| -%>
-<%= n['ipaddress'] %> 	OK #<%= n['fqdn'] %>
+<% @mail_sender.each do |m| -%>
+<%= m['ipaddress'] %>	OK #ROLE#<%= m['fqdn'] %>
 <% end -%>
 <% @device_whitelist.each do |d| -%>
-<%= d['device_ip'] %>	OK #<%= d['id'] %>
+<%= d['device_ip'] %>	OK #DTBG#<%= d['id'] %>
 <% end -%>

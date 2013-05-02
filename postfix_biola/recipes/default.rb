@@ -11,9 +11,9 @@ service "postfix" do
 	supports :status => true, :stop => true, :start => true, :reload => true, :restart => true, :status => true
 end
 
-postfix_whitelist = Array.new
+mail_sender = Array.new
 
-postfix_whitelist = search(:node, "postfix_relayhost_role:postfix_relayhost")
+mail_sender = search(:node, "roles:mail_sender")
 
 device_whitelist = Array.new
 
@@ -24,7 +24,7 @@ template "/etc/postfix/whitelist" do
 	owner "root"
 	group "root"
 	mode "00644"
-	variables 	:postfix_whitelist => postfix_whitelist,
-	:device_whitelist => device_whitelist
+	variables 	:device_whitelist => device_whitelist,
+	:mail_sender => mail_sender
 	notifies :reload, "service[postfix]"
 end
