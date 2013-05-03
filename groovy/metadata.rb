@@ -5,4 +5,4 @@ description      "Installs Groovy Java language for JVM"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          "0.0.1"
 depends          "apt"
-supports "ubuntu>=12.04"
+supports 'ubuntu', '>= 12.04'
