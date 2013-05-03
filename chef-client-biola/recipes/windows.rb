@@ -20,7 +20,6 @@
 if node["os"] == "windows"
   execute "set chef-client to delayed start" do
     command "sc config chef-client start= delayed-auto"
-    action :nothing
   end
 end
 
