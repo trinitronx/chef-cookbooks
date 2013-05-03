@@ -101,7 +101,8 @@ esxhost_user = node['vmware']['splunk_esxhost_user']
 if Chef::Config[:solo]
   Chef::Log.warn("This recipe uses search. Chef Solo does not support Search")
 else
-  vc_host = search(:node, "role:vcenter_host")[0]['fqdn']
+  vmware_role_name = node['vmware']['vcenter_server_role']
+  vc_host = search(:node, "role:#{vmware_role_name}")[0]['fqdn']
 end
 
 template "#{Chef::Config['file_cache_path']}/splunkvmwareconfig/engine.template" do
