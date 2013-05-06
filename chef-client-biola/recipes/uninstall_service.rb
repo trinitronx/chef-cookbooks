@@ -22,15 +22,12 @@ service "chef-client" do
 	action [ :disable, :stop ]
 end
 
-case node["chef_client"]["init_style"]
-when "upstart"
-
-when "init"
-
-when "winsw"
-
-when "launchd"
-
-else
-  log "Could not determine service init style, manual intervention required to remove the chef-client service."
+execute "uninstall service" do
+	case node["chef_client"]["init_style"]
+	when "init"
+		command "update-rc.d -f chef-client remove"
+	when "winsw"
+		command "sc delete chef-client"
+	end
+	action :run
 end
