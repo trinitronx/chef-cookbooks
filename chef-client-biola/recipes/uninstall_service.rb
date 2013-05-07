@@ -19,7 +19,7 @@
 
 # Stop and disable the chef-client service
 if node["platform"] == "windows"
-	if Win32::Service.exists?("chef-client")
+	unless WMI::Win32_Service.find(:first, :conditions => {:name => "chef-client"}).nil?
 		service "chef-client" do
 			action [ :disable, :stop ]
 		end
