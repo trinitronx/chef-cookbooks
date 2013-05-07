@@ -18,16 +18,15 @@
 #
 
 # Stop and disable the chef-client service
-service "chef-client" do
-	action [ :disable, :stop ]
-end
+if node["platform"] == "windows"
+	if Win32::Service.exists?("chef-client")
+		service "chef-client" do
+			action [ :disable, :stop ]
+		end
 
-execute "uninstall service" do
-	case node["chef_client"]["init_style"]
-	when "init"
-		command "update-rc.d -f chef-client remove"
-	when "winsw"
-		command "sc delete chef-client"
+		execute "uninstall service" do
+			command "sc delete chef-client"
+			action :run
+		end
 	end
-	action :run
 end
