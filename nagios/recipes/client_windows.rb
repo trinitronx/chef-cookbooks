@@ -49,6 +49,11 @@ if node['platform'] == "windows" then
     action :install
   end
 
+  service "nscp" do
+    action :nothing
+    supports :restart => true
+  end
+
   # Create configuration file
   template "C:/Program Files/NSClient++/nsclient.ini" do
     source "nsclient.ini.erb"
@@ -56,10 +61,6 @@ if node['platform'] == "windows" then
       :mon_host => mon_host,
       :aliases => node["nagios"]["aliases"]
     )
-  end
-
-  # Restart the NSClient++ service
-  service "nscp" do
-    action :restart
+    notifies :restart, resources(:service => "nscp")
   end
 end
