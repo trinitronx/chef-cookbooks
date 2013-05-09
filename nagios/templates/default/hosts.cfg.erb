@@ -32,9 +32,9 @@ define host {
   host_name <%= node['nagios']['server']['normalize_hostname'] ? n.name.downcase : n.name %>
   <% if node['nagios']['multi_environment_monitoring'] -%>
   <% if n.roles.nil? || n.roles.length == 0 -%>
-  hostgroups all,<%= n.os %>, <%= n.chef_environment %>
+  hostgroups all,<%= n.os %>,<%= n.chef_environment %>
   <% else -%>
-  hostgroups all,<%= (n.roles & @hostgroups).join(",") %>,<%= n.os %>, <%= n.chef_environment %>
+  hostgroups all,<%= (n.roles & @hostgroups).join(",") %>,<%= n.os %>,<%= n.chef_environment %>
   <% end -%>
   <% elsif -%>
   <% if n.roles.nil? || n.roles.length == 0 -%>

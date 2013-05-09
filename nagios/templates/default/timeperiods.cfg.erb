@@ -17,13 +17,27 @@ define timeperiod {
 define timeperiod {
   timeperiod_name <%= timeperiod['id'] %>
   alias           <%= timeperiod['description'] %>
-  sunday          <%= timeperiod['sunday'].nil? ? "00:00-24:00" : timeperiod['sunday'] %>
-  monday          <%= timeperiod['monday'].nil? ? "00:00-24:00" : timeperiod['monday'] %>
-  tuesday         <%= timeperiod['tuesday'].nil? ? "00:00-24:00" : timeperiod['tuesday'] %>
-  wednesday       <%= timeperiod['wednesday'].nil? ? "00:00-24:00" : timeperiod['wednesday'] %>
-  thursday        <%= timeperiod['thursday'].nil? ? "00:00-24:00" : timeperiod['thursday'] %>
-  friday          <%= timeperiod['friday'].nil? ? "00:00-24:00" : timeperiod['friday'] %>
-  saturday        <%= timeperiod['saturday'].nil? ? "00:00-24:00" : timeperiod['saturday'] %>
+  <% unless timeperiod['sunday'].nil? -%>
+  sunday          <%= timeperiod['sunday'] %>
+  <% end -%>
+  <% unless timeperiod['monday'].nil? -%>
+  monday          <%= timeperiod['monday'] %>
+  <% end -%>
+  <% unless timeperiod['tuesday'].nil? -%>
+  tuesday          <%= timeperiod['tuesday'] %>
+  <% end -%>
+  <% unless timeperiod['wednesday'].nil? -%>
+  wednesday          <%= timeperiod['wednesday'] %>
+  <% end -%>
+  <% unless timeperiod['thursday'].nil? -%>
+  thursday          <%= timeperiod['thursday'] %>
+  <% end -%>
+  <% unless timeperiod['friday'].nil? -%>
+  friday          <%= timeperiod['friday'] %>
+  <% end -%>
+  <% unless timeperiod['saturday'].nil? -%>
+  saturday          <%= timeperiod['saturday'] %>
+  <% end -%>
 }
 
 <% end -%>

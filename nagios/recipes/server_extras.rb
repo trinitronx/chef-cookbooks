@@ -42,7 +42,11 @@ Chef::Log.info("Beginning search for nodes.  This may take some time depending o
 nodes = Array.new
 
 if node['nagios']['multi_environment_monitoring']
-  nodes = search(:node, "hostname:[* TO *]")
+  if node["nagios"].attribute?("environments")
+    nodes = search(:node, "hostname:[* TO *] AND (chef_environment:#{node['nagios']['environments'].join(" OR chef_environment:")})")
+  else
+    nodes = search(:node, "hostname:[* TO *]")
+  end
 else
   nodes = search(:node, "hostname:[* TO *] AND chef_environment:#{node.chef_environment}")
 end

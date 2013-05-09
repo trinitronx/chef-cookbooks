@@ -5,6 +5,7 @@ Installs and configures Nagios server and NRPE client. This cookbook has been mo
 
 server.rb
 ---------
+* When using the multi_environment_monitoring option, an array of environments can be specified to limit the scope of the search
 * host_name_attribute is ignored; all Nagios hosts are named using the node name
 * Search-defined hostgroups use the node name instead of the hostname
 * Custom timeperiods are pulled from databags and inserted into timeperiods template
@@ -40,6 +41,7 @@ hosts.cfg.erb
 -------------
 
 * host_name_attribute is ignored; all Nagios hosts are named using the node name
+* Search-based hosts are defined
 * Unmanaged hosts are named using the "host_name" attribute instead of the ID, since Chef does not allow dots in the ID
 
 hostextinfo.cfg.erb

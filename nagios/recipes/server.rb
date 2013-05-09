@@ -102,7 +102,11 @@ nodes = Array.new
 hostgroups = Array.new
 
 if node['nagios']['multi_environment_monitoring']
-  nodes = search(:node, "hostname:[* TO *]")
+  if node["nagios"].attribute?("environments")
+    nodes = search(:node, "hostname:[* TO *] AND (chef_environment:#{node['nagios']['environments'].join(" OR chef_environment:")})")
+  else
+    nodes = search(:node, "hostname:[* TO *]")
+  end
 else
   nodes = search(:node, "hostname:[* TO *] AND chef_environment:#{node.chef_environment}")
 end
@@ -170,11 +174,11 @@ if nagios_bags.bag_list.include?("nagios_hostgroups")
     temp_hostgroup_array= Array.new
     if node['nagios']['multi_environment_monitoring']
       search(:node, "#{hg['search_query']}") do |n|
-        temp_hostgroup_array << n.name
+        temp_hostgroup_array << n['hostname']
       end
     else
       search(:node, "#{hg['search_query']} AND chef_environment:#{node.chef_environment}") do |n|
-        temp_hostgroup_array << n.name
+        temp_hostgroup_array << n['hostname']
       end
     end
     hostgroup_nodes[hg['hostgroup_name']] = temp_hostgroup_array.join(",")
@@ -280,6 +284,7 @@ end
 
 nagios_conf "hosts" do
   variables(:nodes => nodes,
+            :search_nodes => hostgroup_nodes,
             :unmanaged_hosts => unmanaged_hosts,
             :hostgroups => hostgroups)
 end
