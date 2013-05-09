@@ -18,18 +18,6 @@
 #
 
 if node["platform"] == "windows"
-	# Remove the chef-client service if it exists
-	unless WMI::Win32_Service.find(:first, :conditions => {:name => "chef-client"}).nil?
-		service "chef-client" do
-			action [ :disable, :stop ]
-		end
-
-		execute "uninstall service" do
-			command "sc delete chef-client"
-			action :run
-		end
-	end
-
 	# Scheduled task options
 	task_name = "chef-client"
 	task_command = "#{node["chef_client"]["ruby_bin"]} #{node["chef_client"]["bin"]} -L #{File.join(node["chef_client"]["log_dir"], "client.log")} -c #{File.join(node["chef_client"]["conf_dir"], "client.rb")} -s #{node["chef_client"]["splay"]}"
@@ -54,6 +42,18 @@ if node["platform"] == "windows"
 				command "schtasks /Create /TN \"#{task_name}\" /SC minute /MO #{task_interval} /TR \"#{task_command}\" /RU \"SYSTEM\""
 				action :run
 			end			
+		end
+	end
+
+	# Remove the chef-client service if it exists
+	unless WMI::Win32_Service.find(:first, :conditions => {:name => "chef-client"}).nil?
+		service "chef-client" do
+			action [ :disable, :stop ]
+		end
+
+		execute "uninstall service" do
+			command "sc delete chef-client"
+			action :run
 		end
 	end
 end
