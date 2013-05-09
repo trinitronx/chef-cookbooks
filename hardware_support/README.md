@@ -15,6 +15,9 @@ This recipe will modify the /etc/init/mountall.conf file and add a 180 second de
 #### hardware\_support::acpi\_memhotplug
 Loads the acpi\_memhotplug kernel module if it is present (but unloaded) and the node is running as a virtualized guest. Should allow Ubuntu nodes to have memory dynamically added like RHEL nodes.
 
+#### hardware\_support::scsitools
+Installs the scsitools package on ubuntu nodes. This provides the rescan-scsi-bus script, allowing for new hard disks to be detected on the fly
+
 Contributing
 ------------
 1. Fork the repository on Github
