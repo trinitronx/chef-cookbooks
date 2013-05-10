@@ -41,8 +41,8 @@ hosts.cfg.erb
 -------------
 
 * host_name_attribute is ignored; all Nagios hosts are named using the node name
-* Search-based hosts are defined
 * Unmanaged hosts are named using the "host_name" attribute instead of the ID, since Chef does not allow dots in the ID
+* A notification period can be specified per host
 
 hostextinfo.cfg.erb
 -------------
@@ -58,6 +58,7 @@ nagios.cfg.erb
 ----------------
 
 * Template updated with options needed for Splunk app
+* Removed timezone option set to UTC; will use system timezone instead
 
 nsclient.ini.erb
 ----------------
@@ -73,6 +74,7 @@ templates.cfg.erb
 ----------------
 
 * Template updated to enable performance data collection for default hosts and services
+* Removed 24x7 timeperiod for service template; the timeperiod will now be pulled from the host definition, which can be dynamically assigned
 
 timeperiods.cfg.erb
 ----------------
