@@ -17,10 +17,13 @@
 # limitations under the License.
 #
 
-
-chef_gem "ruby-shadow"
-
-users_manage "beoper" do
-  group_id 2304
-  action [ :remove, :create ]
+# group is specifically required for BackupExec RALUS systems
+# Can be ignored on Windows
+unless node["os"] == "windows"
+  chef_gem "ruby-shadow"
+  
+  users_manage "beoper" do
+    group_id 2304
+    action [ :remove, :create ]
+  end
 end
