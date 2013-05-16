@@ -35,7 +35,7 @@ script
     fi
 
     # Custom sleep here, to compensate for slow device enumeration
-    sleep 180
+    sleep <%= node['hardware_support']['mountall_delay'] %>
     exec mountall --daemon $force_fsck $fsck_fix
 end script
 
