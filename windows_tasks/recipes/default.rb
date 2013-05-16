@@ -28,6 +28,8 @@ node['windows']['scheduled_tasks'].each_with_index do |parameters, index|
       run_level parameters[task_name]['run_level'].to_sym if parameters[task_name]['run_level']
       frequency parameters[task_name]['frequency'].to_sym if parameters[task_name]['frequency']
       frequency_modifier parameters[task_name]['frequency_modifier'] if parameters[task_name]['frequency_modifier']
+      start_day parameters[task_name]['start_day'] if parameters[task_name]['start_day']
+      start_time parameters[task_name]['start_time'] if parameters[task_name]['start_time']
     end
   end
 end
