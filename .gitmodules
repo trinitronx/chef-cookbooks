@@ -3,7 +3,7 @@
 	url = git://github.com/jschneiderhan/logrotate.git 
 [submodule "windows"]
 	path = windows
-	url = git://github.com/opscode-cookbooks/windows.git
+	url = git://github.com/biola/windows_cookbook.git
 [submodule "chef_handler"]
 	path = chef_handler
 	url = git://github.com/opscode-cookbooks/chef_handler.git
