@@ -10,7 +10,7 @@ Currently targeted at linux
 Usage
 -----
 #### hardware\_support::mountalldelay
-This recipe will modify the /etc/init/mountall.conf file and add a 180 second delay on boot if the mpt2sas kernel module is detected. This is to work around implementations of this chipset where the disk devices are not available immediately on boot. Currently tested only on Ubuntu 12.04
+This recipe will modify the /etc/init/mountall.conf file and add a 240 second delay (specific number of seconds are overridable via a node\['hardware\_support'\]\['mountall\_delay'\] attribute) on boot if the mpt2sas kernel module is detected. This is to work around implementations of this chipset where the disk devices are not available immediately on boot. Currently tested only on Ubuntu 12.04
 
 #### hardware\_support::acpi\_memhotplug
 Loads the acpi\_memhotplug kernel module if it is present (but unloaded) and the node is running as a virtualized guest. Should allow Ubuntu nodes to have memory dynamically added like RHEL nodes.
