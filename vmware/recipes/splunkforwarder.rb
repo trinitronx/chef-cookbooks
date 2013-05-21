@@ -76,95 +76,96 @@ template "/home/splunkadmin/opt/splunk/etc/system/local/outputs.conf" do
 end
 
 # Set up vsphere data gathering
+# TODO This needs to be corrected to only run periodically
 
-directory "#{Chef::Config['file_cache_path']}/splunkvmwareconfig" do
-  owner "splunkadmin"
-  group "splunkadmin"
-  mode 0700
-end
-
-# Populate variables containing the vsphere & esx host credentials
-data_bag_name = "service_accounts"
-vsphere_user_pass = Chef::EncryptedDataBagItem.load(data_bag_name, node['vmware']['splunk_vsphere_user'])['password']  
-esxhost_user_pass = Chef::EncryptedDataBagItem.load(data_bag_name, node['vmware']['splunk_esxhost_user'])['password']  
-
-# Add domain prefix if necessary
-if (Chef::EncryptedDataBagItem.load(data_bag_name, node['vmware']['splunk_vsphere_user'])['domain']) != nil
-  vsphere_user = Chef::EncryptedDataBagItem.load(data_bag_name, node['vmware']['splunk_vsphere_user'])['domain'] + "\\" + node['vmware']['splunk_vsphere_user']
-else
-  vsphere_user = node['vmware']['splunk_vsphere_user']
-end
-
-esxhost_user = node['vmware']['splunk_esxhost_user']
-
-
-if Chef::Config[:solo]
-  Chef::Log.warn("This recipe uses search. Chef Solo does not support Search")
-else
-  vmware_role_name = node['vmware']['vcenter_server_role']
-  vc_host = search(:node, "role:#{vmware_role_name}")[0]['fqdn']
-end
-
-template "#{Chef::Config['file_cache_path']}/splunkvmwareconfig/engine.template" do
-  source "forwarder/engine.template.erb"
-  owner "splunkadmin"
-  group "splunkadmin"
-  variables(
-    :vsphere_user => vsphere_user,
-    :vsphere_user_pass => vsphere_user_pass,
-    :esxhost_user => esxhost_user,
-    :esxhost_user_pass => esxhost_user_pass,
-    :vc_host=> vc_host
-  )
-end
-
-#Create the config files
-execute "splunk_config_generator" do
-  user "splunkadmin"
-  group "splunkadmin"
-  cwd "#{Chef::Config['file_cache_path']}/splunkvmwareconfig"
-  command "PATH=$PATH:/home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/bin /home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/bin/enginebuilder.py"
-end
-
-# Update the config files to correct path
-execute "update_file_paths" do
-  cwd "#{Chef::Config['file_cache_path']}/splunkvmwareconfig"
-  command "for f in ./*; do sed -i \'s/var\\/cache\\/chef\\/splunkvmwareconfig/home\\/splunkadmin\\/opt\\/splunk\\/etc\\/apps\\/Splunk_TA_vmware\\/local/g\' $f; done"
-end
-
-# Compare existing config file if it exists, otherwise copy them over to splunk
-if File.exists?("/home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/local/engineperf.conf")
-  ruby_block "Compare_existing_files" do
-    block do
-      require 'chef/digester'
-      if not (Chef::Digester.checksum_for_file("#{Chef::Config['file_cache_path']}/splunkvmwareconfig/engineperf.conf") == Chef::Digester.checksum_for_file("/home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/local/engineperf.conf"))
-        execute "/sbin/service splunk stop" do
-          ignore_failure true
-        end
-        execute "move_splunk_config_files_in_place" do
-          user "splunkadmin"
-          cwd "#{Chef::Config['file_cache_path']}/splunkvmwareconfig"
-          command "mv ./* /home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/local/"
-        end
-        execute "/sbin/service splunk start" do
-          ignore_failure true
-        end
-      end
-    end
-  end
-else
-  execute "/sbin/service splunk stop" do
-    ignore_failure true
-  end
-  execute "move_splunk_config_files_in_place" do
-    user "splunkadmin"
-    cwd "#{Chef::Config['file_cache_path']}/splunkvmwareconfig"
-    command "mv ./* /home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/local/"
-  end
-  execute "/sbin/service splunk start" do
-    ignore_failure true
-  end
-end
+#directory "#{Chef::Config['file_cache_path']}/splunkvmwareconfig" do
+#  owner "splunkadmin"
+#  group "splunkadmin"
+#  mode 0700
+#end
+#
+## Populate variables containing the vsphere & esx host credentials
+#data_bag_name = "service_accounts"
+#vsphere_user_pass = Chef::EncryptedDataBagItem.load(data_bag_name, node['vmware']['splunk_vsphere_user'])['password']  
+#esxhost_user_pass = Chef::EncryptedDataBagItem.load(data_bag_name, node['vmware']['splunk_esxhost_user'])['password']  
+#
+## Add domain prefix if necessary
+#if (Chef::EncryptedDataBagItem.load(data_bag_name, node['vmware']['splunk_vsphere_user'])['domain']) != nil
+#  vsphere_user = Chef::EncryptedDataBagItem.load(data_bag_name, node['vmware']['splunk_vsphere_user'])['domain'] + "\\" + node['vmware']['splunk_vsphere_user']
+#else
+#  vsphere_user = node['vmware']['splunk_vsphere_user']
+#end
+#
+#esxhost_user = node['vmware']['splunk_esxhost_user']
+#
+#
+#if Chef::Config[:solo]
+#  Chef::Log.warn("This recipe uses search. Chef Solo does not support Search")
+#else
+#  vmware_role_name = node['vmware']['vcenter_server_role']
+#  vc_host = search(:node, "role:#{vmware_role_name}")[0]['fqdn']
+#end
+#
+#template "#{Chef::Config['file_cache_path']}/splunkvmwareconfig/engine.template" do
+#  source "forwarder/engine.template.erb"
+#  owner "splunkadmin"
+#  group "splunkadmin"
+#  variables(
+#    :vsphere_user => vsphere_user,
+#    :vsphere_user_pass => vsphere_user_pass,
+#    :esxhost_user => esxhost_user,
+#    :esxhost_user_pass => esxhost_user_pass,
+#    :vc_host=> vc_host
+#  )
+#end
+#
+##Create the config files
+#execute "splunk_config_generator" do
+#  user "splunkadmin"
+#  group "splunkadmin"
+#  cwd "#{Chef::Config['file_cache_path']}/splunkvmwareconfig"
+#  command "PATH=$PATH:/home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/bin /home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/bin/enginebuilder.py"
+#end
+#
+## Update the config files to correct path
+#execute "update_file_paths" do
+#  cwd "#{Chef::Config['file_cache_path']}/splunkvmwareconfig"
+#  command "for f in ./*; do sed -i \'s/var\\/cache\\/chef\\/splunkvmwareconfig/home\\/splunkadmin\\/opt\\/splunk\\/etc\\/apps\\/Splunk_TA_vmware\\/local/g\' $f; done"
+#end
+#
+## Compare existing config file if it exists, otherwise copy them over to splunk
+#if File.exists?("/home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/local/engineperf.conf")
+#  ruby_block "Compare_existing_files" do
+#    block do
+#      require 'chef/digester'
+#      if not (Chef::Digester.checksum_for_file("#{Chef::Config['file_cache_path']}/splunkvmwareconfig/engineperf.conf") == Chef::Digester.checksum_for_file("/home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/local/engineperf.conf"))
+#        execute "/sbin/service splunk stop" do
+#          ignore_failure true
+#        end
+#        execute "move_splunk_config_files_in_place" do
+#          user "splunkadmin"
+#          cwd "#{Chef::Config['file_cache_path']}/splunkvmwareconfig"
+#          command "mv ./* /home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/local/"
+#        end
+#        execute "/sbin/service splunk start" do
+#          ignore_failure true
+#        end
+#      end
+#    end
+#  end
+#else
+#  execute "/sbin/service splunk stop" do
+#    ignore_failure true
+#  end
+#  execute "move_splunk_config_files_in_place" do
+#    user "splunkadmin"
+#    cwd "#{Chef::Config['file_cache_path']}/splunkvmwareconfig"
+#    command "mv ./* /home/splunkadmin/opt/splunk/etc/apps/Splunk_TA_vmware/local/"
+#  end
+#  execute "/sbin/service splunk start" do
+#    ignore_failure true
+#  end
+#end
 
 service "splunk" do
    action :start
