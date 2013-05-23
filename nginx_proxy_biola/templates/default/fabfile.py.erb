@@ -1,5 +1,5 @@
 from __future__ import with_statement
-from fabric.api import local, run, cd
+from fabric.api import *
 
 env.hosts = [<%= @hosts.map{|h| "'#{h}'"}.join(',')  unless @hosts.empty? %>]
 
@@ -11,7 +11,7 @@ def commit():
         local("git add -p && git commit && git push")
 
 def deploy():
-        with cd('/tmp/nginx-config-test'):
+        with cd('/etc/nginx'):
                 run("git pull")
                 run("sudo nginx -t")
                 run("sudo service nginx reload")
