@@ -1,0 +1,7 @@
+<% unless @nodehash.backups.include?("backuppc") and (@nodehash.backups.backuppc.include?("XferMethod") and not @nodehash.backups.backuppc.XferMethod == "rsync") -%><%= "$Conf{XferMethod} = 'rsync';" %> 
+$Conf{RsyncShareName} = [
+<% generatedtargets = 0 -%><% @nodehash.backups.targets.each_with_index do |params, index| -%><% params.each_key do |backup_target| -%><% if (params[backup_target]['backupservice'] == "backuppc") or (params[backup_target]['backupservice'].nil?) -%><% generatedtargets = generatedtargets + 1 -%>  '<%= backup_target %>'<%= "," if generatedtargets < @node_target_counts[@nodehash.name] %>
+<% end -%><% end -%><% end -%>];
+$Conf{RsyncClientCmd} = '$sshPath -q -x -l <% unless @nodehash.backups.include?('backuppc') and @nodehash.backups.backuppc.include?('user') -%>backuppc<% else -%><%= @nodehash.backups.backuppc.user %><% end -%> -o ServerAliveInterval=60 $host <%= "sudo " unless @nodehash.backups.include?('backuppc') and (@nodehash.backups.backuppc.include?('usesudo') and @nodehash.backups.backuppc.usesudo == false) %>$rsyncPath $argList+';
+$Conf{RsyncClientRestoreCmd} = '$sshPath -q -x -l <% unless @nodehash.backups.include?('backuppc') and @nodehash.backups.backuppc.include?('user') -%>backuppc<% else -%><%= @nodehash.backups.backuppc.user %><% end -%> $host <%= "sudo " unless @nodehash.backups.include?('backuppc') and (@nodehash.backups.backuppc.include?('usesudo') and @nodehash.backups.backuppc.usesudo == false) %>$rsyncPath $argList+';<% else -%>
+# SMB STUFF<% end -%>
