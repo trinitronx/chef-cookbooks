@@ -30,6 +30,7 @@ when 'ubuntu', 'debian'
   package "nano"
   package "screen"
   package "curl"
+  package "rsync"
 when 'redhat'
   package "screen"
 end

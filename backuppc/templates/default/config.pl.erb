@@ -1881,7 +1881,7 @@ $Conf{EMailNotifyMinDays} = 2.5;
 # handler this is either a plain name (eg: "admin") or a fully-qualified
 # name (eg: "admin@mydomain.com").
 #
-$Conf{EMailFromUserName} = 'backuppc';
+$Conf{EMailFromUserName} = '<%= node['backuppc']['EMailFromUserName'] %>';
 
 #
 # Destination address to an administrative user who will receive a
@@ -1890,7 +1890,7 @@ $Conf{EMailFromUserName} = 'backuppc';
 # handler this is either a plain name (eg: "admin") or a fully-qualified
 # name (eg: "admin@mydomain.com").
 #
-$Conf{EMailAdminUserName} = 'backuppc';
+$Conf{EMailAdminUserName} = '<%= node['backuppc']['EMailAdminUserName'] %>';
 
 #
 # Destination domain name for email sent to users.  By default
@@ -1901,7 +1901,7 @@ $Conf{EMailAdminUserName} = 'backuppc';
 #
 # With this setting user email will be set to 'user@mydomain.com'.
 #
-$Conf{EMailUserDestDomain} = '';
+$Conf{EMailUserDestDomain} = '<%= node['backuppc']['EMailUserDestDomain'] if node['backuppc']['EMailUserDestDomain'] %>';
 
 #
 # This subject and message is sent to a user if their PC has never been

@@ -76,40 +76,44 @@ end
 
 # Populate the list of hosts in Chef to backup
 #
-# node_target_counts is used in the host config
+# backup_target_count is used in the host config
 # template generation (cheap way of making lists
 # that don't have a comma on their last entry)
-chef_nodes = []
-node_target_counts = {}
+chef_nodes_presort = []
 search(:node, "backups_targets:*").each do |n|
   targetcount = 0
   n['backups']['targets'].each_with_index do |params, index|
     params.each_key do |backup_target|
       if (params[backup_target]['backupservice'].nil?) or (params[backup_target]['backupservice'] == "backuppc")
-        chef_nodes << n unless chef_nodes.include? n
-        targetcount = targetcount + 1
+        unless chef_nodes_presort.include? n['fqdn']
+          newhost = Hash.new
+          newhost[n['fqdn']] = Hash.new
+          newhost[n['fqdn']]['hostname'] = n['fqdn']
+          newhost[n['fqdn']]['backups'] = n['backups']
+          newhost[n['fqdn']]['backup_target_count'] = 1
+          chef_nodes_presort << newhost
+        else
+          chef_nodes_presort[n['fqdn']]['backup_target_count'] += 1
+        end
       end
     end
   end
-  node_target_counts[n.name] = targetcount
 end
-#chef_nodes.sort!
 
 # Look for non-chef hosts to backup
-nonchef_nodes_presort = []
 search(:backup_targets_nonchef, "id:*").each do |datab|
   datab['backups']['targets'].each_with_index do |params, index|
     params.each_key do |backup_target|
       if (params[backup_target]['backupservice'].nil?) or (params[backup_target]['backupservice'] == "backuppc")
-        unless nonchef_nodes_presort.include? datab['hostname']
+        unless chef_nodes_presort.include? datab['hostname']
           newhost = Hash.new
           newhost[datab['hostname']] = Hash.new
           newhost[datab['hostname']]['hostname'] = datab['hostname']
           newhost[datab['hostname']]['backups'] = datab['backups']
           newhost[datab['hostname']]['backup_target_count'] = 1
-          nonchef_nodes_presort << newhost
+          chef_nodes_presort << newhost
         else
-          nonchef_nodes_presort[datab['hostname']]['backup_target_count'] += 1
+          chef_nodes_presort[datab['hostname']]['backup_target_count'] += 1
         end 
       end
     end
@@ -120,14 +124,14 @@ end
 # Generates nonchef_nodes via sort on the keys in nonchef_nodes_presort
 # (Implemented because "nonchef_nodes_presort.sort {|a,b| a[:zip] <=> b[:zip]}"
 # and similar weren't working)
-nonchef_nodes_names = []
-nonchef_nodes = []
-nonchef_nodes_presort.each do |n| 
-  nonchef_nodes_names << n.keys[0]
+chef_nodes_names = []
+chef_nodes = []
+chef_nodes_presort.each do |n| 
+  chef_nodes_names << n.keys[0]
 end
-nonchef_nodes_names_sorted = nonchef_nodes_names.sort
-nonchef_nodes_names_sorted.each do |n|
-  nonchef_nodes << nonchef_nodes_presort[nonchef_nodes_names.index(n)]
+chef_nodes_names_sorted = chef_nodes_names.sort
+chef_nodes_names_sorted.each do |n|
+  chef_nodes << chef_nodes_presort[chef_nodes_names.index(n)]
 end
 # End terrible sort
 
@@ -135,8 +139,7 @@ end
 template "/etc/backuppc/hosts" do
   source "hosts.erb"
   variables(
-    :chef_nodes => chef_nodes,
-    :nonchef_nodes => nonchef_nodes
+    :chef_nodes => chef_nodes
   )
   notifies :reload, "service[backuppc]"
 end
@@ -144,25 +147,9 @@ end
 
 # Set up config files for each Chef node
 chef_nodes.each do |n|
-  template "/etc/backuppc/" + n.name + ".pl" do
-    source "hostconfig.pl.erb"
-    owner "backuppc"
-    group "www-data"
-    mode 0640
-    variables(
-      :nodehash => n,
-      :node_target_counts => node_target_counts
-    )
-    notifies :reload, "service[backuppc]"
-  end
-end
-
-
-# Set up config files for each non-Chef node
-nonchef_nodes.each do |n|
   n.each do |nkey, nvalue|
     template "/etc/backuppc/" + nvalue['hostname'].to_s + ".pl" do
-      source "hostconfig_nonchef.pl.erb"
+      source "hostconfig.pl.erb"
       owner "backuppc"
       group "www-data"
       mode 0640

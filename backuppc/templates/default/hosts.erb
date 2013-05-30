@@ -55,8 +55,6 @@
 host        dhcp    user    moreUsers     # <--- do not edit this line
 #farside    0       craig   jill,jeff     # <--- example static IP host entry
 #larson     1       bill                  # <--- example DHCP host entry
-localhost   0       backuppc
-<% @chef_nodes.each do |n| -%><%= n.name %> 0<% if n['backups']['backuppc'] -%> <% if n['backups']['backuppc']['backupowner'] -%><%= n['backups']['backuppc']['backupowner'] %><% else -%>backuppc<% end -%><% if n['backups']['backuppc']['otherbackupusers'] -%><%= n['backups']['backuppc']['otherbackupusers'] %><% end -%><% else -%> backuppc<% end -%>
+<% @chef_nodes.each do |n| -%><% n.each do |node, value| -%><%= node %> 0 <% if value['backups']['backuppc'] -%> <% if value['backups']['backuppc']['backupowner'] -%><%= value['backups']['backuppc']['backupowner'] %><% else -%>backuppc<% end -%><% if value['backups']['backuppc']['otherbackupusers'] -%><%= value['backups']['backuppc']['otherbackupusers'] %><% end -%><% else -%> backuppc<% end -%>
 <% end -%>
-<% @nonchef_nodes.each do |n| -%><% n.each do |node, value| -%><%= node %> 0 backuppc<% end -%>
 <% end -%>
