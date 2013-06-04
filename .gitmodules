@@ -82,3 +82,6 @@
 [submodule "splunk"]
 	path = splunk
 	url = git://github.com/biola/splunk_cookbook.git
+[submodule "yum"]
+	path = yum
+	url = git://github.com/opscode-cookbooks/yum.git
