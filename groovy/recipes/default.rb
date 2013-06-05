@@ -36,3 +36,8 @@ package "groovy-2.0.5" do
 	action :install
 end
 
+directory "/srv" do
+  owner node['groovy']['user']
+  group node['groovy']['group']
+  mode 00775
+end
