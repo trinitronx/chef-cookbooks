@@ -27,7 +27,7 @@ Etc.passwd {|u|
   existing_system_users << u.name
 }
 
-node['users']['accounts'].each do |username|
+node['users']['systemaccounts'].each do |username|
   username.each do |ukey, uvalue|
 
     if uvalue['databagname']
