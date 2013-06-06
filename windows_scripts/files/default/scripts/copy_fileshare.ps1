@@ -5,7 +5,8 @@
 # -FromPath			A valid absolute path to the folder containing the file(s) to copy
 # -Include			A filename or wildcard pattern for including files
 # -ToPath				The destination path to copy to
-# -AddTimestamp	(Optional) Append a timestamp to the destination filename(s)
+# -AddTimestamp	(Optional) Append the date and time to the destination filename(s)
+# -AddDatestamp	(Optional) Append the date to the destination filename(s)
 # -Username			(Optional) Copy the file as the given user
 # -Password			(Optional) The password for the specified user
 
@@ -18,6 +19,7 @@ Param (
 	[string]$Include,
 	[string]$ToPath,
 	[switch]$AddTimestamp,
+	[switch]$AddDatestamp,
 	[string]$Username,
 	[string]$Password
 )
@@ -41,6 +43,9 @@ else {
 		# Add a timestamp to the destination filename if specified
 		if ($AddTimestamp) {
 			$DestinationFile = "$($f.Basename)_$(Get-Date -Format "MM-dd-yyyy_HHmm")$($f.Extension)"
+		}
+		elseif ($AddDatestamp) {
+			$DestinationFile = "$($f.Basename)_$(Get-Date -Format "MM-dd-yyyy")$($f.Extension)"
 		}
 		else {
 			$DestinationFile = $f.Name
