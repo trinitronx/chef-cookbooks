@@ -1,0 +1,242 @@
+#!/usr/bin/env python
+#
+#   check_xserve_raid  Nagios plugin to check Apple Xserve RAIDs
+#   Copyright (C) 2010  Tom Payne
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+from httplib import HTTPConnection, HTTP_PORT
+from itertools import chain
+from optparse import OptionParser
+from plistlib import readPlist, writePlistToString
+import socket
+import sys
+
+
+OK, WARNING, CRITICAL, UNKNOWN = xrange(0, 4)
+status_message = 'OK WARNING CRITICAL UNKNOWN'.split()
+
+
+def format_slots(slots):
+    if not slots:
+        return 'none'
+    left = right = None
+    ranges = []
+    for slot in sorted(slots):
+        if left is None:
+            left = right = slot
+        elif slot == right + 1:
+            right = slot
+        else:
+            ranges.append((left, right))
+            left = right = slot
+    ranges.append((left, right))
+    if ranges == [(1, 7)]:
+        return 'all'
+    ss = []
+    for left, right in ranges:
+        if left == right:
+            ss.append('#%d' % left)
+        else:
+            ss.append('#%d-#%d' % (left, right))
+    return ', '.join(ss)
+
+
+class Array(object):
+
+    def __init__(self, array):
+        self.id = array['id']
+        self.progress = array['progress']
+        self.raid_level = array['raid-level']
+        self.raid_status = array['raid-status']
+        self.sector_capacity = array['sector-capacity']
+        self.slots = set(m['slot-id'] for m in array['members'] if m['slot-id'])
+        self.broken_raid_member_slots = set()
+        self.rebuilding_slots = set()
+        self.offline_slots = set()
+
+    def add_slot(self, slot_id, status):
+        if status.get('broken-raid-member', False):
+            self.broken_raid_member_slots.add(slot_id)
+        if not status['online']:
+            self.offline_slots.add(slot_id)
+        if status['rebuilding']:
+            self.rebuilding_slots.add(slot_id)
+
+    def check(self):
+        exit_status = OK
+        for i, u in reversed(list(enumerate('KB MB GB TB PB'.split()))):
+            if self.sector_capacity >= 2 ** (10 * i + 1):
+                capacity = '%0.2f%s' % (float(self.sector_capacity) / 2 ** (10 * i + 1), u)
+                break
+        else:
+            capacity = '%0.2fB' % (512 * float(self.sector_capacity))
+        value = ['%s RAID%s' % (capacity, self.raid_level), self.raid_status]
+        if self.raid_status != 'online':
+            exit_status = max(exit_status, CRITICAL)
+        for key in 'add-member expand initialize verify'.split():
+            if self.progress.get(key, 255) != 255:
+                value.append('%s(%d%%)' % (key, self.progress[key]))
+        if self.broken_raid_member_slots:
+            exit_status = max(exit_status, CRITICAL)
+            value.append('broken(%s)' % format_slots(self.broken_raid_member_slots))
+        if self.rebuilding_slots:
+            exit_status = max(exit_status, WARNING)
+            value.append('rebuilding(%s)' % format_slots(self.rebuilding_slots))
+        if self.offline_slots:
+            exit_status = max(exit_status, WARNING)
+            value.append('offline(%s)' % format_slots(self.offline_slots))
+        return (exit_status, 'array %d: %s' % (self.id, ', '.join(value)))
+
+
+class Controller(object):
+
+    def __init__(self, controller):
+        status = controller['status']
+        self.warnings = []
+        for warning in 'fan power temperature ups'.split():
+            if status.get('%s-warning' % warning, False):
+                self.warnings.append(warning)
+
+    def check(self):
+        if self.warnings:
+            return (WARNING, 'controller warnings: %s' % ' '.join(self.warnings))
+        return (OK, None)
+
+
+class Offline(object):
+
+    def __init__(self):
+        self.offline_slots = set()
+
+    def add_slot(self, slot_id, status):
+        self.offline_slots.add(slot_id)
+
+    def check(self):
+        if self.offline_slots:
+            return (OK, 'offline(%s)' % format_slots(self.offline_slots))
+        return (OK, None)
+
+
+class XserveRAID(object):
+
+    def __init__(self, host, username, password):
+        self.host = host
+        self.username = username
+        self.password = password
+
+    def get(self, url, request, headers={}):
+        conn = HTTPConnection(self.host, HTTP_PORT)
+        try:
+            headers['User-Agent'] = 'check_xserve_raid/1.0'
+            headers['Host'] = self.host
+            headers['Content-Type'] = 'application/xml'
+            headers['ACP-User'] = self.username
+            headers['ACP-Password'] = self.password
+            body = writePlistToString(request)
+            conn.request('POST', url, body, headers)
+            plist = readPlist(conn.getresponse())
+            if 'status' in plist:
+                if plist['status'] == -16:
+                    raise RuntimeError('access denied')
+                else:
+                    raise RuntimeError('unknown status: %d' % plist['status'])
+            return plist
+        finally:
+            conn.close()
+
+    def acp_action(self, key):
+        return self.get('/cgi-bin/acp-action', {key: {}})[key]
+
+    def get_page(self, page_id, apple_xsync):
+        return self.get('/cgi-bin/rsp-action', {'get-page': {'page-id': page_id}}, {'Apple-Xsync': apple_xsync})['get-page']
+
+    def perform(self, requests, apple_xsync):
+        return self.get('/cgi-bin/perform', {'requests': requests}, {'Apple-Xsync': apple_xsync})['responses']
+
+
+def main(argv):
+    parser = OptionParser()
+    parser.add_option('-H', metavar='ADDRESS', dest='host')
+    parser.add_option('-c', metavar='top|bottom', dest='controller')
+    parser.add_option('-u', metavar='USERNAME', dest='username')
+    parser.add_option('-p', metavar='PASSWORD', dest='password')
+    parser.set_defaults(controller='top')
+    parser.set_defaults(username='guest')
+    parser.set_defaults(password='fkyaaa1i') # public
+    options, args = parser.parse_args(argv[1:])
+    xserve_raid = XserveRAID(options.host, options.username, options.password)
+    exit_status, messages = OK, []
+    try:
+        power_state = xserve_raid.acp_action('power-state-get')['power-state']
+        if not power_state:
+            exit_status = max(exit_status, CRITICAL)
+            messages.append('power off')
+        status = xserve_raid.perform([{'inputs': {}, 'method': '/system/get-system-status'}], options.controller)[0]['outputs']['status']
+        if status['enclosure']['buzzer'] != 'off':
+            exit_status = max(exit_status, WARNING)
+            messages.append('buzzer %s' % status['enclosure']['buzzer'])
+        for key, value in status['monitor'].items():
+            if value != 'ok':
+                exit_status = max(exit_status, CRITICAL)
+                messages.append('%s %s' % (key, value))
+        if status['raid-controller']['fibre-link-state'] != 'up':
+            exit_status = max(exit_status, CRITICAL)
+            messages.append('%s %s' % ('fibre-link-state', status['raid-controller']['fibre-link-state']))
+        smart_drives = set()
+        for drive in status['smart']:
+            if drive['status']:
+                smart_drives.add(drive['drive-id'])
+        if smart_drives:
+            exit_status = max(exit_status, CRITICAL)
+            messages.append('smart(%s)' % format_slots(smart_drives))
+        for key, value in status['ups'].items():
+            if value:
+                exit_status = max(exit_status, WARNING)
+                messages.append(key)
+        status = xserve_raid.get_page(1, options.controller)
+        if 'status' in status:
+            if status['status'] == -6745:
+                exit_status = max(exit_status, UNKNOWN)
+                messages.append('controller starting up...')
+            else:
+                exit_status = max(exit_status, UNKNOWN)
+                messages.append(str(status['status']))
+        else:
+            controller = Controller(status['controller'])
+            arrays = [Array(array) for array in status['arrays']]
+            offline = Offline()
+            for slot in status['slots']:
+                slot_id, status = slot['id'], slot['status']
+                try:
+                    obj = (array for array in arrays if slot_id in array.slots).next()
+                except StopIteration:
+                    obj = offline
+                obj.add_slot(slot_id, status)
+            for obj in chain([controller], arrays, [offline]):
+                object_status, object_message = obj.check()
+                exit_status = max(exit_status, object_status)
+                if object_message:
+                    messages.append(object_message)
+    except (EnvironmentError, RuntimeError):
+        exit_status, messages = (CRITICAL, [str(sys.exc_info()[1])])
+    except socket.error:
+        exit_status, messages = (CRITICAL, [str(sys.exc_info()[1][1])])
+    print 'XSERVE RAID %s: %s' % (status_message[exit_status], '; '.join(messages))
+    sys.exit(exit_status)
+
+
+if __name__ == '__main__':
+    main(sys.argv)

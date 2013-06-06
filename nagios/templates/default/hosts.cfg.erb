@@ -46,6 +46,9 @@ define host {
   <% if n.attribute?("nagios") and n.nagios.attribute?("notification_period") -%>
   notification_period <%= n['nagios']['notification_period'] %>
   <% end -%>
+  <% if n.attribute?("nagios") and n.nagios.attribute?("contact_groups") -%>
+  contact_groups <%= n['nagios']['contact_groups'] %>
+  <% end -%>
 }
 <% end -%>
 <% end -%>
@@ -60,6 +63,9 @@ define host {
   notifications_enabled <%= n['notifications'] %>
   <% unless n["notification_period"].nil? -%>
   notification_period <%= n['notification_period'] %>
+  <% end -%>
+  <% unless n["contact_groups"].nil? -%>
+  contact_groups <%= n['contact_groups'] %>
   <% end -%>
 }
 <% end -%>
