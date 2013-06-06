@@ -1,9 +1,8 @@
 #
 # Cookbook Name:: users
-# Recipe:: sysadmins
+# Recipe:: banneradmins 
 #
-# Copyright 2011, Eric G. Wolfe
-# Copyright 2009-2011, Opscode, Inc.
+# Copyright 2013, Biola University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,25 +17,11 @@
 # limitations under the License.
 #
 
-# Searches data bag "users" for groups attribute "sysadmin".
-# Places returned users in Unix group "sysadmin" with GID 2300.
 
 chef_gem "ruby-shadow"
 
-case node['platform']
-when 'ubuntu', 'debian'
-  package "bash-completion"
-  package "vim"
-  package "nano"
-  package "screen"
-  package "curl"
-  package "rsync"
-when 'redhat', 'centos'
-  package "screen"
-  package "rsync"
-end
 
-users_manage "sysadmin" do
-  group_id 2300
+users_manage "cognosadmins" do
+  group_id 2312
   action [ :remove, :create ]
 end
