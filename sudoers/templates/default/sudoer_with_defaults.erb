@@ -1,0 +1,8 @@
+# This file is managed by Chef for <%= node['fqdn'] %>
+# Do NOT modify this file directly.
+
+Defaults:<%= @sudoer %> <%= @defaults %>
+
+<% @commands.each do |command| -%>
+<%= @sudoer %>  <%= @host %>=(<%= @runas %>) <%= 'NOPASSWD:' if @nopasswd %><%= command %>
+<% end -%>

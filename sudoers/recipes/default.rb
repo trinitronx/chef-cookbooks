@@ -27,6 +27,8 @@ if node['authorization']['sudo']['include_sudoers_d']
         host parameters[fragment_name]['host'] if parameters[fragment_name]['host']
         runas parameters[fragment_name]['runas'] if parameters[fragment_name]['runas']
         nopasswd parameters[fragment_name]['nopasswd'] if parameters[fragment_name]['nopasswd']
+        template parameters[fragment_name]['template'] if parameters[fragment_name]['template']
+        variables parameters[fragment_name]['variables'] if parameters[fragment_name]['variables']
       end
     end
   end
