@@ -19,98 +19,41 @@
 
 # installs supplementary required packages for Oracle
 
-yum_package "binutils"
-
-yum_package "compat-libstdc++-33" do
-  arch "i386"
+['binutils','elfutils-libelf','elfutils-libelf-devel','gcc','gcc-c++','glibc-common','glibc-headers','ksh','libstdc++-devel','make','sysstat'].each do |packagename|
+  yum_package packagename
 end
 
-yum_package "compat-libstdc++-33" do
-  arch "x86_64"
+# These packages need their i386 version installed as well 
+multiarchpackages = ['compat-libstdc++-33','glibc-devel','libaio','libaio-devel','libgcc','libstdc++','unixODBC','unixODBC-devel']
+
+# glibc needs to specifically have the i686 version
+isixeightysixpackages = ['glibc']
+
+if node['kernel']['machine'] == "i686"
+  multiarchpackages.each do |packagename|
+    yum_package packagename
+  end
+  
+  isixeightysixpackages.each do |packagename|
+    yum_package packagename
+  end
+
+# Since the machine has been determined to not be 32bit
+# This should probably be changed to a 64bit check
+else
+  multiarchpackages.each do |packagename|
+    ['x86_64','i386'].each do |architecture|
+      yum_package packagename do
+        arch architecture
+      end
+    end
+  end
+
+  isixeightysixpackages.each do |packagename|
+    ['x86_64','i686'].each do |architecture|
+      yum_package packagename do
+        arch architecture
+      end
+    end
+  end
 end
-
-yum_package "elfutils-libelf"
-
-yum_package "elfutils-libelf-devel"
-
-yum_package "gcc"
-
-yum_package "gcc-c++"
-
-yum_package "glibc" do
-  arch "i686"
-end
-
-yum_package "glibc" do
-  arch "x86_64"
-end
-
-yum_package "glibc-common"
-
-yum_package "glibc-devel" do
-  arch "x86_64"
-end
-
-yum_package "glibc-devel" do
-  arch "i386"
-end
-
-yum_package "glibc-headers"
-
-yum_package "ksh"
-
-yum_package "libaio" do
-  arch "x86_64"
-end
-
-yum_package "libaio" do
-  arch "i386"
-end
-
-yum_package "libaio-devel" do
-  arch "x86_64"
-end
-
-yum_package "libaio-devel" do
-  arch "i386"
-end
-
-yum_package "libgcc" do
-  arch "x86_64"
-end
-
-yum_package "libgcc" do
-  arch "i386"
-end
-
-yum_package "libstdc++" do
-  arch "x86_64"
-end
-
-yum_package "libstdc++" do
-  arch "i386"
-end
-
-yum_package "libstdc++-devel"
-
-yum_package "make"
-
-yum_package "sysstat"
-
-yum_package "unixODBC" do
-  arch "x86_64"
-end
-
-yum_package "unixODBC" do
-  arch "i386"
-end
-
-yum_package "unixODBC-devel" do
-  arch "x86_64"
-end
-
-yum_package "unixODBC-devel" do
-  arch "i386"
-end
-
-
