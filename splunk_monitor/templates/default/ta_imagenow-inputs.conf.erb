@@ -1,0 +1,10 @@
+[script://$SPLUNK_HOME\etc\apps\TA-imagenow\bin\check_imagenow_usercount.bat]
+# change to false to start the input, requires restart
+disabled = false 
+#host = 
+index = main
+# frequency to run the script
+interval = 300 	
+source = check_imagenow_usercount.vbs
+sourcetype = imagenowusage
+index = main

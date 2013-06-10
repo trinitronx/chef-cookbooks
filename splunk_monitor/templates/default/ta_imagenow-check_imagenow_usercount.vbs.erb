@@ -1,0 +1,42 @@
+' Copyright 2013, Biola University 
+'
+' Licensed under the Apache License, Version 2.0 (the "License");
+' you may not use this file except in compliance with the License.
+' You may obtain a copy of the License at
+'
+' http://www.apache.org/licenses/LICENSE-2.0
+'
+' Unless required by applicable law or agreed to in writing, software
+' distributed under the License is distributed on an "AS IS" BASIS,
+' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+' See the License for the specific language governing permissions and
+' limitations under the License.
+'
+
+
+Dim ObjExec
+Dim strFromProc
+Dim listFromProc
+
+Dim nowString
+nowString = Date & " " & Time
+
+Dim rxp
+Set rxp = new RegExp
+rxp.Global = True
+rxp.Multiline = False
+rxp.Pattern = "\s{2,}"
+
+
+Set objShell = WScript.CreateObject("WScript.Shell")
+Set ObjExec = objShell.Exec("<%= node['splunk']['apps']['ta_imagenow']['bindir'] %>\inserver -c")
+Do
+    strFromProc = ObjExec.StdOut.ReadLine()
+    if inStr(strFromProc, "Client") then
+        strFromProc = "username=" & strFromProc
+        ' replace spaces with a special string that split will catch
+        strFromProc = rxp.Replace(strFromProc, "#@#@#@#")
+        listFromProc = Split(strFromProc,"#@#@#@#")
+        WScript.Echo nowString & " " & listFromProc(0) & " sessionIDIPaddr=" & listFromProc(1) & " imagenowstarttime='" & listFromProc(2) & "'  imagenowlicense='" & listFromProc(3) & "'"
+    end if
+Loop While Not ObjExec.Stdout.atEndOfStream
