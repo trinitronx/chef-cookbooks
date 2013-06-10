@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: splunk_windows
-# Recipe:: default
+# Cookbook Name:: nagios
+# Recipe:: client_windows
 #
 # Copyright 2013, Biola University 
 #
