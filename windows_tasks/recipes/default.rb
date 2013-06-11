@@ -35,10 +35,18 @@ if node['windows']
   if node['windows']['scheduled_tasks']
     node['windows']['scheduled_tasks'].each_with_index do |parameters, index|
       parameters.each_key do |task_name|
-        # Set the default action to create
+        # Set the default task action to create
         task_action = parameters[task_name]['action'].nil? ? 'create' : parameters[task_name]['action']
 
-        if (((task_action == 'create' || task_action == 'run') && !task_exists(task_name)) || (task_action == 'delete' && task_exists(task_name)))
+        # Handle deletion of scheduled tasks to bypass the LWRP and to provide Windows 2003 compatibility
+        if (task_action == 'delete' && task_exists(task_name))
+          execute "delete scheduled task" do
+            command "schtasks /Delete /F /TN \"#{task_name}\""
+            action :run
+          end
+          Chef::Log.info "#{task_name} task deleted"
+        # Verify that the task exists before calling the LWRP
+        elsif ((task_action == 'create' || task_action == 'run') && !task_exists(task_name))
           windows_task parameters.keys[0].to_s do
             user parameters[task_name]['user'] if parameters[task_name]['user']
             password parameters[task_name]['password'] if parameters[task_name]['password']
