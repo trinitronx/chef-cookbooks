@@ -22,6 +22,11 @@ client_windows.rb
 
 * New recipe for installing and configuring NSClient++ on Windows
 
+knife.rb
+---------
+
+* New recipe that gives Nagios the ability to interact with Chef; deploys a knife configuration file and sets the nagios user as the owner of the node's Chef client key
+
 server_extras.rb
 ---------
 
