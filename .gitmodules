@@ -85,3 +85,21 @@
 [submodule "yum"]
 	path = yum
 	url = git://github.com/opscode-cookbooks/yum.git
+[submodule "database"]
+	path = database
+	url = git://github.com/opscode-cookbooks/database.git
+[submodule "mysql"]
+	path = mysql
+	url = git://github.com/opscode-cookbooks/mysql.git
+[submodule "build-essential"]
+	path = build-essential
+	url = git://github.com/opscode-cookbooks/build-essential.git
+[submodule "postgresql"]
+	path = postgresql
+	url = git://github.com/opscode-cookbooks/postgresql.git
+[submodule "aws"]
+	path = aws
+	url = git://github.com/opscode-cookbooks/aws.git
+[submodule "xfs"]
+	path = xfs
+	url = git://github.com/opscode-cookbooks/xfs.git
