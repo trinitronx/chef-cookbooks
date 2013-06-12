@@ -1,6 +1,6 @@
 maintainer       'Biola'
 maintainer_email 'adam.crownoble@biola.edu'
 description      'Sets up the basic framework for an Nginx proxy'
-version          '0.1.1'
+version          '0.1.2'
 recipe           'nginx_proxy_biola', 'Sets up a basic Nginx proxy'
 supports         'ubuntu'
