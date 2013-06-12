@@ -6,10 +6,10 @@ env.hosts = [<%= @hosts.map{|h| "'#{h}'"}.join(',')  unless @hosts.empty? %>]
 @runs_once
 def test():
         local("sudo nginx -t")
+        local("sudo service nginx reload")
 
 @runs_once
 def commit():
-        test()
         local("git add -p && git commit && git push")
 
 def deploy():
