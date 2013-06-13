@@ -1,10 +1,10 @@
-# CHANGELOG for logrotate_misc
+# CHANGELOG for logrotate_apps
 
-This file is used to list changes made in each version of logrotate_misc.
+This file is used to list changes made in each version of logrotate_apps.
 
 ## 0.1.0:
 
-* Initial release of logrotate_misc
+* Initial release of logrotate_apps
 
 - - - 
 Check the [Markdown Syntax Guide](http://daringfireball.net/projects/markdown/syntax) for help with Markdown.
