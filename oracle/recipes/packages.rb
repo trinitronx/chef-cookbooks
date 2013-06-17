@@ -26,11 +26,29 @@ when "rhel"
     yum_package packagename
   end
 
-  # pdksh was removed from RHEL6 and replaced with mksh
+  # Special exceptions here for RHEL 5/6
   if node['platform_version'].to_i >= 6
     yum_package 'mksh'
+    if node['kernel']['machine'] == "i686"
+      yum_package 'openmotif'
+    else
+      ['x86_64','i686'].each do |architecture|
+        yum_package 'openmotif' do
+          arch architecture
+        end
+      end
+    end
   else
     yum_package 'pdksh'
+    if node['kernel']['machine'] == "i686"
+      yum_package 'openmotif'
+    else
+      ['x86_64','i386'].each do |architecture|
+        yum_package 'openmotif' do
+          arch architecture
+        end
+      end
+    end
   end
 
   # These packages need their i386 version installed as well 
