@@ -17,42 +17,53 @@
 # limitations under the License.
 #
 
-# installs supplementary required packages for Oracle
+case node['platform_family']
+when "rhel"
 
-['binutils','elfutils-libelf','elfutils-libelf-devel','gcc','gcc-c++','glibc-common','glibc-headers','ksh','libstdc++-devel','make','sysstat'].each do |packagename|
-  yum_package packagename
-end
+  # installs supplementary required packages for Oracle
 
-# These packages need their i386 version installed as well 
-multiarchpackages = ['compat-libstdc++-33','glibc-devel','libaio','libaio-devel','libgcc','libstdc++','unixODBC','unixODBC-devel']
-
-# glibc needs to specifically have the i686 version
-isixeightysixpackages = ['glibc']
-
-if node['kernel']['machine'] == "i686"
-  multiarchpackages.each do |packagename|
+  ['binutils','elfutils-libelf','elfutils-libelf-devel','gcc','gcc-c++','glibc-common','glibc-headers','ksh','libstdc++-devel','make','sysstat'].each do |packagename|
     yum_package packagename
   end
+
+  # pdksh was removed from RHEL6 and replaced with mksh
+  if node['platform_version'].to_i >= 6
+    yum_package 'mksh'
+  else
+    yum_package 'pdksh'
+  end
+
+  # These packages need their i386 version installed as well 
+  multiarchpackages = ['compat-libstdc++-33','glibc-devel','libaio','libaio-devel','libgcc','libstdc++','unixODBC','unixODBC-devel']
+
+  # glibc needs to specifically have the i686 version
+  isixeightysixpackages = ['glibc']
+
+  if node['kernel']['machine'] == "i686"
+    multiarchpackages.each do |packagename|
+      yum_package packagename
+    end
   
-  isixeightysixpackages.each do |packagename|
-    yum_package packagename
-  end
+    isixeightysixpackages.each do |packagename|
+      yum_package packagename
+    end
 
-# Since the machine has been determined to not be 32bit
-# This should probably be changed to a 64bit check
-else
-  multiarchpackages.each do |packagename|
-    ['x86_64','i386'].each do |architecture|
-      yum_package packagename do
-        arch architecture
+  # Since the machine has been determined to not be 32bit
+  # This should probably be changed to a 64bit check
+  else
+    multiarchpackages.each do |packagename|
+      ['x86_64','i386'].each do |architecture|
+        yum_package packagename do
+          arch architecture
+        end
       end
     end
-  end
 
-  isixeightysixpackages.each do |packagename|
-    ['x86_64','i686'].each do |architecture|
-      yum_package packagename do
-        arch architecture
+    isixeightysixpackages.each do |packagename|
+      ['x86_64','i686'].each do |architecture|
+        yum_package packagename do
+          arch architecture
+        end
       end
     end
   end

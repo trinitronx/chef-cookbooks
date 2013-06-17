@@ -17,16 +17,28 @@
 # limitations under the License.
 #
 
-# Install the X11 package group
-execute "x11installation" do
-	command "yum groupinstall -y 'X Window System'"
-	creates "/usr/bin/startx"
-	end
+case node['platform_family']
+when "rhel"
 
-# Add internet browsers
-execute "browserinstallation" do
-	command "yum groupinstall -y 'Graphical Internet'"
-	creates "/usr/bin/firefox"
-	end
+  # Install the X11 package group
+  execute "x11installation" do
+    command "yum groupinstall -y 'X Window System'"
+    creates "/usr/bin/startx"
+  end
 
-yum_package "vnc-server"
+  # Add internet browsers
+  execute "browserinstallation" do
+    if node['platform_version'].to_i >= 6
+      command "yum groupinstall -y 'Internet Browser'"
+    else
+      command "yum groupinstall -y 'Graphical Internet'"
+    end
+    creates "/usr/bin/firefox"
+  end
+
+  # Regular packages to install
+  ['vnc-server','xterm','twm'].each do |packagename|
+    yum_package packagename
+  end
+
+end
