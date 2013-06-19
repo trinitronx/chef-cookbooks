@@ -41,4 +41,11 @@ when "rhel"
     yum_package packagename
   end
 
+  # Packages needed on RHEL6+
+  # On RHEL6.4 x64, twm will fail to start without
+  # liberation-mono-fonts package
+  if node['platform_version'].to_i >= 6
+    yum_package 'liberation-mono-fonts'
+  end
+
 end

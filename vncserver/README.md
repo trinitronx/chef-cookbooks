@@ -20,13 +20,13 @@ Add attributes in the following manner on your node (this will populate the /etc
         {
           "firstusernamehere": {
             "display": "1",
-            "arguments": "-geometry 1024x768"
+            "arguments": "-geometry 1024x768 -localhost"
           }
         },
         {
           "secondusername here": {
             "display": "2",
-            "arguments": "-geometry 1024x768"
+            "arguments": "-geometry 1024x768 -localhost"
           }
         }
       ]
