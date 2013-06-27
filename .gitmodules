@@ -109,3 +109,6 @@
 [submodule "nginx"]
 	path = nginx
 	url = git://github.com/opscode-cookbooks/nginx.git
+[submodule "ohai"]
+	path = ohai
+	url = git@github.com:opscode-cookbooks/ohai.git
