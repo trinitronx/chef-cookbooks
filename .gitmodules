@@ -106,3 +106,6 @@
 [submodule "logrotate"]
 	path = logrotate
 	url = git://github.com/opscode-cookbooks/logrotate.git
+[submodule "nginx"]
+	path = nginx
+	url = git://github.com/opscode-cookbooks/nginx.git
