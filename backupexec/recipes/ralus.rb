@@ -70,6 +70,8 @@ cookbook_file "#{Chef::Config[:file_cache_path]}/RALUS.tar.gz" do
   end
 
 
+# Response file pulled from /var/tmp/vxif after installation
+# Deleted systems line from the file
 template "#{Chef::Config[:file_cache_path]}/ralusresponsefile.response" do
   source "ralusresponsefile.response.erb"
   not_if "test -f /opt/VRTSralus/bin/beremote"
