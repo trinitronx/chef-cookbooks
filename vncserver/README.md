@@ -20,7 +20,8 @@ Add attributes in the following manner on your node (this will populate the /etc
         {
           "firstusernamehere": {
             "display": "1",
-            "arguments": "-geometry 1024x768 -localhost"
+            "arguments": "-geometry 1024x768 -localhost",
+            "disablefirefoxlaunch": true
           }
         },
         {
@@ -32,6 +33,8 @@ Add attributes in the following manner on your node (this will populate the /etc
       ]
     }
 ```
+
+"disablefirefoxlaunch" will deploy a .Xclients template to the user with the firefox launch disabled
 
 Usage
 -----
@@ -60,6 +63,8 @@ Just include `vncserver` in your node's `run_list`:
   ]
 }
 ```
+
+If a user's password is set as their "vncpassword" in their record in the 'users' databag, and that user does not have a vncpasswd file, it will be created for them.
 
 
 License and Authors
