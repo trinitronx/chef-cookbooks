@@ -28,7 +28,7 @@ if output.split(",").length < 5
     cron_d "scrub_" + pool do
       minute 0
       hour 2
-      weekday 7
+      weekday 0
       command "[ $(date +\%d) -ge " + weekstart.to_s + " -a $(date +\%d) -le " + weekend.to_s + " ] && zpool scrub " + pool
     end
     weekstart += 7
@@ -41,7 +41,7 @@ elsif output.split(",").length < 13
     cron_d "scrub_" + pool do
       minute 0
       hour 2
-      weekday 7
+      weekday 0
       month monthint
       command "[ $(date +\%d) -le 7 ] && zpool scrub " + pool
     end
