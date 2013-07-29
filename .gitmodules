@@ -64,9 +64,6 @@
 [submodule "cron"]
 	path = cron
 	url = git://github.com/opscode-cookbooks/cron.git
-[submodule "sudo"]
-	path = sudo
-	url = git://github.com/biola/sudo_cookbook.git
 [submodule "nginx_simplecgi"]
 	path = nginx_simplecgi
 	url = git://github.com/heavywater/chef-nginx_simplecgi.git
