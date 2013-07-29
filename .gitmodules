@@ -109,3 +109,6 @@
 [submodule "ohai"]
 	path = ohai
 	url = git@github.com:opscode-cookbooks/ohai.git
+[submodule "sudo"]
+	path = sudo
+	url = https://github.com/opscode-cookbooks/sudo.git
