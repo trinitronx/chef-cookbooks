@@ -19,6 +19,8 @@
 
 output = `zpool list | tail -n +2 | cut -d ' ' -f 1 | tr "\n" "," | sed '$s/.$//'`
 
+zpoolLocation = `which zpool`.strip
+
 # Weekly jobs
 if output.split(",").length < 5
   # Run the scrub once a week on Sunday
@@ -29,7 +31,7 @@ if output.split(",").length < 5
       minute 0
       hour 2
       weekday 0
-      command "[ $(date +\\%d) -ge " + weekstart.to_s + " -a $(date +\\%d) -le " + weekend.to_s + " ] && zpool scrub " + pool
+      command "[ $(date +\\%d) -ge " + weekstart.to_s + " -a $(date +\\%d) -le " + weekend.to_s + " ] && " + zpoolLocation + " scrub " + pool
     end
     weekstart += 7
     weekend += 7
@@ -43,7 +45,7 @@ elsif output.split(",").length < 13
       hour 2
       weekday 0
       month monthint
-      command "[ $(date +\\%d) -le 7 ] && zpool scrub " + pool
+      command "[ $(date +\\%d) -le 7 ] && " + zpoolLocation + " scrub " + pool
     end
     monthno += 1
   end
