@@ -112,3 +112,6 @@
 [submodule "sudo"]
 	path = sudo
 	url = https://github.com/opscode-cookbooks/sudo.git
+[submodule "users"]
+	path = users
+	url = git@github.com:opscode-cookbooks/users.git
