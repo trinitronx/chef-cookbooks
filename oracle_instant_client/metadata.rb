@@ -1,0 +1,6 @@
+maintainer       'Biola'
+maintainer_email 'adam.crownoble@biola.edu'
+description      'Installs Oracle Instant Client'
+version          '0.1.0'
+recipe           'oracle_instant_client', 'Installs Oracle Instant Client libraries'
+supports         'ubuntu'
