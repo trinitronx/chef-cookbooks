@@ -17,6 +17,13 @@
 # limitations under the License.
 #
 
+if node['platform_family'] == 'debian'
+  %w{ libarchive-zip-perl libcrypt-ssleay-perl libclass-methodmaker-perl libdata-dump-perl libsoap-lite-perl perl-doc libssl-dev libuuid-perl liburi-perl libxml-libxml-perl }.each do |p|
+    package p do
+      action :install
+    end
+  end
+end
 
 src_filename = node['vmware']['perlsdk_x64_url'].split('/').last
 src_filepath = "#{Chef::Config['file_cache_path']}/#{src_filename}"
@@ -36,6 +43,15 @@ if (node['kernel']['machine'] == "x86_64") && (not File.exists?("/usr/bin/vmware
       tar xzf #{src_filename} -C #{extract_path}
       EOH
     not_if { ::File.exists?(extract_path) }
+  end
+
+  if node['platform_family'] == 'debian'
+    bash 'set environment variables' do
+      code <<-EOH
+      export http_proxy=
+      export ftp_proxy=
+      EOH
+    end
   end
 
   bash 'execute_installer' do
