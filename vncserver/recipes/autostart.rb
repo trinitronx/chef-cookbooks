@@ -46,17 +46,17 @@ node['vncserver']['users'].each_with_index do |parameters, index|
     unless File.exists?("/home/#{parameters.keys[0]}/.vnc/passwd")
       userDataBag = data_bag_item('users', parameters.keys[0])
       if userDataBag['vncpassword']
-        directory "/home/#{parameters.keys[0]}/.vnc" do
-          owner parameters.keys[0]
-          group parameters.keys[0]
+        execute "Stage #{parameters.keys[0]}'s password" do
+          command "echo \"#{userDataBag['vncpassword']}\" > #{Chef::Config[:file_cache_path]}/#{parameters.keys[0]}-vnc"
+        end
+        execute "Stage #{parameters.keys[0]}'s password step 2" do
+          command "echo \"#{userDataBag['vncpassword']}\" >> #{Chef::Config[:file_cache_path]}/#{parameters.keys[0]}-vnc"
         end
         execute "Populate #{parameters.keys[0]}'s initial VNC password" do
-          command "su -l -c 'echo #{userDataBag['vncpassword']}|vncpasswd -f > /home/#{parameters.keys[0]}/.vnc/passwd' #{parameters.keys[0]}"
+          command "su -l -c \"vncpasswd <#{Chef::Config[:file_cache_path]}/#{parameters.keys[0]}-vnc >/dev/null 2>/dev/null\" #{parameters.keys[0]}"
         end
-        file "/home/#{parameters.keys[0]}/.vnc/passwd" do
-          owner parameters.keys[0]
-          group parameters.keys[0]
-          mode 0600
+        execute "Remove #{parameters.keys[0]}'s staged password" do
+          command "rm #{Chef::Config[:file_cache_path]}/#{parameters.keys[0]}-vnc"
         end
       end
     end
