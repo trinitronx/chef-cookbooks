@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+require 'etc'
+
 # Set the RHEL autostart file
 template "/etc/sysconfig/vncservers" do
   source "vncservers.erb"
@@ -33,7 +35,7 @@ node['vncserver']['users'].each_with_index do |parameters, index|
       template "/home/#{parameters.keys[0]}/.Xclients" do
         source "dotXclients.erb"
         owner  parameters.keys[0]
-        group parameters.keys[0]
+        group Etc.getgrgid((Etc.getpwnam(parameters.keys[0])['gid']))['name']
         mode  0755
       end
     end
