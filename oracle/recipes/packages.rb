@@ -34,7 +34,7 @@ when "rhel"
   end
 
   # These packages need their i386 (on RHEL5) or i686 (RHEL6+) version installed as well 
-  multiarchpackages = ['compat-libstdc++-33','glibc-devel','libaio','libaio-devel','libgcc','libstdc++','unixODBC','unixODBC-devel','openmotif']
+  multiarchpackages = ['compat-libstdc++-33','glibc-devel','libaio','libaio-devel','libgcc','libstdc++','unixODBC','unixODBC-devel','openmotif','openmotif22']
 
   # glibc needs to specifically have the i686 version on RHEL5
   isixeightysixpackages = ['glibc']
