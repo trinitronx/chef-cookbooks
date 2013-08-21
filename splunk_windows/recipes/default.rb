@@ -37,8 +37,12 @@ end
 
 unless File.exists?("c:/chef/splunk_setup_passwd")
   splunk_password = node['splunk']['auth'].split(':')[1]
-  execute "\"#{splunk_cmd}\" edit user admin -password #{splunk_password} -roles admin -auth admin:changeme"
-  execute "echo true > c:/chef/splunk_setup_passwd"
+  windows_batch "set splunk forwarder password" do
+    code <<-EOH
+    "#{splunk_cmd}" edit user admin -password #{splunk_password} -roles admin -auth admin:changeme
+    echo true > c:/chef/splunk_setup_passwd
+    EOH
+  end
 end
 
 

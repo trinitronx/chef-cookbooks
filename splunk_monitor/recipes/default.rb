@@ -77,12 +77,24 @@ end
 
 # Update splunk servername just before splunk is to be restarted
 splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
-execute "update_splunk_servername" do
-	command "\"" + splunk_cmd + "\"" + " set servername "+ splunk_hostname + " -auth " + node['splunk']['auth'] 
-	subscribes :run, resources(:template => "#{node['splunk']['forwarder_home']}/etc/system/local/inputs.conf"), :immediately
-        action :nothing
+if node["os"] == "windows"
+  execute "update_splunk_servername" do
+    command "\"" + splunk_cmd + "\"" + " set servername "+ splunk_hostname + " -auth " + node['splunk']['auth'] 
+    subscribes :run, resources(:template => "#{node['splunk']['forwarder_home']}/etc/system/local/inputs.conf"), :immediately
+    action :nothing
+  end
 end
 
+# Servername update for windows
+if node["os"] == "windows"
+  windows_batch "update_splunk_servername" do
+    code <<-EOH
+    "#{splunk_cmd}" set servername #{splunk_hostname} -auth #{node['splunk']['auth']}
+    EOH
+    subscribes :run, resources(:template => "#{node['splunk']['forwarder_home']}/etc/system/local/inputs.conf"), :immediately
+    action :nothing
+  end
+end
 
 if node[:splunk][:monitors] 
 	directory "#{node['splunk']['forwarder_home']}/etc/apps/search/local" do
