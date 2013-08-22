@@ -20,8 +20,11 @@
 # Set up the Percona apt repository
 include_recipe "percona::repository"
 
-# Search for other cluster members
-cluster_members = search("node", "(percona_cluster_role:master OR percona_cluster_role:slave) AND chef_environment:#{node.chef_environment}") || []
+# Search for cluster masters (writable nodes) and slaves (used for failover only)
+cluster_masters = search("node", "percona_cluster_role:master AND chef_environment:#{node.chef_environment}") || []
+master_count = cluster_masters.length
+cluster_slaves = search("node", "percona_cluster_role:slave AND chef_environment:#{node.chef_environment}") || []
+cluster_members = cluster_masters.concat(cluster_slaves)
 
 # Reduce the cluster_members down to just the IPs
 cluster_members.map! do |member|
@@ -82,7 +85,8 @@ template "#{node['mysql']['confd_dir']}/xtradb_cluster.cnf" do
   group "root"
   mode 00644
   variables(
-    :wsrep_cluster_address => wsrep_cluster_address
+    :wsrep_cluster_address => wsrep_cluster_address,
+    :master_count => master_count
   )
 end
 

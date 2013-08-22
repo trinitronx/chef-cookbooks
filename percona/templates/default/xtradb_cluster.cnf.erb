@@ -27,6 +27,9 @@ innodb_autoinc_lock_mode=2
 # Node address
 wsrep_node_address=<%= node['ipaddress'] %>
 
+# Node name
+wsrep_node_name=<%= node['hostname'] %>
+
 # SST method
 wsrep_sst_method=<%= node['percona']['sst_method'] %>
 
@@ -37,3 +40,8 @@ wsrep_sst_auth="<%= node['percona']['sst_user'] %>:<%= node['percona']['sst_pass
 
 # Cluster name
 wsrep_cluster_name=<%= node['percona']['cluster_name'] %>
+
+<% if @master_count == 1 %>
+# Recommended options when writing to a single node
+wsrep_provider_options = "gcs.fc_limit = 256; gcs.fc_factor = 0.99; gcs.fc_master_slave = yes"
+<% end %>

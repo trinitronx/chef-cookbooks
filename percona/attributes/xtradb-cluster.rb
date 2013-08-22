@@ -19,7 +19,7 @@
 
 # Percona XtraDB Cluster settings
 default['percona']['cluster_name'] = "percona_xtradb_cluster"
-default['percona']['sst_method'] = "rsync"
+default['percona']['sst_method'] = "xtrabackup"
 default['percona']['sst_user'] = "xtrabackup_user"
 default['percona']['sst_password'] = "Passw0rd"
 default['percona']['cluster_role'] = ""
