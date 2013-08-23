@@ -35,7 +35,7 @@ wsrep_sst_method=<%= node['percona']['sst_method'] %>
 
 <% if node['percona']['sst_method'] == "xtrabackup" %>
 # Authentication for SST method
-wsrep_sst_auth="<%= node['percona']['sst_user'] %>:<%= node['percona']['sst_password'] %>"
+wsrep_sst_auth="<%= node['percona']['sst_user'] %>:<%= @sst_password %>"
 <% end %>
 
 # Cluster name

@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: percona
-# Attributes:: loadbalance
+# Attributes:: server
 #
 # Copyright 2013, Biola University
 #
@@ -17,13 +17,4 @@
 # limitations under the License.
 #
 
-# Default listener for MySQL connections (reads and writes)
-default['percona']['haproxy_write_port'] = 3306
-# Option to enable load-balanced MySQL listener for read-only use
-default['percona']['haproxy_enable_readonly_listener'] = true
-default['percona']['haproxy_read_port'] = 3307
-# Option to enable HAProxy stats
-default['percona']['haproxy_enable_stats'] = true
-default['percona']['haproxy_stats_port'] = 8282
-default['percona']['haproxy_stats_user'] = "stats"
-default['percona']['haproxy_stats_password'] = "passwordgoeshere"
+default['percona']['server_package'] = "percona-server-server-5.5"

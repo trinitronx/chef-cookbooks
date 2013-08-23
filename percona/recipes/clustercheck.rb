@@ -36,12 +36,16 @@ execute "create mysqlchk service" do
   not_if "grep 9200/tcp /etc/services"
 end
 
+# Retrieve authentication information from the mysql_users data bag
+root = data_bag_item("mysql_users", "root")
+clustercheck = data_bag_item("mysql_users", "clustercheck")
+
 # Set up the clustercheck user
-mysql_connection_info = { :host => "localhost", :username => 'root', :password => node['percona']['root_password'] }
+mysql_connection_info = { :host => "localhost", :username => 'root', :password => root['password'] }
 mysql_database_user 'clustercheck' do
   connection mysql_connection_info
   host 'localhost'
-  password node['percona']['clustercheck_password']
+  password clustercheck['password']
   privileges [:process]
   action :grant
 end

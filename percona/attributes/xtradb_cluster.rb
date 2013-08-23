@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: percona
-# Attributes:: loadbalance
+# Attributes:: xtradb-cluster
 #
 # Copyright 2013, Biola University
 #
@@ -17,13 +17,8 @@
 # limitations under the License.
 #
 
-# Default listener for MySQL connections (reads and writes)
-default['percona']['haproxy_write_port'] = 3306
-# Option to enable load-balanced MySQL listener for read-only use
-default['percona']['haproxy_enable_readonly_listener'] = true
-default['percona']['haproxy_read_port'] = 3307
-# Option to enable HAProxy stats
-default['percona']['haproxy_enable_stats'] = true
-default['percona']['haproxy_stats_port'] = 8282
-default['percona']['haproxy_stats_user'] = "stats"
-default['percona']['haproxy_stats_password'] = "passwordgoeshere"
+default['percona']['xtradb_cluster_package'] = "percona-xtradb-cluster-server-5.5"
+default['percona']['cluster_name'] = "percona_xtradb_cluster"
+default['percona']['sst_method'] = "xtrabackup"
+default['percona']['sst_user'] = "xtrabackup_user"
+default['percona']['cluster_role'] = ""

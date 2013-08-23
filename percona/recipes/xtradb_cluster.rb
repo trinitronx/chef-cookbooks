@@ -50,6 +50,11 @@ if bootstrap_cluster == false
 	wsrep_cluster_address += cluster_members.join(',')
 end
 
+# Retrieve user information from the mysql_users data bag
+root = data_bag_item("mysql_users", "root")
+debian_sys_maint = data_bag_item("mysql_users", "debian-sys-maint")
+sst_user = data_bag_item("mysql_users", node['percona']['sst_user'])
+
 # Prestage the mysql configuration files
 directory node['mysql']['conf_dir'] do
   owner "root"
@@ -77,6 +82,9 @@ template "#{node['mysql']['conf_dir']}/debian.cnf" do
   owner "root"
   group "root"
   mode 00600
+  variables(
+    :dsm_password => debian_sys_maint['password']
+  )
 end
 
 template "#{node['mysql']['confd_dir']}/xtradb_cluster.cnf" do
@@ -86,7 +94,8 @@ template "#{node['mysql']['confd_dir']}/xtradb_cluster.cnf" do
   mode 00644
   variables(
     :wsrep_cluster_address => wsrep_cluster_address,
-    :master_count => master_count
+    :master_count => master_count,
+    :sst_password => sst_user['password']
   )
 end
 
@@ -101,18 +110,13 @@ template "/tmp/percona.preseed" do
 	mode     0600
 	action   :create
 	variables(
-		:root_password => node['percona']['root_password']
+		:root_password => root['password']
 	)
 	notifies :run, resources(:execute => "install percona preseed"), :immediately
 end
 
-# Install the Percona packages
-package "percona-xtrabackup" do
-  action :install
-  only_if { node['percona']['sst_method'] == "xtrabackup" }
-end
-package "percona-xtradb-cluster-client-5.5"
-package "percona-xtradb-cluster-server-5.5"
+# Install the Percona XtraDB Cluster server package (includes client and xtrabackup packages)
+package node['percona']['xtradb_cluster_package']
 
 # Install mysql ruby gem after dependencies are met
 node.set['build_essential']['compiletime'] = true
@@ -126,13 +130,13 @@ package "libmysqlclient-dev" do
 end
 
 # Get MySQL authentication info
-mysql_connection_info = { :host => "localhost", :username => 'root', :password => node['percona']['root_password'] }
+mysql_connection_info = { :host => "localhost", :username => 'root', :password => root['password'] }
 
 # Update the password for the debian_sys_maint user
 mysql_database_user "debian-sys-maint" do
   connection mysql_connection_info
   host 'localhost'
-  password node['percona']['debian_sys_maint_password']
+  password debian_sys_maint['password']
   privileges [:all]
   action :grant
 end
@@ -142,7 +146,7 @@ if node['percona']['sst_method'] == "xtrabackup"
   mysql_database_user node['percona']['sst_user'] do
     connection mysql_connection_info
     host 'localhost'
-    password node['percona']['sst_password']
+    password sst_user['password']
     privileges ["reload","lock tables","replication client"]
     action :grant
   end
