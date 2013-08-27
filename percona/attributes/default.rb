@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+default['percona']['users_databag'] = "mysql_users"
+
 default['percona']['max_allowed_packet'] = "16M"
 default['percona']['table_definition_cache'] = "400"
 default['percona']['table_open_cache'] = "400"

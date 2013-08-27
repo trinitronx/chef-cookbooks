@@ -41,8 +41,8 @@ execute "install percona preseed" do
   command "debconf-set-selections /tmp/percona.preseed"
 end
 
-# Retrieve root password from the mysql_users data bag
-root = data_bag_item("mysql_users", "root")
+# Retrieve root password from the data bag containing MySQL user configuration
+root = data_bag_item(node['percona']['users_databag'], "root")
 
 template "/tmp/percona.preseed" do
   source   "percona-server.preseed.erb"

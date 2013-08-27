@@ -20,9 +20,9 @@
 # Install xinetd
 package "xinetd"
 
-# Retrieve authentication information from the mysql_users data bag
-root = data_bag_item("mysql_users", "root")
-clustercheck = data_bag_item("mysql_users", "clustercheck")
+# Retrieve authentication information from the data bag containing MySQL user configuration
+root = data_bag_item(node['percona']['users_databag'], "root")
+clustercheck = data_bag_item(node['percona']['users_databag'], "clustercheck")
 
 # Install the clustercheck script
 template "/usr/bin/clustercheck" do

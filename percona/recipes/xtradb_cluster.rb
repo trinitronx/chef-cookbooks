@@ -50,10 +50,10 @@ if bootstrap_cluster == false
 	wsrep_cluster_address += cluster_members.join(',')
 end
 
-# Retrieve user information from the mysql_users data bag
-root = data_bag_item("mysql_users", "root")
-debian_sys_maint = data_bag_item("mysql_users", "debian-sys-maint")
-sst_user = data_bag_item("mysql_users", node['percona']['sst_user'])
+# Retrieve user information from the data bag containing MySQL user configuration
+root = data_bag_item(node['percona']['users_databag'], "root")
+debian_sys_maint = data_bag_item(node['percona']['users_databag'], "debian-sys-maint")
+sst_user = data_bag_item(node['percona']['users_databag'], node['percona']['sst_user'])
 
 # Prestage the mysql configuration files
 directory node['mysql']['conf_dir'] do
