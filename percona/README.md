@@ -34,7 +34,7 @@ Pre-stages MySQL configuration files and installs Percona XtraDB Cluster. Includ
 Usage
 =====
 
-server setup
+Server setup
 ------------
 
 Create roles in Chef to deploy XtraDB Cluster. One role should contain the percona::xtradb recipe and all of the attributes needed to properly set up the host, including MySQL user passwords needed for the root user, the debian-sys-maint user, the clustercheck user, and optionally the user for XtraBackup. The role should also contain firewall exceptions for the ports used by XtraDB Cluster (3306, 4444, 4567, 4568, and 9200) if applicable.

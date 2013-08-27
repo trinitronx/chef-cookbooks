@@ -20,13 +20,17 @@
 # Install xinetd
 package "xinetd"
 
+# Retrieve authentication information from the mysql_users data bag
+root = data_bag_item("mysql_users", "root")
+clustercheck = data_bag_item("mysql_users", "clustercheck")
+
 # Install the clustercheck script
 template "/usr/bin/clustercheck" do
   source   "clustercheck.erb"
   mode     0755
   action   :create
   variables(
-    :clustercheck_password => node['percona']['clustercheck_password']
+    :clustercheck_password => clustercheck['password']
   )
 end
 
@@ -35,10 +39,6 @@ execute "create mysqlchk service" do
   command %Q(echo "mysqlchk        9200/tcp                        # mysqlchk" >> /etc/services)
   not_if "grep 9200/tcp /etc/services"
 end
-
-# Retrieve authentication information from the mysql_users data bag
-root = data_bag_item("mysql_users", "root")
-clustercheck = data_bag_item("mysql_users", "clustercheck")
 
 # Set up the clustercheck user
 mysql_connection_info = { :host => "localhost", :username => 'root', :password => root['password'] }
