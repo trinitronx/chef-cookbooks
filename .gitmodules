@@ -118,3 +118,6 @@
 [submodule "keepalived"]
 	path = keepalived
 	url = git@github.com:opscode-cookbooks/keepalived.git
+[submodule "ulimit"]
+	path = ulimit
+	url = git@github.com:biola/chef-ulimit.git
