@@ -21,8 +21,9 @@
 package "xinetd"
 
 # Retrieve authentication information from the data bag containing MySQL user configuration
-root = data_bag_item(node['percona']['users_databag'], "root")
-clustercheck = data_bag_item(node['percona']['users_databag'], "clustercheck")
+encryption_key = Chef::EncryptedDataBagItem.load_secret(node['percona']['databag_encryption_key'])
+root = Chef::EncryptedDataBagItem.load(node['percona']['users_databag'], "root", encryption_key)
+clustercheck = Chef::EncryptedDataBagItem.load(node['percona']['users_databag'], "clustercheck", encryption_key)
 
 # Install the clustercheck script
 template "/usr/bin/clustercheck" do

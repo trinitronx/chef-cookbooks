@@ -51,9 +51,10 @@ if bootstrap_cluster == false
 end
 
 # Retrieve user information from the data bag containing MySQL user configuration
-root = data_bag_item(node['percona']['users_databag'], "root")
-debian_sys_maint = data_bag_item(node['percona']['users_databag'], "debian-sys-maint")
-sst_user = data_bag_item(node['percona']['users_databag'], node['percona']['sst_user'])
+encryption_key = Chef::EncryptedDataBagItem.load_secret(node['percona']['databag_encryption_key'])
+root = Chef::EncryptedDataBagItem.load(node['percona']['users_databag'], "root", encryption_key)
+debian_sys_maint = Chef::EncryptedDataBagItem.load(node['percona']['users_databag'], "debian-sys-maint", encryption_key)
+sst_user = Chef::EncryptedDataBagItem.load(node['percona']['users_databag'], node['percona']['sst_user'], encryption_key)
 
 # Prestage the mysql configuration files
 directory node['mysql']['conf_dir'] do

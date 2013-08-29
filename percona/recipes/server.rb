@@ -42,7 +42,8 @@ execute "install percona preseed" do
 end
 
 # Retrieve root password from the data bag containing MySQL user configuration
-root = data_bag_item(node['percona']['users_databag'], "root")
+encryption_key = Chef::EncryptedDataBagItem.load_secret(node['percona']['databag_encryption_key'])
+root = Chef::EncryptedDataBagItem.load(node['percona']['users_databag'], "root", encryption_key)
 
 template "/tmp/percona.preseed" do
   source   "percona-server.preseed.erb"

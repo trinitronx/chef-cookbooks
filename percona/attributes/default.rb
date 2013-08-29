@@ -17,7 +17,8 @@
 # limitations under the License.
 #
 
-default['percona']['users_databag'] = "mysql_users"
+default['percona']['users_databag'] = "pxc_users"
+default['percona']['databag_encryption_key'] = "/etc/chef/encryption_keys/pxc_key"
 
 default['percona']['max_allowed_packet'] = "16M"
 default['percona']['table_definition_cache'] = "400"
