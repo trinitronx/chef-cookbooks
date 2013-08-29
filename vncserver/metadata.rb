@@ -4,4 +4,4 @@ maintainer_email 'troy.ready@biola.edu'
 license          'Apache 2.0'
 description      'Configures systems to serve desktops via VNC'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '3.0.0'
+version          '4.0.0'

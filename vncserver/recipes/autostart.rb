@@ -64,3 +64,7 @@ node['vncserver']['users'].each_with_index do |parameters, index|
     end
   end
 end
+
+service "vncserver" do
+  action [:enable, :start]
+end
