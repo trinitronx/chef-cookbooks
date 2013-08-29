@@ -121,3 +121,6 @@
 [submodule "ulimit"]
 	path = ulimit
 	url = git@github.com:biola/chef-ulimit.git
+[submodule "selinux"]
+	path = selinux
+	url = git@github.com:opscode-cookbooks/selinux.git
