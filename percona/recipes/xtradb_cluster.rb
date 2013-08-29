@@ -100,24 +100,34 @@ template "#{node['mysql']['confd_dir']}/xtradb_cluster.cnf" do
   )
 end
 
-# Prepare a debconf seed for the percona-server package
-execute "install percona preseed" do
-	action  :nothing
-	command "debconf-set-selections /tmp/percona.preseed"
-end
-
-template "/tmp/percona.preseed" do
-	source   "percona-server.preseed.erb"
-	mode     0600
-	action   :create
-	variables(
-		:root_password => root['password']
-	)
-	notifies :run, resources(:execute => "install percona preseed"), :immediately
-end
-
 # Install the Percona XtraDB Cluster server package (includes client and xtrabackup packages)
-package node['percona']['xtradb_cluster_package']
+package_installed = `apt-cache policy #{node['percona']['xtradb_cluster_package']} | grep Installed`
+
+unless package_installed
+  # Prepare a debconf seed for the percona-server package
+  execute "install percona preseed" do
+  	action  :nothing
+  	command "debconf-set-selections /tmp/percona.preseed"
+  end
+
+  template "/tmp/percona.preseed" do
+  	source   "percona-server.preseed.erb"
+  	mode     0600
+  	action   :create
+  	variables(
+  		:root_password => root['password']
+  	)
+  	notifies :run, resources(:execute => "install percona preseed"), :immediately
+  end
+
+  # Install the package
+  package node['percona']['xtradb_cluster_package']
+
+  # Remove the debconf seed
+  file "/tmp/percona.preseed" do
+    action :delete
+  end
+end
 
 # Install mysql ruby gem after dependencies are met
 node.set['build_essential']['compiletime'] = true
