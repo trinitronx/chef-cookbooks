@@ -29,7 +29,8 @@ package "libmysqlclient-dev" do
 end
 
 # Retrieve authentication information from the data bag containing MySQL user configuration
-root = data_bag_item(node['mysql']['management']['users_databag'], "root")
+encryption_key = Chef::EncryptedDataBagItem.load_secret(node['mysql']['management']['databag_encryption_key'])
+root = Chef::EncryptedDataBagItem.load(node['mysql']['management']['users_databag'], "root", encryption_key)
 
 # Create a hash of MySQL authentication info
 mysql_connection_info = { :host => "localhost", :username => 'root', :password => root['password'] }
@@ -37,7 +38,7 @@ mysql_connection_info = { :host => "localhost", :username => 'root', :password =
  # Loop through all of the items in the data bag containing MySQL database configuration
 mysql_databases = data_bag(node['mysql']['management']['databases_databag'])
 mysql_databases.each do |db_name|
-  database = data_bag_item(node['mysql']['management']['databases_databag'], db_name)
+	database = Chef::EncryptedDataBagItem.load(node['mysql']['management']['databases_databag'], db_name, encryption_key)
   # Create the database if it doesn't exist
 	mysql_database db_name do
 		connection mysql_connection_info
@@ -63,7 +64,7 @@ end
 # Loop through all of the items in the data bag containing MySQL user configuration
 mysql_users = data_bag(node['mysql']['management']['users_databag'])
 mysql_users.each do |user_name|
-  user = data_bag_item(node['mysql']['management']['users_databag'], user_name)
+	user = Chef::EncryptedDataBagItem.load(node['mysql']['management']['users_databag'], user_name, encryption_key)
 	# Grant permissions on each of the databases configured
 	if user['privileges']
 		user['privileges'].each do |db_name, db_privileges|

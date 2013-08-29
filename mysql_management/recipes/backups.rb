@@ -22,15 +22,18 @@ if File.directory?(node['mysql']['backup']['backup_location'])
   # Store backup definitions in an array of hashes
   backup_definitions = Array.new
 
+  # Retrieve encryption key for databag items
+  encryption_key = Chef::EncryptedDataBagItem.load_secret(node['mysql']['management']['databag_encryption_key'])
+
   # Loop through all of the items in the data bag containing MySQL database configuration
   mysql_databases = data_bag(node['mysql']['management']['databases_databag'])
   mysql_databases.each do |db_name|
-    database = data_bag_item(node['mysql']['management']['databases_databag'], db_name)
-    database['backup_schedule'] ||= node['mysql']['backup']['default_schedule']
-    unless database['backup_schedule'] == 'none'
+    database = Chef::EncryptedDataBagItem.load(node['mysql']['management']['databases_databag'], db_name, encryption_key)
+    backup_schedule = database['backup_schedule'] ? database['backup_schedule'] : node['mysql']['backup']['default_schedule']
+    unless backup_schedule == 'none'
     	# Add the database to the backup definitions
-  	  database['backup_rotation_period'] ||= node['mysql']['backup']['default_rotation_period']
-  	  d = { "db_name" => db_name, "schedule" => database['backup_schedule'], "rotation_period" => database['backup_rotation_period'] }
+      backup_rotation_period = database['backup_rotation_period'] ? database['backup_rotation_period'] : node['mysql']['backup']['default_rotation_period']
+  	  d = { "db_name" => db_name, "schedule" => backup_schedule, "rotation_period" => backup_rotation_period }
   	  backup_definitions << d
 
   	  # Create a subdirectory for the backups
@@ -58,7 +61,7 @@ if File.directory?(node['mysql']['backup']['backup_location'])
   end
 
   # Retrieve authentication information from the data bag containing MySQL user configuration
-  backup_user = data_bag_item(node['mysql']['management']['users_databag'], node['mysql']['backup']['backup_user'])
+  backup_user = Chef::EncryptedDataBagItem.load(node['mysql']['management']['users_databag'], node['mysql']['backup']['backup_user'], encryption_key)
 
   # Create the backup script
   template "#{node['mysql']['backup']['backup_location']}/scheduled_backup.sh" do

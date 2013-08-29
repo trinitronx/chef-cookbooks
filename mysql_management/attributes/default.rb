@@ -19,3 +19,4 @@
 
 default['mysql']['management']['databases_databag'] = "mysql_databases"
 default['mysql']['management']['users_databag'] = "mysql_users"
+default['mysql']['management']['encryption_key'] = "/etc/chef/encryption_keys/mysql_key"
