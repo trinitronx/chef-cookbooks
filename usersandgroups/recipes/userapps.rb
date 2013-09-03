@@ -42,7 +42,3 @@ when 'redhat', 'centos'
   package "rsync"
   package "vim"
 end
-
-
-
-package
