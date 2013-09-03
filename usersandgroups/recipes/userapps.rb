@@ -17,6 +17,17 @@
 # limitations under the License.
 #
 
+# Setup run-one ppa for older Ubuntu versions
+if node['platform'] == 'ubuntu' and node['platform_version'].to_i < 12
+  apt_repository "run-one" do
+    uri "http://ppa.launchpad.net/run-one/ppa/ubuntu"
+    distribution node['lsb']['codename']
+    components ["main"]
+    keyserver "keyserver.ubuntu.com"
+    key "DC68C79C61E668B4D505C77326FB1781A5163C88"
+  end
+end
+
 case node['platform']
 when 'ubuntu', 'debian'
   package "bash-completion"
@@ -25,7 +36,13 @@ when 'ubuntu', 'debian'
   package "screen"
   package "curl"
   package "rsync"
+  package "run-one"
 when 'redhat', 'centos'
   package "screen"
   package "rsync"
+  package "vim"
 end
+
+
+
+package
