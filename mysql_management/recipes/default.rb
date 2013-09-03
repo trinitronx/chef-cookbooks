@@ -17,16 +17,8 @@
 # limitations under the License.
 #
 
-# Install mysql ruby gem after dependencies are met
-node.set['build_essential']['compiletime'] = true
-include_recipe "build-essential"
-chef_gem "mysql" do
-  action :nothing
-end
-package "libmysqlclient-dev" do
-  action :install
-  notifies :install, "chef_gem[mysql]", :immediately
-end
+# Install mysql ruby gem
+include_recipe "mysql::ruby"
 
 # Retrieve authentication information from the data bag containing MySQL user configuration
 encryption_key = Chef::EncryptedDataBagItem.load_secret(node['mysql']['management']['databag_encryption_key'])
