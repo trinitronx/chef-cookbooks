@@ -17,6 +17,12 @@
 # limitations under the License.
 #
 
+# Set up the Percona apt repository
+include_recipe "percona::repository"
+
+# Install the ruby gem
+include_recipe "mysql::ruby"
+
 # Install xinetd
 package "xinetd"
 

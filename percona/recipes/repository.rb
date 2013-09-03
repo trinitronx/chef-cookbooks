@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-# Add the Percona repository and grab key from keyserver
-apt_repository "percona" do
+# Add the Percona repository and grab key from keyserver (do this during the compilation phase)
+a = apt_repository "percona" do
   uri "http://repo.percona.com/apt"
   distribution node['lsb']['codename']
   components ["main"]
@@ -30,3 +30,4 @@ apt_repository "percona" do
 		File.exists?("/etc/apt/sources.list.d/percona.list")
   end
 end
+a.run_action(:add)

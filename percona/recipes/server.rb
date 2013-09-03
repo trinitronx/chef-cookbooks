@@ -20,6 +20,9 @@
 # Set up the Percona apt repository
 include_recipe "percona::repository"
 
+# Use Percona-provided client packages for the mysql ruby gem dependencies
+node.override['mysql']['client']['packages'] = %w{percona-server-client-5.5 libmysqlclient18-dev}
+
 # Prestage the my.cnf configuration file
 directory node['mysql']['conf_dir'] do
   owner "root"
@@ -38,15 +41,15 @@ end
 # Prepare a debconf seed for the percona-server package
 execute "install percona preseed" do
   action  :nothing
-  command "debconf-set-selections /tmp/percona.preseed"
+  command "debconf-set-selections /var/cache/local/preseeding/percona.seed"
 end
 
 # Retrieve root password from the data bag containing MySQL user configuration
 encryption_key = Chef::EncryptedDataBagItem.load_secret(node['percona']['databag_encryption_key'])
 root = Chef::EncryptedDataBagItem.load(node['percona']['users_databag'], "root", encryption_key)
 
-template "/tmp/percona.preseed" do
-  source   "percona-server.preseed.erb"
+template "/var/cache/local/preseeding/percona.seed" do
+  source   "percona-server.seed.erb"
   mode     0600
   action   :create
   variables(
@@ -54,6 +57,5 @@ template "/tmp/percona.preseed" do
   )
   notifies :run, resources(:execute => "install percona preseed"), :immediately
 end
-
 # Install Percona Server
 package node['percona']['server_package']

@@ -20,6 +20,12 @@
 # Set up the Percona apt repository
 include_recipe "percona::repository"
 
+# Use Percona-provided client packages for the mysql ruby gem dependencies
+node.override['mysql']['client']['packages'] = %w{percona-xtradb-cluster-client-5.5 libmysqlclient18-dev}
+
+# Install the ruby gem
+include_recipe "mysql::ruby"
+
 # Search for cluster masters (writable nodes) and slaves (used for failover only)
 cluster_masters = search("node", "percona_cluster_role:master AND chef_environment:#{node.chef_environment}") || []
 master_count = cluster_masters.length
@@ -100,45 +106,24 @@ template "#{node['mysql']['confd_dir']}/xtradb_cluster.cnf" do
   )
 end
 
+# Prepare a debconf seed for the percona-server package
+execute "install percona preseed" do
+  action  :nothing
+  command "debconf-set-selections /var/cache/local/preseeding/percona.seed"
+end
+
+template "/var/cache/local/preseeding/percona.seed" do
+  source   "percona-server.seed.erb"
+  mode     0600
+  action   :create
+  variables(
+    :root_password => root['password']
+  )
+  notifies :run, resources(:execute => "install percona preseed"), :immediately
+end
+
 # Install the Percona XtraDB Cluster server package (includes client and xtrabackup packages)
-package_installed = `apt-cache policy #{node['percona']['xtradb_cluster_package']} | grep Installed`
-
-unless package_installed
-  # Prepare a debconf seed for the percona-server package
-  execute "install percona preseed" do
-  	action  :nothing
-  	command "debconf-set-selections /tmp/percona.preseed"
-  end
-
-  template "/tmp/percona.preseed" do
-  	source   "percona-server.preseed.erb"
-  	mode     0600
-  	action   :create
-  	variables(
-  		:root_password => root['password']
-  	)
-  	notifies :run, resources(:execute => "install percona preseed"), :immediately
-  end
-
-  # Install the package
-  package node['percona']['xtradb_cluster_package']
-
-  # Remove the debconf seed
-  file "/tmp/percona.preseed" do
-    action :delete
-  end
-end
-
-# Install mysql ruby gem after dependencies are met
-node.set['build_essential']['compiletime'] = true
-include_recipe "build-essential"
-chef_gem "mysql" do
-  action :nothing
-end
-package "libmysqlclient-dev" do
-  action :install
-  notifies :install, "chef_gem[mysql]", :immediately
-end
+package node['percona']['xtradb_cluster_package']
 
 # Get MySQL authentication info
 mysql_connection_info = { :host => "localhost", :username => 'root', :password => root['password'] }
