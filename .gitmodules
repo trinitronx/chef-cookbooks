@@ -84,7 +84,7 @@
 	url = git://github.com/opscode-cookbooks/database.git
 [submodule "mysql"]
 	path = mysql
-	url = git://github.com/opscode-cookbooks/mysql.git
+	url = git@github.com:biola/mysql.git
 [submodule "build-essential"]
 	path = build-essential
 	url = git://github.com/opscode-cookbooks/build-essential.git
