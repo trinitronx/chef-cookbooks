@@ -45,6 +45,12 @@ end
 execute "create mysqlchk service" do
   command %Q(echo "mysqlchk        9200/tcp                        # mysqlchk" >> /etc/services)
   not_if "grep 9200/tcp /etc/services"
+  notifies :restart, "service[xinetd]"
+end
+
+# Restart the xinetd service
+service "xinetd" do
+  action :nothing
 end
 
 # Set up the clustercheck user
