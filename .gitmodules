@@ -124,3 +124,6 @@
 [submodule "selinux"]
 	path = selinux
 	url = git@github.com:opscode-cookbooks/selinux.git
+[submodule "resolver"]
+	path = resolver
+	url = git@github.com:opscode-cookbooks/resolver.git
