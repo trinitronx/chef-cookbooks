@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+def exitBadArguments()
+  puts ''
+  puts 'Usage: purge_older_than HOURS DIRECTORY'
+  puts ''
+  puts 'e.g., ./purge_older_than 8 "/home/Downloads/cats"'
+  puts 'This will elminate all directories/files under cats older than 8 hours'
+  puts '(not including the cats directory itself)'
+  puts ''
+  abort()
+end
+
+unless ARGV.length == 2
+  exitBadArguments()
+end
+
+unless File.directory?(ARGV[1])
+  exitBadArguments()
+end
+
+def checkFileOrDirectory(objForChecking, cutoffTime)
+  # First, let's see if this file or directory matches our new scope
+  throw :objIsNew if File.ctime(objForChecking) > cutoffTime
+  # Since it doesn't; check it is a directory and start the process again
+  if File.directory?(objForChecking)
+    objForCheckingsChildren = Dir.entries(objForChecking) - ['.','..']
+    objForCheckingsChildren.each do |objForCheckingsChild|
+      checkFileOrDirectory(objForChecking + '/' + objForCheckingsChild, cutoffTime)
+    end
+  end
+end
+
+# Will populate this with directories to toss
+directoriesToDelete = []
+
+# Setup the object defining the oldest allowed file. Each hour has 3600 seconds.
+inputCutoffTime = Time.at(Time.now() - (ARGV[0].to_i * 3600))
+
+# Strip trailing slashes
+baseDirectory = ARGV[1].sub(/\/$/,'')
+
+# Strip the current and previous directory from its list of entries
+topLevelObjs = Dir.entries(baseDirectory) - ['.','..']
+
+# Start checking
+topLevelObjs.each do |topLevelDirorFile|
+  catch (:objIsNew) do
+    checkFileOrDirectory(baseDirectory + '/' + topLevelDirorFile, inputCutoffTime)
+    directoriesToDelete << baseDirectory + '/' + topLevelDirorFile
+  end
+end
+
+# Now the at the list has been created, perform the deletions
+require 'syslog'
+require 'fileutils'
+sysLogObj = Syslog.open('purge_older_than')
+unless directoriesToDelete == []
+  directoriesToDelete.each do |terminatedDir|
+    sysLogObj.info("Deleting directory: #{terminatedDir}")
+    FileUtils.rm_rf(terminatedDir)
+  end
+else
+  sysLogObj.info("No directories found to delete")
+end
+sysLogObj.close()
