@@ -40,5 +40,5 @@ when 'ubuntu', 'debian'
 when 'redhat', 'centos'
   package "screen"
   package "rsync"
-  package "vim"
+  package "vim-enhanced"
 end
