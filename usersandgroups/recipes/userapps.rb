@@ -37,6 +37,7 @@ when 'ubuntu', 'debian'
   package "curl"
   package "rsync"
   package "run-one"
+  package "ncdu"
 when 'redhat', 'centos'
   package "screen"
   package "rsync"
