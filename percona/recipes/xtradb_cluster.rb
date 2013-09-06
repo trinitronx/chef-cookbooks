@@ -21,7 +21,7 @@
 include_recipe "percona::repository"
 
 # Use Percona-provided client packages for the mysql ruby gem dependencies
-node.override['mysql']['client']['packages'] = %w{percona-xtradb-cluster-client-5.5 libmysqlclient18-dev}
+node.override['mysql']['client']['packages'] = node['percona']['xtradb_cluster_client_packages']
 
 # Install the ruby gem
 include_recipe "mysql::ruby"
@@ -122,7 +122,7 @@ template "/var/cache/local/preseeding/percona.seed" do
   notifies :run, resources(:execute => "install percona preseed"), :immediately
 end
 
-# Install the Percona XtraDB Cluster server package (includes client and xtrabackup packages)
+# Install the Percona XtraDB Cluster server package
 package node['percona']['xtradb_cluster_package']
 
 # Get MySQL authentication info

@@ -34,7 +34,7 @@ key-buffer-size                = 32M
 myisam-recover                 = FORCE,BACKUP
 
 # SAFETY #
-max-allowed-packet             = 16M
+max-allowed-packet             = <%= node['percona']['max_allowed_packet'] %>
 max-connect-errors             = 1000000
 
 # DATA STORAGE #
@@ -75,7 +75,7 @@ slow-query-log-file            = /var/log/mysql/mysql-slow.log
 # MYSQLDUMP #
 quick
 quote-names
-max_allowed_packet             = 16M
+max_allowed_packet             = <%= node['percona']['max_allowed_packet'] %>
 
 #
 # * IMPORTANT: Additional settings that can override those from this file!

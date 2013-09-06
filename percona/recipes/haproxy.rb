@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-# Install HAProxy
+# Install and enable HAProxy
 package "haproxy" do
   action :install
   notifies :run, "execute[enable haproxy]", :immediately

@@ -18,3 +18,4 @@
 #
 
 default['percona']['server_package'] = "percona-server-server-5.5"
+default['percona']['server_client_packages'] = %w{percona-server-client-5.5 libmysqlclient18-dev}

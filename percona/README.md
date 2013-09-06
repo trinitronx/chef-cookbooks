@@ -29,7 +29,7 @@ Sets up Percona's apt repository providing binaries for XtraDB Cluster, XtraBack
 xtradb_cluster.rb
 -----------------
 
-Pre-stages MySQL configuration files and installs Percona XtraDB Cluster. Includes the `percona::clustercheck` recipe for an HAProxy host to monitor database functionality. Also optionally installs Percona XtraBackup and sets up a user to provide state transfers between cluster members.
+Pre-stages MySQL configuration files and installs Percona XtraDB Cluster. Includes the `percona::clustercheck` recipe for an HAProxy host to monitor database functionality. Also installs Percona XtraBackup and sets up a user to provide state transfers between cluster members.
 
 Usage
 =====
