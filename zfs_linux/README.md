@@ -24,6 +24,29 @@ Just include `zfs_linux` in your node's `run_list`:
 #### zfs\_linux::auto-snapshot
 Installs the zfs-auto-snapshot package, which automatically sets up rotating snapshots (hourly snapshots kept for a day, daily snapshots kept for a month, etc).
 
+#### zfs\_linux::snapshot-pruning
+Complements the auto-snapshot recipe by providing a mechanism (via attributes) for controlling how many snapshots are retained on a daily basis. This recipe is included in the default recipe, as action is only taken if attributes like the following are set:
+
+```json
+"zfs": {
+  "filesystems": [
+    {
+      "zfsfilesytem1": {
+        "zpool": "zpool1",
+        "snapshot_retention": {
+          "monthly": "3",
+          "weekly": "2",
+          "daily": "15"
+        }
+      }
+    },
+    ...
+  ]
+}
+```
+
+The retention values (each are optional) dicate the number of the most recent snapshots to keep. So in the example above, each day the snapshots of zpool1/zfsfilesystem1 will be evaluated and only the 15 most recent daily snapshots will be kept, etc. For any given snapshot type you can set the value to "0" to have all snapshots of that type deleted.
+
 #### zfs\_linux::auto-scrub
 Uses cron.d (via the cron cookbook) to setup cron jobs on Sunday morning for each zpool. If greater than 4 zpools are present, runs the checks once a month on the first Sunday.
 

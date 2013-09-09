@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /sbin/zfs list -t snapshot -o name -s name | grep <%= @filesystem %>@zfs-auto-snap_<%= @snapshot_interval %> | sort -r <% unless @snapshot_retention.to_s == "0" -%>| sed 1,<%= @snapshot_retention.to_s %>d <% end -%>| xargs -r -n 1 /sbin/zfs destroy

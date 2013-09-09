@@ -37,3 +37,7 @@ when "ubuntu"
     
   end
 end
+
+# This will only be relevant for nodes with the appropriate
+# attributes set, so it should be pretty safe to always have it run
+include_recipe "zfs_linux::snapshot-pruning"
