@@ -1,0 +1,7 @@
+# MySQL client configuration for Nagios plugins
+# This file is managed by Chef; any changes will be lost
+
+[client]
+host=localhost
+user=<%= node['mysql']['management']['nagios_user'] %>
+password="<%= @nagios_user_password %>"
