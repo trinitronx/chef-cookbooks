@@ -24,7 +24,6 @@ if node['zfs']
     node['zfs']['filesystems'].each do |filesystem|
       filesystem.each do |fkey, fvalue|
         if fvalue['snapshot_retention'].respond_to?(:each)
-          #fkey.to_s == ts
           fvalue['snapshot_retention'].each do |skey,svalue|
             template "/etc/cron.daily/zfs-auto-prune-#{fvalue['zpool']}-#{fkey.to_s}-#{skey}" do
               source "zfs-auto-prune.erb"
