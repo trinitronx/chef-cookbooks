@@ -99,7 +99,7 @@
 	url = git://github.com/opscode-cookbooks/xfs.git
 [submodule "nagios"]
 	path = nagios
-	url = git://github.com/biola/nagios.git
+	url = https://github.com/biola/nagios.git
 [submodule "logrotate"]
 	path = logrotate
 	url = git://github.com/opscode-cookbooks/logrotate.git
