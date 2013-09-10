@@ -30,6 +30,7 @@ Create `mysql_databases` and `mysql_users` data bags in Chef to hold configurati
   "backup_rotation_period": "7",
   "dbo_users": {
     "database_name_dbo": {
+      "host": "%",
       "password": "passwordgoeshere",
       "privileges": [
         "all"

@@ -43,7 +43,7 @@ mysql_databases.each do |db_name|
 			values['privileges'] ||= ["all"]
 			mysql_database_user username do
 				connection mysql_connection_info
-				host '%'
+				host values['host']
 				database_name db_name
 				password values['password']
 				privileges values['privileges']
