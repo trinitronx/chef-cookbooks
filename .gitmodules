@@ -127,3 +127,12 @@
 [submodule "resolver"]
 	path = resolver
 	url = git@github.com:opscode-cookbooks/resolver.git
+[submodule "redis"]
+	path = redis
+	url = git@github.com:miah/chef-redis.git
+[submodule "stunnel"]
+	path = stunnel
+	url = git@github.com:hw-cookbooks/stunnel.git
+[submodule "discovery"]
+	path = discovery
+	url = git@github.com:hw-cookbooks/discovery.git
