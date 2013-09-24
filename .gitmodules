@@ -136,3 +136,6 @@
 [submodule "discovery"]
 	path = discovery
 	url = git@github.com:hw-cookbooks/discovery.git
+[submodule "datadog"]
+	path = datadog
+	url = git@github.com:DataDog/chef-datadog.git
