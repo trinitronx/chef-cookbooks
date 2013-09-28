@@ -1,0 +1,26 @@
+# See sidekiq-all.conf for how to manage all Sidekiq instances at once.
+#
+# Manage sidekiq with:
+#   sudo start sidekiq app=app_name index=0 user=username
+#   sudo stop sidekiq app=/path/to/app  index=0 user=username
+#   sudo status sidekiq app=/path/to/app index=0 user=username
+
+description "Sidekiq Background Worker"
+
+# no "start on", we don't want to automatically start
+stop on (stopping sidekiq-all or runlevel [06])
+
+# TODO: figure out a sure to run as
+#setuid ${user}
+#setgid ${user}
+
+respawn
+respawn limit 3 30
+
+instance ${app}-${index}
+
+script
+  logger -t sidekiq "Starting process: $app-$index as $user"
+
+  /bin/bash -l -c 'cd <%= @app_root %>/$app; ./bin/sidekiq --index $index -e <%= @environment %> --pidfile /tmp/sidekiq-$app-$index.pid --logfile /var/log/sidekiq/$app-$index.log'
+end script
