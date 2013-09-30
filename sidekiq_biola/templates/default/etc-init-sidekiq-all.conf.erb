@@ -20,7 +20,7 @@ stop on runlevel [06]
 pre-start script
 <% @apps.each do |app| %>
 <% (app[:workers] || 1).times do |n| %>
-  start sidekiq app=<%= app[:name] %> user=<%= app[:user] || app[:name] %> index=<%= n %>
+  start sidekiq-<%= app[:name] %> index=<%= n %>
 <% end %>
 <% end %>
 end script
