@@ -63,11 +63,11 @@ group "beoper" do
   members "root"
 end
 
-cookbook_file "#{Chef::Config[:file_cache_path]}/RALUS.tar.gz" do
-  source "RALUS.tar.gz"
+remote_file "#{Chef::Config[:file_cache_path]}/RALUS.tar.gz" do
+  source node['backupexec']['ralusurl']
   action :create_if_missing
   not_if "test -f /opt/VRTSralus/bin/beremote"
-  end
+end
 
 
 # Response file pulled from /var/tmp/vxif after installation
@@ -75,7 +75,7 @@ cookbook_file "#{Chef::Config[:file_cache_path]}/RALUS.tar.gz" do
 template "#{Chef::Config[:file_cache_path]}/ralusresponsefile.response" do
   source "ralusresponsefile.response.erb"
   not_if "test -f /opt/VRTSralus/bin/beremote"
-  end
+end
 
 # Install steps 
 execute "ExtractRALUSinstaller" do
