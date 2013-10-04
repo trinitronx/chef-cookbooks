@@ -139,3 +139,6 @@
 [submodule "datadog"]
 	path = datadog
 	url = git@github.com:DataDog/chef-datadog.git
+[submodule "runit"]
+	path = runit
+	url = git@github.com:opscode-cookbooks/runit.git
