@@ -142,3 +142,6 @@
 [submodule "runit"]
 	path = runit
 	url = git@github.com:opscode-cookbooks/runit.git
+[submodule "iptables-ng"]
+	path = iptables-ng
+	url = git@github.com:chr4-cookbooks/iptables-ng.git
