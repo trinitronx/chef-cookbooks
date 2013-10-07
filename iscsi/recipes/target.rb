@@ -20,22 +20,27 @@
 package "iscsitarget-dkms"
 package "iscsitarget"
 
-# Enable iscsi target service in debian default file
-template "/etc/default/iscsitarget"
-
-template "/etc/iet/ietd.conf" do
-  variables ({
-    :iscsi_targets => node[:iscsi][:targets]
-  })
-end
-
-template "/etc/iet/initiators.allow" do
-  variables ({
-    :iscsi_targets => node[:iscsi][:targets]
-  })
-end
-
-service "iscsitarget" do
-  supports :status => true, :restart => true, :start => true, :stop => true
-  action [ :enable, :start ]
+# Do nothing until attributes are defined
+if node['iscsi']
+  if node['iscsi']['targets']
+    # Enable iscsi target service in debian default file
+    template "/etc/default/iscsitarget"
+    
+    template "/etc/iet/ietd.conf" do
+      variables ({
+        :iscsi_targets => node[:iscsi][:targets]
+      })
+    end
+    
+    template "/etc/iet/initiators.allow" do
+      variables ({
+        :iscsi_targets => node[:iscsi][:targets]
+      })
+    end
+    
+    service "iscsitarget" do
+      supports :status => true, :restart => true, :start => true, :stop => true
+      action [ :enable, :start ]
+    end
+  end
 end
