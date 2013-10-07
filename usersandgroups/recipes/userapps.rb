@@ -28,18 +28,34 @@ if node['platform'] == 'ubuntu' and node['platform_version'].to_i < 12
   end
 end
 
+# Packages to install on every system
+pkgsAllSystems = ['screen','rsync']
+
+# Packages for Debian systems
+pkgsDebSystems = ['bash-completion','vim','nano','curl','ncdu']
+
+# Packages for Ubuntu systems
+pkgsUbuSystems = ['run-one','byobu','bash-completion','vim','nano','curl','ncdu']
+
+# Packages for RHEL systems
+pkgsRHELSystems = ['vim-enhanced']
+
+
+# Install the packages
+pkgsAllSystems.each do |i|
+  package i
+end
 case node['platform']
-when 'ubuntu', 'debian'
-  package "bash-completion"
-  package "vim"
-  package "nano"
-  package "screen"
-  package "curl"
-  package "rsync"
-  package "run-one"
-  package "ncdu"
+when 'ubuntu'
+  pkgsUbuSystems.each do |i|
+    package i
+  end
+when 'debian'
+  pkgsDebSystems.each do |i|
+    package i
+  end
 when 'redhat', 'centos'
-  package "screen"
-  package "rsync"
-  package "vim-enhanced"
+  pkgsRHELSystems.each do |i|
+    package i
+  end
 end
