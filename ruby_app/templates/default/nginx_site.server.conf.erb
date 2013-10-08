@@ -1,0 +1,25 @@
+server {
+  listen                      <%= node[:ipaddress] %>:80;
+  listen                      <%= node[:ipaddress] %>:443 ssl;
+  server_name                 <%= @env_domain %>;
+  server_name                 <%= @host_domain %>;
+
+  <% if @apps.any? { |app| app['url']['path'].to_s =~ /\w/ } %>
+  root                        <%= @static_dir %>/<%= @env_domain %>;
+  <% else %>
+  root                        <%= @apps_dir %>/<%= @apps.first['id'] %>/public;
+  <% end %>
+  <% @apps.each do |app| %>
+
+  location <%= app['url']['path'] || '/' %> {
+    rack_env                  <%= @rack_env %>;
+    passenger_enabled         on;
+    <% if app['url']['path'].to_s =~ /\w/ %>
+    passenger_base_uri        <%= app['url']['path'] %>;
+    <% end %>
+    passenger_user            <%= username_for(app['id']) %>;
+    passenger_group           <%= username_for(app['id']) %>;
+    passenger_set_cgi_param   HTTP_X_FORWARDED_PROTO $scheme;
+  }
+  <% end %>
+}
