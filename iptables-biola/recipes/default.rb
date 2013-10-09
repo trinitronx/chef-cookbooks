@@ -42,10 +42,10 @@ else
   # Parse each of the firewall rule attributes
   node['firewall']['rules'].each_with_index do |parameters, index|
     parameters.each_key do |rule_name|
-  		# Create the contents of the rule using the attributes given
-  		firewall_protocol = parameters[rule_name].attribute?('protocol') ? parameters[rule_name]['protocol'] : node['firewall']['default_protocol']
-  		firewall_action = parameters[rule_name].attribute?('action') ? parameters[rule_name]['action'].downcase : node['firewall']['default_action']
-  		firewall_actions = { 'allow' => 'ACCEPT', 'deny' => 'DROP', 'redirect' => 'REDIRECT', 'reject' => 'REJECT' }
+      # Create the contents of the rule using the attributes given
+      firewall_protocol = parameters[rule_name].attribute?('protocol') ? parameters[rule_name]['protocol'] : node['firewall']['default_protocol']
+      firewall_action = parameters[rule_name].attribute?('action') ? parameters[rule_name]['action'].downcase : node['firewall']['default_action']
+      firewall_actions = { 'allow' => 'ACCEPT', 'deny' => 'DROP', 'redirect' => 'REDIRECT', 'reject' => 'REJECT' }
 
       if parameters[rule_name].attribute?('static_rule')
         firewall_rule = parameters[rule_name]['static_rule']
@@ -61,7 +61,7 @@ else
         firewall_rule << "#{parameters[rule_name]['parameters']} " if parameters[rule_name]['parameters']
       end
 
-  		# Create the rule using the iptables_ng_rule LWRP
+      # Create the rule using the iptables_ng_rule LWRP
       iptables_ng_rule parameters.keys[0].to_s.downcase.tr(" ", "_") do
         chain parameters[rule_name]['chain'] if parameters[rule_name]['chain']
         table parameters[rule_name]['table'] if parameters[rule_name]['table']
