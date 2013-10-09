@@ -65,3 +65,11 @@ unless File.readlines("/root/.profile").grep(/DBUS_SESSION_BUS_ADDRESS/).size > 
   execute "echo 'export XDG_CACHE_HOME=\"$NETATALKPREFIX/var/netatalk/\"' >> /root/.profile"
   execute "echo 'export DBUS_SESSION_BUS_ADDRESS=\"unix:path=$NETATALKPREFIX/var/netatalk/spotlight.ipc\"' >> /root/.profile"
 end
+
+# Bundled configuration file doesn't support reload; adjusting it here
+template "/etc/init.d/netatalk" do
+  source "netatalk.initd.erb"
+  mode 0755
+  owner "root"
+  group "root"
+end
