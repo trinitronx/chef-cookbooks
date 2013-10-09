@@ -117,7 +117,7 @@ if File.exists? apps_dir
 
     bash 'set group on all files' do
       cwd app_dir
-      code "chgrp --recursive #{dev_group} ."
+      code "chgrp --recursive #{dev_group} . ./log/"
     end
 
     bash 'set onwer on some files' do
@@ -127,7 +127,7 @@ if File.exists? apps_dir
 
     bash 'make files group writable' do
       cwd app_dir
-      code 'chmod --recursive g+w .'
+      code 'chmod --recursive g+w . ./log/'
     end
 
     bash 'set git repo sharedRepository = true' do
