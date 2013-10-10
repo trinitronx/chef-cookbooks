@@ -54,12 +54,17 @@ when "windows"
   end
 end
 
-
-if node[:splunk][:hostname_source] == "node_name"
+# To avoid confusion between systems with the same hostname, add the subdomain if configured
+if node[:splunk][:hostname_source] == "hostname_with_subdomain"
+	splunk_hostname = node['fqdn'].gsub(/\.\w*\.\w*$/, '')
+elsif node[:splunk][:hostname_source] == "node_name"
 	splunk_hostname = node.name
 else
 	splunk_hostname = node[:hostname]
 end
+
+# Save the hostname in the node's attributes
+node.set['splunk']['hostname'] = splunk_hostname
 
 # Update splunk default hostname in system inputs.conf
 template "#{node['splunk']['forwarder_home']}/etc/system/local/inputs.conf" do
@@ -77,7 +82,7 @@ end
 
 # Update splunk servername just before splunk is to be restarted
 splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
-if node["os"] == "windows"
+if node["os"] == "linux"
   execute "update_splunk_servername" do
     command "\"" + splunk_cmd + "\"" + " set servername "+ splunk_hostname + " -auth " + node['splunk']['auth'] 
     subscribes :run, resources(:template => "#{node['splunk']['forwarder_home']}/etc/system/local/inputs.conf"), :immediately
