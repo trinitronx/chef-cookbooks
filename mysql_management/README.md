@@ -24,33 +24,33 @@ Server setup
 
 Create `mysql_databases` and `mysql_users` data bags in Chef to hold configuration. Items in the `mysql_databases` data bag should be in the following format:
 
-{
-  "id": "database_name",
-  "backup_schedule": "daily",
-  "backup_rotation_period": "7",
-  "dbo_users": {
-    "database_name_dbo": {
-      "host": "%",
-      "password": "passwordgoeshere",
-      "privileges": [
-        "all"
-      ]
+    {
+      "id": "database_name",
+      "backup_schedule": "daily",
+      "backup_rotation_period": "7",
+      "dbo_users": {
+        "database_name_dbo": {
+          "host": "%",
+          "password": "passwordgoeshere",
+          "privileges": [
+            "all"
+          ]
+        }
+      }
     }
-  }
-}
 
 In the above example, "backup_schedule", "backup_rotation_period", "dbo_users", and "privileges" are optional. A database can be created simply with an "id" and other options can be added later if needed.
 
 Items in the `mysql_users` data bag should be in the following format:
 
-{
-  "id": "user_name",
-  "host": "localhost",
-  "password": "passwordgoeshere",
-  "privileges": {
-    "db1": ["select", "insert"],
-    "db2": ["all"]
-  }
-}
+    {
+      "id": "user_name",
+      "host": "localhost",
+      "password": "passwordgoeshere",
+      "privileges": {
+        "db1": ["select", "insert"],
+        "db2": ["all"]
+      }
+    }
 
 Any users that do not have privileges configured will not be managed by this cookbook.
