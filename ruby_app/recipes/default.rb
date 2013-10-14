@@ -76,7 +76,6 @@ if File.exists? apps_dir
   apps.each do |app_name, data|
     app_dir = "#{apps_dir}/#{app_name}"
     app_username = username_for(app_name)
-    conf_data_bag_item = Chef::EncryptedDataBagItem.load(conf_data_bag_name, app_name, data_bag_secret)
 
     group app_username do
       action :create
@@ -137,13 +136,17 @@ if File.exists? apps_dir
     end
 
     # Write config files for each app
-    Array(conf_data_bag_item['files']).each do |filename, hash|
-      file "#{app_dir}/config/#{filename}" do
-        user 'root'
-        group dev_group
-        mode '0664'
-        content YAML::dump(hash)
-        action :create
+    if data_bag(conf_data_bag_name).include? app_name
+      conf_data_bag_item = Chef::EncryptedDataBagItem.load(conf_data_bag_name, app_name, data_bag_secret)
+
+      Array(conf_data_bag_item['files']).each do |filename, hash|
+        file "#{app_dir}/config/#{filename}" do
+          user 'root'
+          group dev_group
+          mode '0664'
+          content YAML::dump(hash)
+          action :create
+        end
       end
     end
   end
