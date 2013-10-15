@@ -125,19 +125,20 @@ if File.exists? apps_dir
     # Write config files for each app
     if data_bag(conf_data_bag_name).include? app.name
       conf_data_bag_item = Chef::EncryptedDataBagItem.load(conf_data_bag_name, app.name, data_bag_secret)
-      conf_files = Array(conf_data_bag_item['files'])
+      app_conf = RubyApp::Config.new(conf_data_bag_item.to_hash, node.chef_environment)
 
-      if conf_data_bag_item[node.chef_environment]
-        conf_files += Array(conf_data_bag_item[node.chef_environment]['files'])
-      end
+      app_conf.files.each do |file_name, file_content|
+        path = File.expand_path("#{app_dir}/#{file_name}")
 
-      conf_files.each do |filename, hash|
-        file "#{app_dir}/config/#{filename}" do
-          user 'root'
-          group dev_group
-          mode '0664'
-          content YAML::dump(hash)
-          action :create
+        # Be sure we're not messing with files we shouldn't be
+        if path =~ /^#{app_dir}/
+          file path do
+            user 'root'
+            group dev_group
+            mode '0664'
+            content file_content
+            action :create
+          end
         end
       end
     end
