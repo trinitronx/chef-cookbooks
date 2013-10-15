@@ -1,13 +1,5 @@
 require 'yaml'
 
-class Chef::Recipe
-  include RubyApp::DomainHelpers
-end
-
-class Erubis::Context
-  include RubyApp::DomainHelpers
-end
-
 data_bag_name       = node['ruby_app']['data_bag_name']
 conf_data_bag_name  = node['ruby_app']['conf_data_bag_name']
 encryption_key_path = node['ruby_app']['encryption_key_path']
