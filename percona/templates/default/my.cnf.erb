@@ -66,7 +66,7 @@ innodb-buffer-pool-size        = <%= node['percona']['innodb_buffer_pool_size'] 
 
 # LOGGING #
 log-error                      = /var/log/mysql/error.log
-log-queries-not-using-indexes  = 1
+log-queries-not-using-indexes  = 0
 slow-query-log                 = 1
 slow-query-log-file            = /var/log/mysql/mysql-slow.log
 
