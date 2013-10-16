@@ -22,7 +22,19 @@ module RubyApp
     private
 
     def config
-      @config ||= @full_config['environments']['all'].merge(@full_config['environments'][environment])
+      return @config unless @config.nil?
+      @config = @full_config['environments']['all']
+
+      # Make sure things like ['all']['files'] gets merged with [environment]['files']
+      # and not overwritten by it.
+      @full_config['environments'][environment].each do |key, value|
+        if @config.has_key?(key) && @config[key].is_a?(Hash)
+          @config[key].merge! value
+        else
+          @config[key] = value
+        end
+      end
+      @config
     end
   end
 end
