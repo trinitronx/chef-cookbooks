@@ -30,9 +30,13 @@ include_recipe "mysql::ruby"
 cluster_masters = search("node", "percona_cluster_role:master AND chef_environment:#{node.chef_environment}") || []
 master_count = cluster_masters.length
 cluster_slaves = search("node", "percona_cluster_role:slave AND chef_environment:#{node.chef_environment}") || []
-cluster_members = cluster_masters.concat(cluster_slaves)
+
+# Sort by hostname to provide stable ordering
+cluster_masters.sort! { |a, b| a['hostname'] <=> b['hostname'] }
+cluster_slaves.sort! { |a, b| a['hostname'] <=> b['hostname'] }
 
 # Reduce the cluster_members down to just the IPs
+cluster_members = cluster_masters.concat(cluster_slaves)
 cluster_members.map! do |member|
 	server_ip = begin
 		member['ipaddress']

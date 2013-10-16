@@ -32,6 +32,10 @@ end
 cluster_masters = search("node", "percona_cluster_role:master AND chef_environment:#{node.chef_environment}") || []
 cluster_slaves = search("node", "percona_cluster_role:slave AND chef_environment:#{node.chef_environment}") || []
 
+# Sort by hostname to provide stable ordering
+cluster_masters.sort! { |a, b| a['hostname'] <=> b['hostname'] }
+cluster_slaves.sort! { |a, b| a['hostname'] <=> b['hostname'] }
+
 # Load the configuration from a template
 template "/etc/haproxy/haproxy.cfg" do
   source "haproxy.cfg.erb"
