@@ -5,7 +5,7 @@ server {
   server_name                 <%= @domain.for_host(node.fqdn) %>;
 
   <% if @domain.non_root_apps? %>
-  root                        <%= @static_dir %>/<%= @env_domain %>;
+  root                        <%= @static_dir %>/<%= @domain.for_environment(node.chef_environment) %>;
   <% else %>
   root                        <%= @apps_dir %>/<%= @domain.apps.first.name %>/public;
   <% end %>
