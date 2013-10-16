@@ -166,6 +166,15 @@ if File.exists? apps_dir
       end
 
       domain.non_root_apps.each do |app|
+        if app.url_parent_path?
+          directory "#{static_dir}/#{env_domain}/#{app.url_parent_path}" do
+            user 'root'
+            group dev_group
+            mode '0775'
+            action :create
+          end
+        end
+
         link "#{static_dir}/#{env_domain}/#{app.url_path}" do
           user 'root'
           group dev_group

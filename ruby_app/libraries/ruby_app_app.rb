@@ -34,6 +34,16 @@ module RubyApp
       @url_path.to_s =~ /\w/
     end
 
+    def url_parent_path
+      parts = url_path.split('/')
+      parent_path = parts[0...parts.length-1].join '/'
+      parent_path == '' ? '/' : parent_path
+    end
+
+    def url_parent_path?
+      url_parent_path != '/'
+    end
+
     def username
       name.downcase.gsub /[^a-z0-9_]/, '_'
     end
