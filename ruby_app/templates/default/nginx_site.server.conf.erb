@@ -12,7 +12,9 @@ server {
   <% @domain.apps.each do |app| %>
 
   location <%= app.url_path %> {
+    <% unless app.script_name %>
     root                      <%= @apps_dir %>/<%= app.name %>/public;
+    <% end %>
     rack_env                  <%= @rack_env %>;
     passenger_enabled         on;
     <% if app.script_name %>
