@@ -2,9 +2,9 @@ gluster Cookbook
 ================
 This cookbook is used to install and configure Gluster on both servers and clients. This cookbook makes several assumptions when configuring Gluster servers:
 
-1. Each disk will contain a single partition dedicated for Gluster; LVM is not used
-2. Each configured partition will be formatted with the ext4 filesystem rather than the recommended xfs filesystem to allow partitions to be resized (xfs filesystems cannot be resized on Ubuntu 12.04 systems without a newer kernel installed)
-3. Gluster volumes will share the configured partitions and will not have their own dedicated storage
+1. Each disk will contain a single partition dedicated for Gluster
+2. If the cookbook will be used to manage disks, each partition will be formatted with the ext4 filesystem rather than the recommended xfs filesystem to allow partitions to be resized (xfs filesystems cannot be resized on Ubuntu 12.04 systems without a newer kernel installed)
+3. Non-replicated volume types are not supported
 4. All peers for a volume will be configured with the same number of bricks
 
 Requirements
@@ -51,15 +51,15 @@ Attributes
     <td>None</td>
   </tr>
   <tr>
-    <td><tt>['gluster']['server']['partitions']</tt></td>
+    <td><tt>['gluster']['server']['disks']</tt></td>
     <td>Array</td>
-    <td>An array of partitions to create and format for use with Gluster, such as '/dev/sdb1'</td>
+    <td>An array of disks to create partitions on and format for use with Gluster, (for example, ['sdb', 'sdc'])</td>
     <td>None</td>
   </tr>
   <tr>
-    <td><tt>['gluster']['server']['volumes'][VOLUME_NAME]['master']</tt></td>
-    <td>String</td>
-    <td>The FQDN of the server used as the 'master' peer; used to run Gluster commands</td>
+    <td><tt>['gluster']['server']['volumes'][VOLUME_NAME]['disks']</tt></td>
+    <td>Array</td>
+    <td>An optional array of disks to put bricks on (for example, ['sdb', 'sdc']); by default the cookbook will use the first x number of disks, equal to the replica count</td>
     <td>None</td>
   </tr>
   <tr>
@@ -85,6 +85,6 @@ Attributes
 Usage
 -----
 
-On two or more identical systems, attach the desired number of dedicated disks to use for Gluster storage. Create a role containing the gluster::server recipe for the gluster peers to use and add the appropriate partitions to the `['gluster']['server']['partitions']` attribute and any volumes to the `['gluster']['server']['volumes']` attribute. Once all peers for a volume have configured their bricks, the 'master' peer will create and start the volume.
+On two or more identical systems, attach the desired number of dedicated disks to use for Gluster storage. Create a role containing the gluster::server recipe for the gluster peers to use and add the appropriate attributes, such as volumes to the `['gluster']['server']['volumes']` attribute. If the cookbook will be used to manage disks, add the disks to the `['gluster']['server']['disks']` attribute; otherwise format the disks appropriately and add them to the `['gluster']['server']['volumes'][VOLUME_NAME]['disks']` attribute. Once all peers for a volume have configured their bricks, the 'master' peer (the first in the array) will create and start the volume.
 
 For clients, create a role containing the gluster::default or gluster::client recipe, and add any volumes to mount to the `['gluster']['client']['volumes']` attribute. The Gluster volume will be mounted on the next chef-client run (provided the volume exists and is available) and added to /etc/fstab.
