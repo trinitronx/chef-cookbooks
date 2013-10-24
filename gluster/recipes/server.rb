@@ -123,6 +123,15 @@ node['gluster']['server']['volumes'].each do |volume_name, volume_values|
 			action :run
 			not_if { `gluster volume info #{volume_name} | grep Status`.include? 'Started' }
 		end
+
+		# Restrict access to the volume if configured
+		if volume_values['allowed_hosts']
+			allowed_hosts = volume_values['allowed_hosts'].join(',')
+			execute "gluster volume set #{volume_name} auth.allow #{allowed_hosts}" do
+				action :run
+				not_if "egrep '^auth.allow=#{allowed_hosts}$' /var/lib/glusterd/vols/#{volume_name}/info"
+			end
+		end
 	end
 end
 

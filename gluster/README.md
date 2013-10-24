@@ -48,12 +48,18 @@ Attributes
     <td><tt>['gluster']['server']['volumes']['brick_mount_path']</tt></td>
     <td>String</td>
     <td>Default path to use for mounting bricks</td>
-    <td>None</td>
+    <td>/gluster</td>
   </tr>
   <tr>
     <td><tt>['gluster']['server']['disks']</tt></td>
     <td>Array</td>
     <td>An array of disks to create partitions on and format for use with Gluster, (for example, ['sdb', 'sdc'])</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td><tt>['gluster']['server']['volumes'][VOLUME_NAME]['allowed_hosts']</tt></td>
+    <td>Array</td>
+    <td>An optional array of IP addresses to allow access to the volume</td>
     <td>None</td>
   </tr>
   <tr>
