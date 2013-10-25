@@ -149,6 +149,16 @@ if File.exists? apps_dir
 
         # Be sure we're not messing with files we shouldn't be
         if path =~ /^#{app_dir}/
+          # Ensure the directory the file lives in exists
+          directory File.dirname(path) do
+            user 'root'
+            group dev_group
+            mode '0775'
+            recursive true
+            action :create
+            not_if { Dir.exists? File.dirname(path) }
+          end
+
           file path do
             user 'root'
             group dev_group
