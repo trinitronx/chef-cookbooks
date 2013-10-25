@@ -24,7 +24,6 @@ apt_repository "ubuntu-glusterfs-3.4" do
   keyserver "keyserver.ubuntu.com"
   key "774BAC4D"
   deb_src true
-  notifies :run, resources(:execute => "apt-get update")
 	not_if do
 		File.exists?("/etc/apt/sources.list.d/ubuntu-glusterfs-3.4.list")
 	end
