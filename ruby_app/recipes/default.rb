@@ -63,19 +63,26 @@ if File.exists? apps_dir
   # Setup user, group, directories, etc. for each app
   apps.each do |app|
     app_dir = "#{apps_dir}/#{app.name}"
+    username = app.username || node['ruby_app']['default_user']
 
-    group app.username do
-      action :create
+    if app.group_name
+      group app.group_name do
+        gid = app.gid
+        action :create
+      end
     end
 
-    user app.username do
-      gid app.username
-      system true
-      action :create
+    if app.username
+      user app.username do
+        uid app.uid
+        gid app.group_name
+        system true
+        action :create
+      end
     end
 
     directory "#{logs_dir}/#{app.name}" do
-      user app.username
+      user username
       group dev_group
       mode '0775'
       action :create
@@ -88,14 +95,24 @@ if File.exists? apps_dir
     end
 
     link "#{app_dir}/log" do
-      user app.username
+      user username
       group dev_group
       to "#{logs_dir}/#{app.name}"
       action :create
     end
 
+    if app.url?
+      directory "#{app_dir}/public" do
+        user username
+        group dev_group
+        mode '0775'
+        action :create
+        not_if { Dir.exists? "#{app_dir}/public"}
+      end
+    end
+
     directory "#{app_dir}/tmp" do
-      user app.username
+      user username
       group dev_group
       mode '0775'
       action :create
@@ -108,7 +125,7 @@ if File.exists? apps_dir
 
     bash 'set onwer on some files' do
       cwd app_dir
-      code "chown --recursive #{app.username} ./tmp/ ./log/"
+      code "chown --recursive #{username} ./tmp/ ./log/"
     end
 
     bash 'make files group writable' do

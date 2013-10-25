@@ -12,7 +12,7 @@ module RubyApp
     end
 
     def files
-      Hash[config['files'].map { |filename, hash| [filename, YAML::dump(hash)] }]
+      Hash[files_hash.map { |filename, hash| [filename, YAML::dump(hash)] }]
     end
 
     def [](key)
@@ -20,6 +20,10 @@ module RubyApp
     end
 
     private
+
+    def files_hash
+      config['files'] || {}
+    end
 
     def config
       return @config unless @config.nil?

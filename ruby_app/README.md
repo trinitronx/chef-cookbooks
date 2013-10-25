@@ -22,11 +22,14 @@ Per-Application User Steps
 2. Add a data bag item using the following command:
 
         knife data bag create ruby_apps boring-blog
-    
+
     The data bag item should be in the following format for a url of `http://boring.example.com/blog`:
-    
+
         {
           "id": "boring-blog",
+          "user": {
+            "uid": 3000
+          }
           "url": {
             "subdomain": "boring",
             "domain": "example.com",
@@ -34,12 +37,14 @@ Per-Application User Steps
           }
         }
 
+    __Note:__ *Be sure that the uid is unique across all the apps and won't conflict with any existing users on any of the servers. Try running `knife search ruby_apps "*:*"|grep uid:|sort` to see what uids are already taken by other Ruby apps.*
+
 3. Add an encrypted data bag item using the following command:
 
         knife data bag create ruby_apps_conf boring-blog --secret-file=/path/to/encryption.key
 
     The data bag item should be in the following format:
-    
+
         {
           "id": "course-pallet",
           "environments": {
@@ -69,7 +74,7 @@ Per-Application User Steps
         }
 
     __Notes:__
-    
+
       - The `--secret-file` should be a local copy of the key you put in `/etc/chef/encryption_keys/` on the server.
       - The environment is the Chef environment not the Ruby application environment. So use `prod` not `production`.
       - The file contents will be converted from JSON to YAML before they're writted to the applyication directory.
