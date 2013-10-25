@@ -98,10 +98,21 @@ node['gluster']['server']['volumes'].each do |volume_name, volume_values|
 			# Create option string
 			options = String.new
 			case volume_values['volume_type']
+			when "replicated"
+				# Ensure the trusted pool has the correct number of bricks available
+				unless brick_count == volume_values['replica_count']
+					Chef::Log.warn("Correct number of bricks not available for volume #{volume_name}. Skipping...")
+					next
+				else
+					options = "replica #{volume_values['replica_count']}"
+					volume_bricks.each do |peer, bricks|
+						options << " #{peer}:#{bricks.first}"
+					end
+				end
 			when "distributed-replicated"
-				# Ensure the trusted pool has the required number of bricks available
+				# Ensure the trusted pool has the correct number of bricks available
 				unless brick_count == (volume_values['replica_count'] * volume_values['peers'].count)
-					Chef::Log.warn("Required number of bricks not available for volume #{volume_name}. Skipping...")
+					Chef::Log.warn("Correct number of bricks not available for volume #{volume_name}. Skipping...")
 					next
 				else
 					options = "replica #{volume_values['replica_count']}"
@@ -131,6 +142,21 @@ node['gluster']['server']['volumes'].each do |volume_name, volume_values|
 				action :run
 				not_if "egrep '^auth.allow=#{allowed_hosts}$' /var/lib/glusterd/vols/#{volume_name}/info"
 			end
+		end
+
+		# Configure volume quote if configured
+		if volume_values['quota']
+			# Enable quota
+			execute "gluster volume quota #{volume_name} enable" do
+				action :run
+				not_if "egrep '^features.quota=on$' /var/lib/glusterd/vols/#{volume_name}/info"
+			end
+
+			# Configure quota for the root of the volume
+			execute "gluster volume quota #{volume_name} limit-usage / #{volume_values['quota']}" do
+				action :run
+				not_if "egrep '^features.limit-usage=/:#{volume_values['quota']}$' /var/lib/glusterd/vols/#{volume_name}/info"
+			end			
 		end
 	end
 end

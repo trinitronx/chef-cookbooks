@@ -75,6 +75,12 @@ Attributes
     <td>None</td>
   </tr>
   <tr>
+    <td><tt>['gluster']['server']['volumes'][VOLUME_NAME]['quota']</tt></td>
+    <td>String</td>
+    <td>An optional disk quota to set for the volume, such as '10GB'</td>
+    <td>None</td>
+  </tr>
+  <tr>
     <td><tt>['gluster']['server']['volumes'][VOLUME_NAME]['replica_count']</tt></td>
     <td>Integer</td>
     <td>The number of replicas to create</td>
@@ -83,7 +89,7 @@ Attributes
   <tr>
     <td><tt>['gluster']['server']['volumes'][VOLUME_NAME]['volume_type']</tt></td>
     <td>String</td>
-    <td>The volume type to use; currently 'distributed replicated' is the only type supported</td>
+    <td>The volume type to use; currently 'replicated' and 'distributed-replicated' are the only types supported</td>
     <td>None</td>
   </tr>
 </table>
