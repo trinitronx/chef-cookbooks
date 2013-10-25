@@ -1,7 +1,9 @@
 module RubyApp
   class App
     attr_reader :id
-    alias :name :id
+    alias       :name :id
+    attr_reader :uid
+    alias       :gid :uid
     attr_reader :domain
     attr_reader :subdomain
     attr_reader :url_path
@@ -10,6 +12,9 @@ module RubyApp
     def initialize(config)
       @config = config
       @id = @config['id']
+      if @config['user']
+        @uid = @config['user']['uid']
+      end
       if @config['url']
         @domain = config['url']['domain']
         @subdomain = config['url']['subdomain']
@@ -21,6 +26,13 @@ module RubyApp
         end
       end
     end
+
+    def username
+      unless uid.nil?
+        underscored_name
+      end
+    end
+    alias :group_name :username
 
     def full_domain
       RubyApp::Domain.concat subdomain, domain
@@ -44,7 +56,9 @@ module RubyApp
       url_parent_path != '/'
     end
 
-    def username
+    private
+
+    def underscored_name
       name.downcase.gsub /[^a-z0-9_]/, '_'
     end
   end
