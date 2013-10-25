@@ -101,6 +101,16 @@ if File.exists? apps_dir
       action :create
     end
 
+    if app.url?
+      directory "#{app_dir}/public" do
+        user username
+        group dev_group
+        mode '0775'
+        action :create
+        not_if { Dir.exists? "#{app_dir}/public"}
+      end
+    end
+
     directory "#{app_dir}/tmp" do
       user username
       group dev_group

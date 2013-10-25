@@ -38,6 +38,10 @@ module RubyApp
       RubyApp::Domain.concat subdomain, domain
     end
 
+    def url?
+      !!domain
+    end
+
     def url_path
       @url_path || '/'
     end
