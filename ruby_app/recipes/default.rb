@@ -160,9 +160,9 @@ if File.exists? apps_dir
           end
 
           file path do
-            user 'root'
+            user username
             group dev_group
-            mode '0664'
+            mode '0660' # not world readable becase there is sensitive info in these files
             content file_content
             action :create
           end
