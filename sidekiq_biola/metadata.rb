@@ -1,6 +1,6 @@
 maintainer       'Biola'
 maintainer_email 'adam.crownoble@biola.edu'
 description      'Installs a sidekiq Upstart script'
-version          '0.1.1'
+version          '0.1.2'
 recipe           'sidekiq_biola', 'Installs a sidekiq Upstart script'
 supports         'ubuntu'
