@@ -145,3 +145,6 @@
 [submodule "iptables-ng"]
 	path = iptables-ng
 	url = git@github.com:chr4-cookbooks/iptables-ng.git
+[submodule "wkhtmltopdf"]
+	path = wkhtmltopdf
+	url = git@github.com:bflad/chef-wkhtmltopdf.git
