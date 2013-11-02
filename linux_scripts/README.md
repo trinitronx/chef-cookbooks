@@ -19,6 +19,31 @@ Just include `linux_scripts` in your node's `run_list`:
 }
 ```
 
+#### linux_scripts::remote_scripts
+
+Allows scripts stored on your own web/ftp server to be deployed via attributes specified on your node/roles.
+
+e.g.:
+```json
+{
+  "name":"my_role",
+  "default_attributes": {
+    "remote_scripts": [
+      {
+        "script1name": {
+          "source": "http://mywebserver/myfile.erb",
+          "path": "/usr/local/bin/myscriptname",
+          "mode": "0555" #optional
+        }
+      }
+    ]
+  }
+}
+```
+
+Just add additional hashes to the 'remote_scripts' array for each script to be deployed.
+
+
 Contributing
 ------------
 
