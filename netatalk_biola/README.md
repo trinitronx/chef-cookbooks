@@ -5,7 +5,7 @@ Installs and configures netatalk.
 
 Current caveats:
 * Targeting Ubuntu 12.04 installations only
-* Deploys the latest beta version (3.1+) of netatalk from source for Spotlight support
+* Deploys the latest version (3.1) of netatalk from source for Spotlight support
 * Configuration file support is missing. Future revisions will target automatic afp.conf configuration via attributes
 * Dconf settings should also be controlled by the recipe
 

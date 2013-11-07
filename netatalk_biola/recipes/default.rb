@@ -17,9 +17,11 @@
 # limitations under the License.
 #
 
-remote_file "#{Chef::Config[:file_cache_path]}/netatalk-3.1-beta2.tar.gz" do
-  source "http://sourceforge.net/projects/netatalk/files/netatalk/3.1/netatalk-3.1-beta2.tar.gz/download"
-  checksum 'e4ddd0b28a7892b0c9392ac9c40a85d33c771aef7f3e21ca8da9d63402e3576b'
+# TODO - breakout version number into attributes
+
+remote_file "#{Chef::Config[:file_cache_path]}/netatalk-3.1.0.tar.gz" do
+  source "http://sourceforge.net/projects/netatalk/files/netatalk/3.1/netatalk-3.1.0.tar.gz/download"
+  checksum 'd1ebcf5fad0185a8e9ea541edf3be57e3a833e9a803caa487677a209bc3a7042'
 end
 
 # Install Tracker binaries
@@ -28,7 +30,7 @@ package "tracker" do
   options "--no-install-recommends"
 end
 
-# Other tracker packages
+# Other tracker & afpstats packages
 trackerPkgs = ['dbus','libdbus-1-dev','libdbus-glib-1-dev','libtracker-sparql-0.14-dev','libtracker-miner-0.14-dev','tracker-miner-fs','tracker-utils']
 trackerPkgs.each do |i|
   package i
@@ -37,11 +39,15 @@ end
 # Netatalk dependencies
 # http://netatalk.sourceforge.net/3.1/htmldocs/installation.html)
 # http://netatalk.sourceforge.net/wiki/index.php/Install_Netatalk_3.0.5_on_Ubuntu_13.04_Raring
-netatalkPkgs = ['build-essential','libdb-dev','libgcrypt11-dev','libssl-dev','libpam0g-dev','libwrap0-dev','libevent-dev']
+netatalkPkgs = ['build-essential','libdb-dev','libgcrypt11-dev','libssl-dev','libpam0g-dev','libwrap0-dev','libevent-dev','libcrack2-dev','libpam-cracklib','libavahi-client-dev','libacl1-dev','libldap2-dev']
 netatalkPkgs.each do |i|
   package i
 end
 
+# Install time
+# Setting system config directory to normal /etc instead of /usr/local/etc (makes pam/dbus components work OOTB)
+# (could instead omit this and do something like 'cp /usr/local/etc/dbus-1/system.d/netatalk-dbus.conf /etc/dbus-1/system.d/ \
+# && service dbus reload')
 unless File.exist?("/usr/local/sbin/netatalk")
   # Installing netatalk
   # ignoring the static libevent in favor of the system bundled version
@@ -49,8 +55,8 @@ unless File.exist?("/usr/local/sbin/netatalk")
     user "root"
     cwd "#{Chef::Config[:file_cache_path]}"
     code <<-EOH
-      tar -zxf netatalk-3.1-beta2.tar.gz
-      (cd netatalk-3.1-beta2/ && ./configure --with-init-style=debian --with-tracker-pkgconfig-version=0.14 --without-libevent && make && make install)
+      tar -zxf netatalk-3.1.0.tar.gz
+      (cd netatalk-3.1.0/ && ./configure --with-init-style=debian --with-tracker-pkgconfig-version=0.14 --without-libevent --with-cracklib --sysconfdir=/etc && make && make install)
     EOH
   end
 
@@ -67,6 +73,7 @@ unless File.readlines("/root/.profile").grep(/DBUS_SESSION_BUS_ADDRESS/).size > 
 end
 
 # Bundled configuration file doesn't support reload; adjusting it here
+# TODO - make version number adjustment automatic
 template "/etc/init.d/netatalk" do
   source "netatalk.initd.erb"
   mode 0755
