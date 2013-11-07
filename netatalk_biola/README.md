@@ -34,7 +34,7 @@ Include `netatalk_biola` in your node's `run_list`:
 ```
 
 1. After install, netatalk will be installed but not started. Root's profile should be configured to interact with Tracker.
-2. Configure shares and settings in /usr/local/etc/afp.conf
+2. Configure shares and settings in /etc/afp.conf
 3. Start the netatalk service
 
 Optionally, you may wish to disable the on the fly Tracker scanning for your shares:
