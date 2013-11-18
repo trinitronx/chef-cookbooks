@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: percona
-# Attributes:: default
+# Recipe:: xtradb_cluster_client
 #
 # Copyright 2013, Biola University
 #
@@ -8,7 +8,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE_2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,13 +17,10 @@
 # limitations under the License.
 #
 
-default['percona']['users_databag'] = "pxc_users"
-default['percona']['databag_encryption_key'] = "/etc/chef/encryption_keys/pxc_key"
+# Set up the Percona apt repository
+include_recipe "percona::repository"
 
-default['percona']['max_allowed_packet'] = "16M"
-default['percona']['table_definition_cache'] = "400"
-default['percona']['table_open_cache'] = "400"
-default['percona']['innodb_log_file_size'] = "5MB"
-default['percona']['innodb_flush_log_at_trx_commit'] = "1"
-default['percona']['innodb_buffer_pool_size'] = "128MB"
-default['percona']['lower_case_table_names'] = "0"
+# Install XtraDB Cluster client packages
+node['percona']['xtradb_cluster_client_packages'].each do |p|
+  package p
+end
