@@ -2,9 +2,10 @@
 # This PowerShell script replicates the functionality of the logrotate utility on Linux/Unix-based systems
 
 # Parameters
-# -Path			A valid absolute path to a log folder
-# -Include	A log file to rotate or a wildcard pattern for including files
-# -Rotate		The number of log files to keep
+# -Path 					A valid absolute path to a log folder
+# -Include				A log file to rotate or a wildcard pattern for including files
+# -Rotate					The number of log files to keep
+# -RestartService	The name of a service to stop and start before and after rotating the logs
 
 # Example
 # .\logrotate.ps1 -Path 'C:\Logs' -Include '*.log' -Rotate 7
@@ -13,7 +14,8 @@
 Param (
 	[string]$Path,
 	[string]$Include,
-	[int]$Rotate = 10
+	[int]$Rotate = 10,
+	[string]$RestartService
 )
 
 # Remove any trailing slashes from the path
@@ -24,6 +26,11 @@ if ((Test-Path -Path $Path -PathType container) -ne $True) {
 	Write-Host "The log folder path specified does not exist."
 }
 else {
+	# Stop a service if requested
+	if ($RestartService) {
+		Stop-Service $RestartService
+	}
+
 	Write-Host "Rotating logs in $($Path)..."
 	$count = 0
 
@@ -56,4 +63,9 @@ else {
 		}
 	}
 	Write-Host "$count log file(s) were rotated in the specified directory."
+
+	# Start a service if requested
+	if ($RestartService) {
+		Start-Service $RestartService
+	}
 }
