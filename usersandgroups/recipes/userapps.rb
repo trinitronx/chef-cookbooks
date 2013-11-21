@@ -32,10 +32,10 @@ end
 pkgsAllSystems = ['screen','rsync']
 
 # Packages for Debian systems
-pkgsDebSystems = ['bash-completion','vim','nano','curl','ncdu']
+pkgsDebSystems = ['bash-completion','vim','nano','curl','ncdu','htop','lsof']
 
 # Packages for Ubuntu systems
-pkgsUbuSystems = ['run-one','byobu','bash-completion','vim','nano','curl','ncdu']
+pkgsUbuSystems = ['run-one','byobu','bash-completion','vim','nano','curl','ncdu','htop','lsof']
 
 # Packages for RHEL systems
 pkgsRHELSystems = ['vim-enhanced']
