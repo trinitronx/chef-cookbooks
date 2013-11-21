@@ -1,0 +1,16 @@
+server {
+  listen 80;
+  listen 443 ssl;
+  server_name <%= @server_name %>;
+  access_log /var/log/nginx/<%= @site_name %>.access.log;
+  root <%= @site_root %><%= @document_root %>;
+  <% if @include -%>
+  <% @include.each do |conf| -%>
+  include /etc/nginx/conf.d/<%= conf %>;
+  <% end -%>
+  <% end -%>
+
+  location / {
+    index index.html index.htm;
+  }
+}

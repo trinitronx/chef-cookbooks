@@ -1,0 +1,32 @@
+[<%= @site_name %>]
+
+user = <%= @user_name %>
+group = <%= @user_name %>
+
+listen = <%= @socket_dir %>/<%= @site_name %>.sock
+listen.owner = <%= @user_name %>
+listen.group = <%= @user_name %>
+listen.mode = 0666
+
+pm = dynamic
+pm.max_children = 10
+pm.start_servers = 2
+pm.min_spare_servers = 2
+pm.max_spare_servers = 6
+pm.max_requests = 50
+
+<% unless @php_restrict_basedir == false -%>
+php_admin_value[open_basedir] = <%= @sites_dir %>/<%= @site_name %>:/tmp
+<% end -%>
+php_admin_value[cgi.fix_pathinfo] = 0
+php_admin_value[disable_functions] = <% unless @enable_mail -%>mail,<% end -%>exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
+<% if @php_admin_flags -%>
+<% @php_admin_flags.each do |key,flag| -%>
+php_admin_flag[<%= key %>] = <%= flag %>
+<% end -%>
+<% end -%>
+<% if @php_admin_values -%>
+<% @php_admin_values.each do |key,value| -%>
+php_admin_value[<%= key %>] = <%= value %>
+<% end -%>
+<% end -%>
