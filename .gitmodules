@@ -148,3 +148,7 @@
 [submodule "wkhtmltopdf"]
 	path = wkhtmltopdf
 	url = git@github.com:bflad/chef-wkhtmltopdf.git
+[submodule "mongodb"]
+	path = mongodb
+	url = git@github.com:edelight/chef-mongodb.git
+	branch = master
