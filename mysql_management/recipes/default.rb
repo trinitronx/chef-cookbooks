@@ -36,21 +36,6 @@ mysql_databases.each do |db_name|
 		connection mysql_connection_info
 		action :create
 	end
-
-	# Create any dbo users if defined
-	if database['dbo_users']
-		database['dbo_users'].each do |username, values|
-			values['privileges'] ||= ["all"]
-			mysql_database_user username do
-				connection mysql_connection_info
-				host values['host']
-				database_name db_name
-				password values['password']
-				privileges values['privileges']
-				action :grant
-			end
-		end
-	end
 end
 
 # Loop through all of the items in the data bag containing MySQL user configuration
