@@ -31,9 +31,6 @@ node['shared_hosting']['wordpress']['php_packages'].each do |pkg|
   package pkg
 end
 
-# Install phpmyadmin
-package "phpmyadmin"
-
 # Install the acl package and re-mount the /srv partition with acl support
 package "acl" do
   notifies :disable, "mount[srv]", :immediately
@@ -68,85 +65,17 @@ service "ssh" do
   action :nothing
 end
 
-# Create a self-signed SSL certificate
-directory "#{node['nginx']['dir']}/certs" do
-  owner "root"
-  group "root"
-  mode 00755
-  action :create
-end
-
-bash "Create SSL Certificate" do
-  cwd "#{node['nginx']['dir']}/certs"
-  code <<-EOH
-  umask 077
-  openssl genrsa 2048 > selfsigned.key
-  openssl req -subj "#{node['shared_hosting']['wordpress']['ssl_req']}" -new -x509 -nodes -sha1 -days 3650 -key selfsigned.key > selfsigned.crt
-  EOH
-  not_if { ::File.exists?("#{node['shared_hosting']['wordpress']['ssl_cert_file']}") }
-end
-
-# Add nginx SSL configuration
-template "#{node['nginx']['dir']}/conf.d/ssl.conf" do
-  owner "root"
-  group "root"
-  mode 00644
-  source "nginx-ssl.conf.erb"
-  variables(
-    :ssl_cert_file => node['shared_hosting']['wordpress']['ssl_cert_file'],
-    :ssl_cert_key => node['shared_hosting']['wordpress']['ssl_cert_key'],
-  )
-  notifies :reload, "service[nginx]"
-end
-
 # Create a directory for nginx sites
-directory node['shared_hosting']['wordpress']['sites_dir'] do
+directory node['shared_hosting']['sites_dir'] do
   owner "root"
   group "root"
   mode 00755
   action :create
-end
-
-# Create a directory and index for the default nginx site
-directory "#{node['shared_hosting']['wordpress']['sites_dir']}/nginx-default" do
-  owner "root"
-  group "root"
-  mode 00755
-  action :create
-end
-
-cookbook_file "#{node['shared_hosting']['wordpress']['sites_dir']}/nginx-default/index.html" do
-  source "404.html"
-  owner "root"
-  group "root"
-  mode 00644
-  action :create
-end
-
-# Update the config for the default nginx site
-template "#{node['nginx']['dir']}/sites-available/#{node['hostname']}" do
-  owner "root"
-  group "root"
-  mode 00644
-  source "nginx-default-site.erb"
-  variables(
-    :site_name => "localhost",
-    :server_name => node['hostname'],
-    :site_root => node['shared_hosting']['wordpress']['sites_dir'],
-    :document_root => "/nginx-default"
-  )
-  notifies :reload, "service[nginx]"
-end
-
-# Enable the default site configuration
-link "/etc/nginx/sites-enabled/#{node['hostname']}" do
-  to "/etc/nginx/sites-available/#{node['hostname']}"
-  notifies :reload, "service[nginx]"
 end
 
 # Give the www-data group default read and execute permissions on the nginx sites
 execute "Set ACLs on nginx sites" do
-  command "setfacl -d -m g:www-data:rx #{node['shared_hosting']['wordpress']['sites_dir']}"
+  command "setfacl -d -m g:www-data:rx #{node['shared_hosting']['sites_dir']}"
   action :run
 end
 
@@ -187,29 +116,6 @@ template "/etc/php5/fpm/pool.d/phpmyadmin.conf" do
   notifies :restart, "service[php5-fpm]"
 end
 
-# Retrieve encryption key for databag items
-encryption_key = Chef::EncryptedDataBagItem.load_secret(node['mysql']['management']['databag_encryption_key'])
-pma_user = Chef::EncryptedDataBagItem.load(node['mysql']['management']['users_databag'], 'phpmyadmin', encryption_key)
-root_user = Chef::EncryptedDataBagItem.load(node['mysql']['management']['users_databag'], 'root', encryption_key)
-
-# Replace the phpmyadmin database config file
-template "/etc/phpmyadmin/config-db.php" do
-  owner "root"
-  group "www-data"
-  mode 00640
-  source "config-db.php.erb"
-  variables(
-    :dbpass => pma_user['password']
-  )
-end
-
-# Create the tables for phpmyadmin
-execute "Create tables" do
-  command "gunzip /usr/share/doc/phpmyadmin/examples/create_tables.sql.gz; mysql -uroot -p#{root_user['password']} < /usr/share/doc/phpmyadmin/examples/create_tables.sql"
-  creates "/usr/share/doc/phpmyadmin/examples/create_tables.sql"
-  action :run
-end
-
 # Create a group for users that need to be chrooted when using SFTP
 group node['shared_hosting']['wordpress']['chroot_group'] do
   action :create
@@ -234,13 +140,13 @@ if node['shared_hosting']['wordpress']['sites']
       # Create a user account with a home folder in the wordpress sites directory
       account_name = site_value['user_name'].nil? ? site_key.to_s : site_value['user_name']
       user account_name do
-        home "#{node['shared_hosting']['wordpress']['sites_dir']}/#{site_key.to_s}"
+        home "#{node['shared_hosting']['sites_dir']}/#{site_key.to_s}"
         shell "/bin/bash"
         action :create
       end
 
       # Create the user's home directory with appropriate permissions
-      directory "#{node['shared_hosting']['wordpress']['sites_dir']}/#{site_key.to_s}" do
+      directory "#{node['shared_hosting']['sites_dir']}/#{site_key.to_s}" do
         unless site_value['chroot_user'] == false
           owner "root"
           group account_name
@@ -271,7 +177,7 @@ if node['shared_hosting']['wordpress']['sites']
           :site_name => site_key.to_s,
           :user_name => account_name,
           :socket_dir => node['shared_hosting']['wordpress']['socket_dir'],
-          :sites_dir => node['shared_hosting']['wordpress']['sites_dir'],
+          :sites_dir => node['shared_hosting']['sites_dir'],
           :php_restrict_basedir => site_value['php_restrict_basedir'],
           :enable_mail => site_value['enable_mail'],
           :php_admin_flags => site_value['php_admin_flags'],
@@ -281,7 +187,7 @@ if node['shared_hosting']['wordpress']['sites']
       end
 
       # Create a public_html directory inside the user's home
-      directory "#{node['shared_hosting']['wordpress']['sites_dir']}/#{site_key.to_s}/public_html" do
+      directory "#{node['shared_hosting']['sites_dir']}/#{site_key.to_s}/public_html" do
         owner account_name
         group account_name
         mode 00750
@@ -299,7 +205,7 @@ if node['shared_hosting']['wordpress']['sites']
           :site_name => site_key.to_s,
           :server_name => site_value['server_name'],
           :include => site_value['nginx_include'],
-          :site_root => "#{node['shared_hosting']['wordpress']['sites_dir']}/#{site_key.to_s}",
+          :site_root => "#{node['shared_hosting']['sites_dir']}/#{site_key.to_s}",
           :document_root => "/public_html",
           :fastcgi_pass => "unix:#{node['shared_hosting']['wordpress']['socket_dir']}/#{site_key.to_s}.sock"
         )

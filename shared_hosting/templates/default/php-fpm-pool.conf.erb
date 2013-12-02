@@ -15,7 +15,7 @@ pm.min_spare_servers = 2
 pm.max_spare_servers = 6
 pm.max_requests = 50
 
-<% unless @php_restrict_basedir == false -%>
+<% if @php_restrict_basedir == true -%>
 php_admin_value[open_basedir] = <%= @sites_dir %>/<%= @site_name %>:/tmp
 <% end -%>
 php_admin_value[cgi.fix_pathinfo] = 0

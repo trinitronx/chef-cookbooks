@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: shared_hosting
-# Attributes:: wordpress
+# Attributes:: default
 #
 # Copyright 2013, Biola University
 #
@@ -17,6 +17,4 @@
 # limitations under the License.
 #
 
-default['shared_hosting']['wordpress']['php_packages'] = %w{ php5-curl php5-gd php5-mcrypt }
-default['shared_hosting']['wordpress']['socket_dir'] = "/var/run/php5-fpm"
-default['shared_hosting']['wordpress']['chroot_group'] = "sftp"
+default['shared_hosting']['sites_dir'] = "/srv/nginx"

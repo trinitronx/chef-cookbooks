@@ -1,4 +1,7 @@
 location /phpmyadmin {
+	if ($server_port = 80) {
+		rewrite ^ https://$host$request_uri permanent;
+	}
 	root /usr/share/;
 	index index.php index.html index.htm;
 	location ~ ^/phpmyadmin/(.+\.php)$ {
