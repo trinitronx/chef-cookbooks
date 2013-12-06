@@ -207,6 +207,7 @@ if node['shared_hosting']['wordpress']['sites']
           :include => site_value['nginx_include'],
           :site_root => "#{node['shared_hosting']['sites_dir']}/#{site_key.to_s}",
           :document_root => "/public_html",
+          :subdirectory => site_value['subdirectory'],
           :fastcgi_pass => "unix:#{node['shared_hosting']['wordpress']['socket_dir']}/#{site_key.to_s}.sock"
         )
         notifies :reload, "service[nginx]"

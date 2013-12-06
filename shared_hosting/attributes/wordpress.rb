@@ -20,3 +20,4 @@
 default['shared_hosting']['wordpress']['php_packages'] = %w{ php5-curl php5-gd php5-mcrypt }
 default['shared_hosting']['wordpress']['socket_dir'] = "/var/run/php5-fpm"
 default['shared_hosting']['wordpress']['chroot_group'] = "sftp"
+default['shared_hosting']['wordpress']['subdirectory'] = nil

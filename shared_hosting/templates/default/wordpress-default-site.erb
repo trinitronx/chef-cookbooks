@@ -12,7 +12,7 @@ server {
 
   location / {
     index index.html index.htm index.php;
-    try_files $uri $uri/ /index.php?$args;
+    try_files $uri $uri/ <%= @subdirectory %>/index.php?$args;
   }
 
   location ~ \.php$ {
@@ -23,4 +23,8 @@ server {
     fastcgi_split_path_info ^(.+\.php)(/.+)$;
     fastcgi_pass <%= @fastcgi_pass %>;
   }
+
+  # Rewrites for WordPress SEO XML Sitemap
+  rewrite ^<%= @subdirectory %>/sitemap_index.xml$ <%= @subdirectory %>/index.php?sitemap=1 last;
+  rewrite ^<%= @subdirectory %>/([^/]+?)-sitemap([0-9]+)?.xml$ <%= @subdirectory %>/index.php?sitemap=$1&sitemap_n=$2 last;
 }
