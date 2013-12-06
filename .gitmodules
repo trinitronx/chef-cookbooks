@@ -152,3 +152,11 @@
 	path = mongodb
 	url = git@github.com:edelight/chef-mongodb.git
 	branch = master
+[submodule "redisio"]
+	path = redisio
+	url = git@github.com:brianbianco/redisio.git
+	branch = master
+[submodule "gitlab"]
+	path = gitlab
+	url = git@github.com:lucasec/gitlab-server.git
+	branch = master
