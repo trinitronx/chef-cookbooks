@@ -16,10 +16,16 @@ module RubyApp
 
     def domains
       [].tap do |domains|
-        @apps.group_by(&:full_domain).each do |domain, apps|
+        web_apps.group_by(&:full_domain).each do |domain, apps|
           domains << RubyApp::Domain.new(apps.first.domain, apps, subdomain: apps.first.subdomain)
         end
       end
+    end
+
+    private
+
+    def web_apps
+      @apps.select(&:url?)
     end
   end
 end
