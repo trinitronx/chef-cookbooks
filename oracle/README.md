@@ -19,6 +19,9 @@ None yet
 #### oracle::legacydirectories
 Apply to your node to create symlinked directories to emulate a legacy system configuration
 
+#### oracle::packages
+Installs pre-req packages for an Oracle database system
+
 License and Authors
 -------------------
  Copyright 2013, Biola University 
