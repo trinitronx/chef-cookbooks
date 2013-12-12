@@ -20,7 +20,7 @@
 # Virtualized nodes should load this module, if it exists and
 # isn't already loaded
 unless node['virtualization'].nil? 
-  if node['virtualization']['role'] == "guest"
+  if node['virtualization']['role'] == "guest" && node['virtualization']['system'] != "xen"
     execute "modprobe acpi_memhotplug" do
       not_if "cat /proc/modules | grep -i acpi_memhotplug"
       only_if "test -f /lib/modules/$(uname -r)/kernel/drivers/acpi/acpi_memhotplug.ko"
