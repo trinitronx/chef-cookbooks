@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# Copyright 2013, Biola University 
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#
+# This script will watch a PID, passed to the script at launch time, and 
+# when the watched PID is no longer executing, a large 'DONE' message will be
+# displayed on the terminal screen.
+
+PID=${1:?Target process not supplied.}
+SCRIPT=$0
+
+# Make sure the target is running first.
+ps aux | grep -v grep|grep -v $SCRIPT|grep $PID> /dev/null 2>&1
+RESULT=$?
+
+if (( $RESULT != 0 )); then
+echo
+echo "Process '$PID' not found."
+exit
+fi
+
+echo
+echo "Script '$SCRIPT'  -  Launched: `date`"
+echo "Waiting for $PID to finish..."
+
+ZERO=0
+FLAG=0
+
+while (( $FLAG == $ZERO ))
+do
+ps aux|grep -v grep|grep -v $SCRIPT|grep $PID> /dev/null 2>&1
+FLAG=$?
+sleep 15
+
+done
+
+# Now display the 'DONE' message
+echo
+echo "`date`"
+echo
+echo "     DDDDDDD     OOOOOO    NNN    NN   EEEEEEE  "
+echo "     DD    DD   OO    OO   NNNN   NN   EE       "
+echo "     DD    DD   OO    OO   NN NN  NN   EE       "
+echo "     DD    DD   OO    OO   NN  NN NN   EEEEE    "
+echo "     DD    DD   OO    OO   NN   NNNN   EE       "
+echo "     DD    DD   OO    OO   NN    NNN   EE       "
+echo "     DDDDDDD     OOOOOO    NN     NN   EEEEEEE  "
+
+
+exit 0
