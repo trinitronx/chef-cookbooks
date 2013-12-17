@@ -14,10 +14,12 @@ end
 mail_sender = Array.new
 
 mail_sender = search(:node, "roles:mail_sender")
+mail_sender.sort! { |a, b| a.name <=> b.name }
 
 device_whitelist = Array.new
 
 device_whitelist = search(:postfix_whitelist, "*:*")
+device_whitelist.sort! { |a, b| a["id"] <=> b["id"] }
 
 template "/etc/postfix/whitelist" do
 	source "whitelist.erb"
