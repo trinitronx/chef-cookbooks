@@ -27,7 +27,7 @@ unless lib_path
   end
 end
 
-# These resources are ruby_blocks because the standard Chef resources
+# This resource is a ruby_block because the standard Chef resources
 # are evaluated before the run list has been excetude. Which means the
 # .zip files haven't been unzipped and lib_path is nil.
 # ruby_block resources, however, are run at execute time.
@@ -43,14 +43,10 @@ ruby_block 'link_libclntsh.so' do
   end
 end
 
-ruby_block 'set_environment_variables' do
-  block do
-    path = '/etc/profile.d/oracle_instant_client.sh'
-
-    unless File.exists? path
-      File.open(path, 'w') do|file|
-        file.write("export LD_LIBRARY_PATH=#{lib_path}")
-      end
-    end
-  end
+# Set environment variable
+template "/etc/profile.d/oracle_instant_client.sh" do
+  source "oracle_instant_client.sh.erb"
+  variables({
+    :lib_path => lib_path
+  })
 end
