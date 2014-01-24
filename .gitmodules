@@ -160,3 +160,12 @@
 	path = gitlab
 	url = git@github.com:lucasec/gitlab-server.git
 	branch = master
+[submodule "ark"]
+	path = ark
+	url = git@github.com:opscode-cookbooks/ark.git
+[submodule "r"]
+	path = r
+	url = git@github.com:stevendanna/cookbook-r.git
+[submodule "rstudio"]
+	path = rstudio
+	url = git@github.com:biola/rstudio-chef.git
