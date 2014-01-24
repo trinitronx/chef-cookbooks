@@ -95,8 +95,8 @@ if node['usersandgroups']
         else
           # Set home to location in data bag,
           # or a reasonable default (/home/$user).
-          if uvalue['home'] || userdatab['home']
-            home_dir = uvalue['home'] || userdatab['home']
+          if uvalue['home'] || ( userdatab['home'] if userdatab )
+            home_dir = uvalue['home'] || ( userdatab['home'] if userdatab )
           else
             home_dir = "/home/#{ukey.to_s}"
           end
