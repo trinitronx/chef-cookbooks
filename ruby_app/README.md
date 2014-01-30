@@ -37,7 +37,10 @@ Per-Application User Steps
           }
         }
 
-    __Note:__ *Be sure that the uid is unique across all the apps and won't conflict with any existing users on any of the servers. Try running `knife search ruby_apps "*:*"|grep uid:|sort` to see what uids are already taken by other Ruby apps.*
+    __Note:__ *Be sure that the uid is unique across all the apps and won't conflict with any existing users on any of the servers. Try running the following command to see what uids are already taken by other Ruby apps.*
+    ```
+    knife search ruby_apps "*:*"|grep uid:|sort
+    ```
 
 3. Add an encrypted data bag item using the following command:
 
