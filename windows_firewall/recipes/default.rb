@@ -49,11 +49,12 @@ unless node['firewall'].nil?
         logging = params['logging'].to_sym if params['logging']
         port = params['port'].to_i if params['port']
         source = params['source'] if params['source']
+        source ||= "any"
         destination = params['destination'] if params['destination']
         dest_port = params['dest_port'].to_i if params['dest_port']
         profile = params['profile'] if params['profile']
         profile ||= "domain"
-        execute "netsh advfirewall firewall add rule name=\"#{name}\" dir=in action=allow protocol=#{protocol} localport=#{port} profile=#{profile}" do
+        execute "netsh advfirewall firewall add rule name=\"#{name}\" dir=in action=allow protocol=#{protocol} localport=#{port} remoteip=#{source} profile=#{profile}" do
           not_if {CheckOpenPort.is_port_open?(node['ipaddress'], port)}
         end
       end
