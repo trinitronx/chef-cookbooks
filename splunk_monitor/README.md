@@ -49,7 +49,8 @@ Same dependencies as the splunk::forwarder recipe:
 >            "index": "couldomitthis",
 >            "sourcetype": "", #optional
 >            "whitelist": "", #optional
->            "blacklist": "" #optional
+>            "blacklist": "", #optional
+>            "crcSalt": "" #optional
 >          }
 >        }
 >      ],

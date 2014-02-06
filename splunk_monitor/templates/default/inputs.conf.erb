@@ -9,6 +9,7 @@ disabled = false
 <%= "whitelist = " + parameters[monitor_name]['whitelist'] if parameters[monitor_name]['whitelist'] %>
 <%= "blacklist = " + parameters[monitor_name]['blacklist'] if parameters[monitor_name]['blacklist'] %>
 <%= "host = " + parameters[monitor_name]['host'] if parameters[monitor_name]['host'] %>
+<%= "crcSalt = <SOURCE>" if parameters[monitor_name]['crcSalt'] %>
 
 <% end -%>
 <% end -%>
