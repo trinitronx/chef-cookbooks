@@ -22,6 +22,9 @@ Apply to your node to create symlinked directories to emulate a legacy system co
 #### oracle::packages
 Installs pre-req packages for an Oracle database system
 
+#### oracle::icu
+Installs ICU libraries
+
 License and Authors
 -------------------
  Copyright 2013, Biola University 
