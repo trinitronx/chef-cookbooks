@@ -25,6 +25,9 @@ Installs pre-req packages for an Oracle database system
 #### oracle::icu
 Installs ICU libraries
 
+#### oracle::icusource
+Installs the ICU libraries from the icu recipe, and unpacks the source package into /usr/local/src
+
 License and Authors
 -------------------
  Copyright 2013, Biola University 
