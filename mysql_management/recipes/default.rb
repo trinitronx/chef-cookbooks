@@ -34,6 +34,9 @@ mysql_databases.each do |db_name|
   # Create the database if it doesn't exist
 	mysql_database db_name do
 		connection mysql_connection_info
+		if database['encoding']
+			encoding database['encoding']
+		end
 		action :create
 	end
 end

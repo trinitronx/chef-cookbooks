@@ -26,11 +26,12 @@ Create `mysql_databases` and `mysql_users` data bags in Chef to hold configurati
 
     {
       "id": "database_name",
+      "encoding": "utf8",
       "backup_schedule": "daily",
       "backup_rotation_period": "7"
     }
 
-In the above example, "backup_schedule", "backup_rotation_period", and "privileges" are optional. A database can be created simply with an "id" and other options can be added later if needed.
+In the above example, "encoding", "backup_schedule", and "backup_rotation_period" are optional. A database can be created simply with an "id" and other options can be added later if needed.
 
 Items in the `mysql_users` data bag should be in the following format:
 
