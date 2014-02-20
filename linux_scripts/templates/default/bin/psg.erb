@@ -1,6 +1,3 @@
--
-
-
 #!/bin/bash
 #
 # Copyright 2013, Biola University 
@@ -18,9 +15,8 @@
 # limitations under the License.
 #
 #
-#   ## Does a 'ps -ef | grep SEARCH'
+#   ## Does a 'ps aux | grep SEARCH'
 #
-
 if [ $# -ne 1 ]; then
   echo
   echo "Usage: psg PARM "  where PARM = the search value for grep.
@@ -35,7 +31,7 @@ SCRIPT=$0
 SEARCH=$1
 ZERO=0
 
-ps -ef|grep -v ${SCRIPT}|grep -v grep|grep "${SEARCH}" > /tmp/psglist
+ps aux|grep -v ${SCRIPT}|grep -v grep|grep "${SEARCH}" > /tmp/psglist
 STATUS=$?
 
 if [ ${STATUS} = ${ZERO} ] 
