@@ -4,22 +4,16 @@ server {
   server_name                 <%= @domain.for_environment(node.chef_environment) %>;
   server_name                 <%= @domain.for_host(node.fqdn) %>;
 
-  <% if @domain.non_root_apps? %>
   root                        <%= @static_dir %>/<%= @domain.for_environment(node.chef_environment) %>;
-  <% else %>
-  root                        <%= @apps_dir %>/<%= @domain.apps.first.name %>/public;
-  <% end %>
   <% @domain.apps.each do |app| %>
 
   location <%= app.url_path %> {
-    <% unless app.script_name %>
-    root                      <%= @apps_dir %>/<%= app.name %>/public;
-    <% end %>
     rack_env                  <%= @rack_env %>;
     passenger_enabled         on;
     <% if app.script_name %>
     passenger_base_uri        <%= app.script_name %>;
     <% end %>
+    passenger_app_root        <%= @apps_dir %>/<%= app.name %>;
     <% if app.username %>
     passenger_user            <%= app.username %>;
     passenger_group           <%= app.group_name %>;

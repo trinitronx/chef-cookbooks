@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'yaml'
 
 data_bag_name       = node['ruby_app']['data_bag_name']
@@ -8,6 +9,7 @@ apps_dir            = node['ruby_app']['apps_dir']
 static_dir          = node['ruby_app']['static_dir']
 logs_dir            = node['ruby_app']['logs_dir']
 nginx_sites_dir     = node['ruby_app']['nginx_sites_dir']
+default_user        = node['ruby_app']['default_user']
 
 data_bag_secret = Chef::EncryptedDataBagItem.load_secret(encryption_key_path)
 
@@ -63,7 +65,7 @@ if File.exists? apps_dir
   # Setup user, group, directories, etc. for each app
   apps.each do |app|
     app_dir = "#{apps_dir}/#{app.name}"
-    username = app.username || node['ruby_app']['default_user']
+    username = app.username || default_user
 
     if app.group_name
       group app.group_name do
@@ -192,22 +194,36 @@ if File.exists? apps_dir
         action :create
       end
 
-      domain.non_root_apps.each do |app|
-        if app.url_parent_path?
-          directory "#{static_dir}/#{env_domain}/#{app.url_parent_path}" do
-            user 'root'
-            group dev_group
-            mode '0775'
-            action :create
-          end
-        end
-
-        link "#{static_dir}/#{env_domain}/#{app.url_path}" do
+      # Create any extra paths between the domain and the app. Like example.com/something/something/app.
+      domain.non_root_apps.select(&:url_parent_path?).each do |app|
+        directory "#{static_dir}/#{env_domain}/#{app.url_parent_path}" do
           user 'root'
           group dev_group
-          to "#{apps_dir}/#{app.name}/public"
+          mode '0775'
           action :create
         end
+      end
+    end
+
+    # Move the public files from /public to the static dir and symlink public to it.
+    domain.apps.each do |app|
+      public_path = "#{apps_dir}/#{app.name}/public"
+      static_path = "#{static_dir}/#{env_domain}"
+      static_path += "/#{app.url_path}" if app.url_path?
+
+      ruby_block "move #{public_path} to #{static_path}" do
+        block do
+          if File.exists?(public_path) && !File.symlink?(public_path)
+            FileUtils.move public_path, static_path
+          end
+        end
+      end
+
+      link public_path do
+        user app.username || default_user
+        group dev_group
+        to static_path
+        action :create
       end
     end
   end
