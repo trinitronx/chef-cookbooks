@@ -29,7 +29,7 @@ Per-Application User Steps
           "id": "boring-blog",
           "user": {
             "uid": 3000
-          }
+          },
           "url": {
             "subdomain": "boring",
             "domain": "example.com",
