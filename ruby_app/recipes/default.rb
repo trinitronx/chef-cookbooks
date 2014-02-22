@@ -13,6 +13,8 @@ default_user        = node['ruby_app']['default_user']
 
 data_bag_secret = Chef::EncryptedDataBagItem.load_secret(encryption_key_path)
 
+package 'rsync'
+
 directory apps_dir do
   user 'root'
   group dev_group
@@ -207,22 +209,34 @@ if File.exists? apps_dir
 
     # Move the public files from /public to the static dir and symlink public to it.
     domain.apps.each do |app|
-      public_path = "#{apps_dir}/#{app.name}/public"
-      static_path = "#{static_dir}/#{env_domain}"
-      static_path += "/#{app.url_path}" if app.url_path?
+      app_public_path = "#{apps_dir}/#{app.name}/public"
+      shared_static_path = "#{static_dir}/#{env_domain}"
+      shared_static_path += "/#{app.url_path}" if app.url_path?
 
-      ruby_block "move #{public_path} to #{static_path}" do
-        block do
-          if File.exists?(public_path) && !File.symlink?(public_path)
-            FileUtils.move public_path, static_path
+      if File.exists?(app_public_path) && !File.symlink?(app_public_path)
+        # If we have two public directories because this isn't the first instance of the app we've deployed
+        # then we need to merge the apps public directory into the shared one and then delete it.
+        if File.exists?(shared_static_path)
+          bash "merge public folders" do
+            code "rsync -abviu #{app_public_path} #{shared_static_path}"
+          end
+
+          directory app_public_path do
+            recursive true
+            action :delete
+          end
+        # Otherwise we can just move it.
+        else
+          bash "move #{app_public_path} to #{shared_static_path}" do
+            code "mv #{app_public_path} #{shared_static_path}"
           end
         end
       end
 
-      link public_path do
+      link app_public_path do
         user app.username || default_user
         group dev_group
-        to static_path
+        to shared_static_path
         action :create
       end
     end
