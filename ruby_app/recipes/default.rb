@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'shellwords'
 require 'yaml'
 
 data_bag_name       = node['ruby_app']['data_bag_name']
@@ -105,16 +106,6 @@ if File.exists? apps_dir
       action :create
     end
 
-    if app.url?
-      directory "#{app_dir}/public" do
-        user username
-        group dev_group
-        mode '0775'
-        action :create
-        not_if { Dir.exists? "#{app_dir}/public"}
-      end
-    end
-
     directory "#{app_dir}/tmp" do
       user username
       group dev_group
@@ -177,10 +168,11 @@ if File.exists? apps_dir
 
   # Setup Nginx for each domain
   apps.domains.each do |domain|
-    rack_env    = (node.chef_environment == 'prod' ? 'production' : 'staging')
-    env_domain  = domain.for_environment(rack_env)
+    rack_env = (node.chef_environment == 'prod' ? 'production' : 'staging')
+    env_domain = domain.for_environment(rack_env)
+    safe_env_domain = domain.for_environment(rack_env, safe: true)
 
-    template "#{nginx_sites_dir}/#{env_domain}.server.conf" do
+    template "#{nginx_sites_dir}/#{safe_env_domain}.server.conf" do
       source    'nginx_site.server.conf.erb'
       owner     'root'
       group     'root'
@@ -189,7 +181,7 @@ if File.exists? apps_dir
     end
 
     if domain.non_root_apps?
-      directory "#{static_dir}/#{env_domain}" do
+      directory "#{static_dir}/#{safe_env_domain}" do
         user 'root'
         group dev_group
         mode '0775'
@@ -198,7 +190,7 @@ if File.exists? apps_dir
 
       # Create any extra paths between the domain and the app. Like example.com/something/something/app.
       domain.non_root_apps.select(&:url_parent_path?).each do |app|
-        directory "#{static_dir}/#{env_domain}/#{app.url_parent_path}" do
+        directory "#{static_dir}/#{safe_env_domain}/#{Shellwords.escape(app.url_parent_path)}" do
           user 'root'
           group dev_group
           mode '0775'
@@ -210,27 +202,25 @@ if File.exists? apps_dir
     # Move the public files from /public to the static dir and symlink public to it.
     domain.apps.each do |app|
       app_public_path = "#{apps_dir}/#{app.name}/public"
-      shared_static_path = "#{static_dir}/#{env_domain}"
-      shared_static_path += "/#{app.url_path}" if app.url_path?
+      shared_static_path = "#{static_dir}/#{safe_env_domain}"
+      shared_static_path += "/#{Shellwords.escape(app.url_path)}" if app.url_path?
 
-      if File.exists?(app_public_path) && !File.symlink?(app_public_path)
-        # If we have two public directories because this isn't the first instance of the app we've deployed
-        # then we need to merge the apps public directory into the shared one and then delete it.
-        if File.exists?(shared_static_path)
-          bash "merge public folders" do
-            code "rsync -abviu #{app_public_path} #{shared_static_path}"
-          end
+      directory "#{shared_static_path}" do
+        user app.username || default_user
+        group dev_group
+        mode '0775'
+        action :create
+      end
 
-          directory app_public_path do
-            recursive true
-            action :delete
-          end
-        # Otherwise we can just move it.
-        else
-          bash "move #{app_public_path} to #{shared_static_path}" do
-            code "mv #{app_public_path} #{shared_static_path}"
-          end
-        end
+      bash 'merge public folders' do
+        system "rsync -abviu #{app_public_path}/* #{shared_static_path}"
+        only_if { File.exists?(app_public_path) && !File.symlink?(app_public_path) }
+      end
+
+      directory app_public_path do
+        recursive true
+        action :delete
+        not_if { File.symlink? app_public_path }
       end
 
       link app_public_path do

@@ -10,14 +10,17 @@ module RubyApp
       @subdomain = options[:subdomain]
     end
 
-    def for_environment(environment)
+    def for_environment(environment, options = {})
       domain_parts = if environment =~ /^prod(uction)?$/
         [subdomain, domain]
       else
         [subdomain, environment, domain]
       end
 
-      RubyApp::Domain.concat(domain_parts)
+      domain_full = RubyApp::Domain.concat(domain_parts)
+      domain_full.gsub! '*', 'wildcard' if options[:safe]
+
+      domain_full
     end
 
     def for_host(hostname)
