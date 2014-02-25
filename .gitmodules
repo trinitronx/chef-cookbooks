@@ -172,3 +172,6 @@
 [submodule "rvm"]
 	path = rvm
 	url = git@github.com:fnichol/chef-rvm.git
+[submodule "chef_gem"]
+	path = chef_gem
+	url = git@github.com:hw-cookbooks/chef_gem.git
