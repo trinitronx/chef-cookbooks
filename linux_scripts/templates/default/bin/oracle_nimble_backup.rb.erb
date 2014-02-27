@@ -1,0 +1,200 @@
+#!/usr/bin/env ruby
+
+# Exception messages
+$exceptions = ['Probable hostname lookup failure','Connection timed out','Unknown exception occured']
+
+# Setup logging
+$outputtoconsole = false
+def log(message)
+  require 'syslog'
+  # $0 is the current script name
+  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.info message }
+  if $outputtoconsole
+    puts message
+  end
+end
+
+# Execute SSH
+def openssh(hostname,user,keys,command)
+  require 'net/ssh'
+  result = ""
+  begin
+    Net::SSH.start(hostname, user, :keys => keys) do |ssh|
+      result = ssh.exec!(command)
+    end
+  rescue Errno::ENOENT
+    result = $exceptions[0]
+  rescue Errno::ETIMEDOUT 
+    result = $exceptions[1]
+  end
+  return result
+end
+
+def recentsnapshotexists?(sanhostname,sanusername,sanuserkey,sanvolume,snapshotidentifier,minsnapshotgap=3300)
+  require 'time'
+  result = openssh(sanhostname,sanusername,sanuserkey,"snapcoll --list --volcoll #{sanvolume} | grep -i #{sanvolume}-#{snapshotidentifier}")
+  unless $exceptions.include?(result) 
+    # Isolate just the snapshot times
+    snapshottimes = result.scan(/\d\d\d\d-\d\d-\d\d::\d\d:\d\d:\d\d\.\d\d\d/)
+    
+    # Check all the snapshots and see if they've occured since the minimumtime seconds in the past
+    t = Time.now
+    recentsnapshot = false
+    snapshottimes.each do |snapshottime|
+      recentsnapshot = true if Time.parse(snapshottime) > (t - minsnapshotgap.to_i)
+    end
+    return recentsnapshot
+    
+  else
+    log('Snapshot check failure - exception is: ' + result)
+    exit
+  end
+end
+
+def backupmode(dbhostname,dbuser,dbkey,enableordisable)
+  # connect to db server and place it in backup mode
+  result = openssh(dbhostname,dbuser,dbkey,"sudo -i -u oracle /usr/local/bin/oracle_backup_mode_#{enableordisable}.sh")
+  unless $exceptions.include?(result)
+    log("Oracle backup mode #{enableordisable} script executed")
+    return result
+  else
+    log('Connection to host to toggle backup mode failed - exception is: ' + result)
+    if enableordisable == 'enable'
+      exit
+    else
+      log('Failed (CRITICAL) to disable backup mode - exception is: ' + result)
+      exit
+    end
+  end
+end
+
+def takesnapshot(sanhostname,sanuser,sankeys,sanvolume,snapshotidentifier)
+  # take the storage level snapshot
+  require 'time'
+  sansnapshot = "#{sanvolume}-#{snapshotidentifier}-#{Time.now.strftime("%F::%T.%L")}"
+  log("Creating Nimble snapshot #{sansnapshot}")
+  result = openssh(sanhostname,sanuser,sankeys,"volcoll --snap #{sanvolume} --snapcoll_name #{sansnapshot}")
+  if $exceptions.include?(result) 
+    log("Failed to create the storage snapshot - logged exception is: #{result}")
+  end
+  return result
+end
+
+def removeoldestbackup(sanhostname,sanusername,sanuserkey,sanvolume,snapshotidentifier,snapshotstoretain,minimumsnapshotage=604740)
+  require 'time'
+  result = openssh(sanhostname,sanusername,sanuserkey,"snapcoll --list --volcoll #{sanvolume} | grep -i #{sanvolume}")
+  unless $exceptions.include?(result) 
+    # Isolate just the snapshot times
+    snapshots = result.scan(/#{sanvolume}-#{snapshotidentifier}-\d\d\d\d-\d\d-\d\d::\d\d:\d\d:\d\d\.\d\d\d/)
+    #snapshots.sort!
+    t = Time.now
+    snapshots.sort.each do |snapshot|
+      if snapshots.length > snapshotstoretain
+        if Time.parse(snapshot.scan(/\d\d\d\d-\d\d-\d\d::\d\d:\d\d:\d\d\.\d\d\d/)[0]) < (t - minimumsnapshotage)
+          log("Deleting Nimble snapshot #{snapshot}")
+          openssh(sanhostname,sanusername,sanuserkey,"snapcoll --delete #{snapshot}")
+          # Remove from the generated array
+          snapshots.delete(snapshot)
+        end
+      end
+    end
+  else
+    log('Snapshot check failure - exception is: ' + result)
+    exit
+  end
+end
+
+
+if __FILE__ == $0
+    require 'optparse'
+    options = {}
+    optparse = OptionParser.new do|opts|
+      # Set a banner, displayed at the top
+      # of the help screen.
+      opts.banner = "Usage: oracle_nimble_backup.rb [options]"
+      
+      options[:sanhostname] = nil
+      opts.on( '-S', '--sanhostname FQDN', 'Connect to Nimble at FQDN' ) do |parsopt|
+        options[:sanhostname] = parsopt
+      end
+      options[:sanusername] = 'admin'
+      opts.on( '-s', '--sanusername USERNAME', 'Connect to Nimble as USERNAME; defaults to admin' ) do |parsopt|
+        options[:sanusername] = parsopt
+      end
+      options[:sanuserkey] = nil
+      opts.on( '-u', '--sanuserkey FILE', 'SSH keyfile for connecting to Nimble' ) do |parsopt|
+        options[:sanuserkey] = parsopt
+      end
+      options[:sanvolume] = nil
+      opts.on( '-v', '--sanvolume VOLUME', 'Work with volume collection VOLUME' ) do |parsopt|
+        options[:sanvolume] = parsopt
+      end
+      options[:snapshotidentifier] = 'oracleawarebackup'
+      opts.on( '-w', '--snapshotidentifier NAME', 'Group snapshots by NAME; defaults to \'oracleawarebackup\'' ) do |parsopt|
+        options[:snapshotidentifier] = parsopt
+      end
+      options[:minsnapshotgap] = 3300
+      opts.on( '-g', '--minsnapshotgap SECONDS', 'Abort backup process if snapshot found more recently than SECONDS' ) do |parsopt|
+        options[:minsnapshotgap] = parsopt.to_i
+      end
+      options[:minsnapshotage] = 604800
+      opts.on( '-a', '--minsnapshotage SECONDS', 'During snapshot cleanup/rotate, do not delete snapshots created more recently than SECONDS; defaults to 7 days' ) do |parsopt|
+        options[:minsnapshotage] = parsopt.to_i
+      end
+      options[:minsnapshotretain] = nil
+      opts.on( '-r', '--minsnapshotretain NUMBER', 'During snapshot cleanup/rotate, do not delete snapshots if there are less than a total of NUMBER' ) do |parsopt|
+        options[:minsnapshotretain] = parsopt.to_i
+      end
+      options[:dbhostname] = nil
+      opts.on( '-d', '--dbhostname FQDN', 'Connect to Oracle DB server at FQDN' ) do |parsopt|
+        options[:dbhostname] = parsopt
+      end
+      options[:dbusername] = nil
+      opts.on( '-e', '--dbusername USERNAME', 'Connect to Oracle DB server as USERNAME' ) do |parsopt|
+        options[:dbusername] = parsopt
+      end
+      options[:dbuserkey] = nil
+      opts.on( '-f', '--dbuserkey FILE', 'SSH keyfile for connecting to Oracle DB server' ) do |parsopt|
+        options[:dbuserkey] = parsopt
+      end
+      opts.on( '-c', '--console', 'Send logging data to console in addition to syslog' ) do
+        $outputtoconsole = true
+      end
+      opts.on( '-h', '-?', '--help', 'Display this screen' ) do
+        puts opts
+        exit
+      end
+    end
+  optparse.parse!
+  # Check for missing options
+  options.each do |key, value|
+    if value == nil
+      puts optparse.help()
+      exit
+    end
+  end
+  # All options accounted for; proceed with the backup
+  log('Beginning backup process')
+  unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
+    log("No recent (< #{options[:minsnapshotage]} seconds old) Nimble snapshots found; proceeding with backup")
+    backupmodeenableresult = backupmode(options[:dbhostname],options[:dbusername],options[:dbuserkey],'enable')
+    if backupmodeenableresult =~ /file\ \d\ is\ already\ in\ backup/i
+      log('Database appears to have already been placed in backup mode; continuing')
+    end
+    if backupmodeenableresult =~ /file\ \d\ is\ already\ in\ backup|Database\ altered/i
+      takesnapshot(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier])
+      unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
+        log('Nimble snapshot requested, but subsequent check did not find it. Proceeding to cleanup')
+      end
+    else
+      log('Request to place place DB in backup mode failed - failure message is: ' + backupmoderesult)
+      exit
+    end
+  else
+    log('Recent Nimble snapshot appears to already exist. Skipping to cleanup')
+  end
+  backupmode(options[:dbhostname],options[:dbusername],options[:dbuserkey],'disable')
+  log("Beginning cleanup; will remove snapshots created before \<#{(Time.now - options[:minsnapshotage]).to_s}\> until there are only #{options[:minsnapshotretain]} snapshots remaining")
+  removeoldestbackup(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotretain],options[:minsnapshotage])
+  log('Cleanup completed successfully. Backup process has completed.')
+end
