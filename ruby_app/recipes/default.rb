@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'shellwords'
 require 'yaml'
 
 data_bag_name       = node['ruby_app']['data_bag_name']
@@ -12,6 +13,8 @@ nginx_sites_dir     = node['ruby_app']['nginx_sites_dir']
 default_user        = node['ruby_app']['default_user']
 
 data_bag_secret = Chef::EncryptedDataBagItem.load_secret(encryption_key_path)
+
+package 'rsync'
 
 directory apps_dir do
   user 'root'
@@ -103,16 +106,6 @@ if File.exists? apps_dir
       action :create
     end
 
-    if app.url?
-      directory "#{app_dir}/public" do
-        user username
-        group dev_group
-        mode '0775'
-        action :create
-        not_if { Dir.exists? "#{app_dir}/public"}
-      end
-    end
-
     directory "#{app_dir}/tmp" do
       user username
       group dev_group
@@ -175,10 +168,11 @@ if File.exists? apps_dir
 
   # Setup Nginx for each domain
   apps.domains.each do |domain|
-    rack_env    = (node.chef_environment == 'prod' ? 'production' : 'staging')
-    env_domain  = domain.for_environment(rack_env)
+    rack_env = (node.chef_environment == 'prod' ? 'production' : 'staging')
+    env_domain = domain.for_environment(rack_env)
+    safe_env_domain = domain.for_environment(rack_env, safe: true)
 
-    template "#{nginx_sites_dir}/#{env_domain}.server.conf" do
+    template "#{nginx_sites_dir}/#{safe_env_domain}.server.conf" do
       source    'nginx_site.server.conf.erb'
       owner     'root'
       group     'root'
@@ -187,7 +181,7 @@ if File.exists? apps_dir
     end
 
     if domain.non_root_apps?
-      directory "#{static_dir}/#{env_domain}" do
+      directory "#{static_dir}/#{safe_env_domain}" do
         user 'root'
         group dev_group
         mode '0775'
@@ -196,7 +190,7 @@ if File.exists? apps_dir
 
       # Create any extra paths between the domain and the app. Like example.com/something/something/app.
       domain.non_root_apps.select(&:url_parent_path?).each do |app|
-        directory "#{static_dir}/#{env_domain}/#{app.url_parent_path}" do
+        directory "#{static_dir}/#{safe_env_domain}/#{Shellwords.escape(app.url_parent_path)}" do
           user 'root'
           group dev_group
           mode '0775'
@@ -207,22 +201,32 @@ if File.exists? apps_dir
 
     # Move the public files from /public to the static dir and symlink public to it.
     domain.apps.each do |app|
-      public_path = "#{apps_dir}/#{app.name}/public"
-      static_path = "#{static_dir}/#{env_domain}"
-      static_path += "/#{app.url_path}" if app.url_path?
+      app_public_path = "#{apps_dir}/#{app.name}/public"
+      shared_static_path = "#{static_dir}/#{safe_env_domain}"
+      shared_static_path += "/#{Shellwords.escape(app.url_path)}" if app.url_path?
 
-      ruby_block "move #{public_path} to #{static_path}" do
-        block do
-          if File.exists?(public_path) && !File.symlink?(public_path)
-            FileUtils.move public_path, static_path
-          end
-        end
-      end
-
-      link public_path do
+      directory "#{shared_static_path}" do
         user app.username || default_user
         group dev_group
-        to static_path
+        mode '0775'
+        action :create
+      end
+
+      bash 'merge public folders' do
+        system "rsync -abviu #{app_public_path}/* #{shared_static_path}"
+        only_if { File.exists?(app_public_path) && !File.symlink?(app_public_path) }
+      end
+
+      directory app_public_path do
+        recursive true
+        action :delete
+        not_if { File.symlink? app_public_path }
+      end
+
+      link app_public_path do
+        user app.username || default_user
+        group dev_group
+        to shared_static_path
         action :create
       end
     end
