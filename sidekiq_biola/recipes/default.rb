@@ -5,7 +5,11 @@ directory '/var/log/sidekiq' do
   action :create
 end
 
-node[:sidekiq_biola][:apps].each do |app|
+deployed_apps = node[:sidekiq_biola][:apps].select do |app|
+  File.exists? File.join(node[:sidekiq_biola][:app_root], app)
+end
+
+apps.each do |app|
   template  "/etc/init/sidekiq-#{app[:name]}.conf" do
     source 'etc-init-sidekiq.conf.erb'
     owner 'root'
@@ -20,7 +24,7 @@ template '/etc/init/sidekiq-all.conf' do
   owner 'root'
   group 'root'
   mode '0644'
-  variables apps: node[:sidekiq_biola][:apps]
+  variables apps: deployed_apps
 end
 
 service 'sidekiq-all' do
