@@ -6,10 +6,10 @@ directory '/var/log/sidekiq' do
 end
 
 deployed_apps = node[:sidekiq_biola][:apps].select do |app|
-  File.exists? File.join(node[:sidekiq_biola][:app_root], app)
+  File.exists? File.join(node[:sidekiq_biola][:app_root], app[:name])
 end
 
-apps.each do |app|
+deployed_apps.each do |app|
   template  "/etc/init/sidekiq-#{app[:name]}.conf" do
     source 'etc-init-sidekiq.conf.erb'
     owner 'root'
