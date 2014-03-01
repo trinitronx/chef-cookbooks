@@ -176,7 +176,7 @@ if __FILE__ == $0
   # All options accounted for; proceed with the backup
   log('Beginning backup process')
   unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
-    log("No recent (< #{options[:minsnapshotage]} seconds old) Nimble snapshots found; proceeding with backup")
+    log("No recent (< #{(options[:minsnapshotgap].to_f / 60.0).round(2).to_s} minutes old) Nimble snapshots found; proceeding with backup")
     backupmodeenableresult = backupmode(options[:dbhostname],options[:dbusername],options[:dbuserkey],'enable')
     if backupmodeenableresult =~ /file\ \d\ is\ already\ in\ backup/i
       log('Database appears to have already been placed in backup mode; continuing')
@@ -194,7 +194,7 @@ if __FILE__ == $0
     log('Recent Nimble snapshot appears to already exist. Skipping to cleanup')
   end
   backupmode(options[:dbhostname],options[:dbusername],options[:dbuserkey],'disable')
-  log("Beginning cleanup; will remove snapshots created before \<#{(Time.now - options[:minsnapshotage]).to_s}\> until there are only #{options[:minsnapshotretain]} snapshots remaining")
+  log("Beginning cleanup; will remove snapshots created before #{(Time.now - options[:minsnapshotage]).to_s} until there are only #{options[:minsnapshotretain]} snapshots remaining")
   removeoldestbackup(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotretain],options[:minsnapshotage])
   log('Cleanup completed successfully. Backup process has completed.')
 end
