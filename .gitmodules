@@ -175,3 +175,6 @@
 [submodule "chef_gem"]
 	path = chef_gem
 	url = git@github.com:hw-cookbooks/chef_gem.git
+[submodule "chef-vault"]
+	path = chef-vault
+	url = git@github.com:opscode-cookbooks/chef-vault.git
