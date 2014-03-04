@@ -113,19 +113,21 @@ if File.exists? apps_dir
       action :create
     end
 
+    # For these commands we use find to perform the operation only on files that
+    # need to be changed. This prevents errors with mounted directories.
     bash 'set group on all files' do
       cwd app_dir
-      code "chgrp --recursive #{dev_group} . ./log/"
+      code "find . ! -group #{dev_group} -exec chgrp #{dev_group} {} +"
     end
 
     bash 'set onwer on some files' do
       cwd app_dir
-      code "chown --recursive #{username} ./tmp/ ./log/"
+      code "find ./log ./tmp ! -user #{username} -exec chown #{username} {} +"
     end
 
     bash 'make files group writable' do
       cwd app_dir
-      code 'chmod --recursive g+w . ./log/'
+      code 'find . ! -perm -g=w -exec chmod g+w {} +'
     end
 
     bash 'set git repo sharedRepository = true' do
