@@ -115,22 +115,22 @@ if File.exists? apps_dir
 
     # For these commands we use find to perform the operation only on files that
     # need to be changed. This prevents errors with mounted directories.
-    bash 'set group on all files' do
+    bash "set group on all files in #{app_dir}" do
       cwd app_dir
       code "find . ! -group #{dev_group} -exec chgrp #{dev_group} {} +"
     end
 
-    bash 'set onwer on some files' do
+    bash "set onwer on files in #{app_dir}/log and #{app_dir}/tmp" do
       cwd app_dir
       code "find ./log ./tmp ! -user #{username} -exec chown #{username} {} +"
     end
 
-    bash 'make files group writable' do
+    bash "make files in #{app_dir} group writable" do
       cwd app_dir
       code 'find . ! -perm -g=w -exec chmod g+w {} +'
     end
 
-    bash 'set git repo sharedRepository = true' do
+    bash "set git repo in #{app_dir} to sharedRepository = true" do
       cwd app_dir
       code 'git config core.sharedRepository group'
       only_if { Dir.exists? "#{app_dir}/.git" }
@@ -214,7 +214,7 @@ if File.exists? apps_dir
         action :create
       end
 
-      bash 'merge public folders' do
+      bash "merge #{app_public_path} with #{shared_static_path}" do
         system "rsync -abviu #{app_public_path}/* #{shared_static_path}"
         only_if { File.exists?(app_public_path) && !File.symlink?(app_public_path) }
       end
