@@ -1,0 +1,10 @@
+{
+  "list": [
+<% @values.each do |hg| -%>
+    {
+      "name": "<%= hg['name'] %>",
+      "matpath": "<%= hg['matpath'] %>"
+    }<% unless hg == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

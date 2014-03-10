@@ -1,0 +1,28 @@
+{
+  "all_hostgroups" : "0",
+  "all_keywords" : "0",
+  "all_servicegroups" : "0",
+  "fullname" : "PagerDuty",
+<% if node['opsview']['default_keywords'].include? 'pagerduty' -%>
+  "keywords" : [
+    {
+      "name": "pagerduty"
+    }
+  ],
+<% end -%>
+  "name" : "pagerduty",
+  "role" : {
+    "name" : "View some, change none"
+  },
+  "sharednotificationprofiles" : [
+    {
+      "name" : "pagerduty-shared",
+    }
+  ],
+  "variables" : [
+    {
+      "name" : "PAGER",
+      "value" : "<%= node['opsview']['pagerduty_key'] %>"
+    }
+  ]
+}

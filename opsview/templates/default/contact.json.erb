@@ -1,0 +1,68 @@
+{
+  "list": [
+<% @values.each do |c| -%>
+    {
+      "name" : "<%= c['name'] %>",
+      "encrypted_password" : "<%= c['encrypted_password'] %>",
+      "fullname" : "<%= c['fullname'] %>",
+      "notificationprofiles" : [
+        {
+          "all_hostgroups" : "<%= c['role'] == 'Administrator' ? '1' : '0' -%>",
+          "all_keywords" : "<%= c['role'] == 'Administrator' ? '1' : '0' -%>",
+          "all_servicegroups" : "<%= c['role'] == 'Administrator' ? '1' : '0' -%>",
+          "host_notification_options" : "u,d,r,f",
+<% if c['keywords'] -%>
+          "keywords" : [
+<% c['keywords'].each do |k| -%>
+            {
+              "name": "<%= k %>"
+            }<% unless k == c['keywords'].last -%>,<% end -%>
+<% end -%>
+          ],
+<% end -%>
+          "name" : "<%= c['id'] %>",
+          "service_notification_options" : "w,c,r,u,f",
+<% if c['email'] -%>
+          "notificationmethods" : [
+            {
+              "name" : "Email"
+            }
+          ],
+<% end -%>
+          "notification_period" : {
+            "name" : "24x7"
+          }
+        }
+      ],
+      "role" : {
+        "name" : "<%= c['role'] || 'View some, change none' %>"
+      },
+<% if c['sharednotificationprofiles'] -%>
+      "sharednotificationprofiles" : [
+<% c['sharednotificationprofiles'].each do |np| -%>
+        {
+          "name": "<%= np %>"
+        }<% unless np == c['sharednotificationprofiles'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+      "variables" : [
+<% if c['variables'] -%>
+<% c['variables'].each do |v| -%>
+        {
+          "name" : "<%= v['name'] %>",
+          "value" : "<%= v['value'] %>"
+        }<% unless v == c['variables'].last -%>,<% end -%>
+<% end -%>
+<% end -%>
+<% if c['email'] -%>
+        {
+          "name" : "EMAIL",
+          "value" : "<%= c['email'] %>"
+        }
+<% end -%>
+      ]
+    }<% unless c == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

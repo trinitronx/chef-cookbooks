@@ -1,0 +1,17 @@
+{
+  "list": [
+<% @values.each do |k| -%>
+    {
+      "name": "<%= k['name'] %>",
+      "description": "<%= k['description'] %>",
+      "enabled": "1",
+      "roles" : [
+        {
+          "name": "View some, change none"
+        }
+      ],
+      "style": "group_by_host"
+    }<% unless k == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

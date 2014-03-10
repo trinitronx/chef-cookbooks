@@ -1,0 +1,10 @@
+{
+  "list": [
+<% @values.each do |ht| -%>
+    {
+      "name": "<%= ht['name'] %>",
+      "description": "<%= ht['description'] %>"
+    }<% unless ht == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

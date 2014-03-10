@@ -1,0 +1,92 @@
+{
+  "list": [
+<% @values.each do |h| -%>
+    {
+      "check_attempts" : "1",
+      "check_command" : {
+        "name" : "ping"
+      },
+      "check_interval" : "1",
+      "check_period" : {
+        "name" : "24x7"
+      },
+<% if h['snmp_community'] -%>
+      "enable_snmp": "1",
+      "snmp_community" : "<%= h['snmp_community'] %>",
+<% end -%>
+      "flap_detection_enabled" : "1",
+      "hostgroup" : {
+        "name" : "<%= h['hostgroup'] || 'Unconfigured' %>"
+      },
+<% if h['hostattributes'] -%>
+      "hostattributes" : [
+<% h['hostattributes'].each do |ha| -%>
+        {
+          "name" : "<%= ha['name'] %>",
+<% if ha['value'] -%>
+          "value" : "<%= ha['value'] %>",
+<% end -%>
+          "arg1" : "<%= ha['arg1'] %>",
+          "arg2" : "<%= ha['arg2'] %>",
+          "arg3" : "<%= ha['arg3'] %>",
+          "arg4" : "<%= ha['arg4'] %>"
+        }<% unless ha == h['hostattributes'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+<% if h['hosttemplates'] -%>
+      "hosttemplates" : [
+<% h['hosttemplates'].each do |ht| -%>
+        {
+          "name" : "<%= ht %>"
+        }<% unless ht == h['hosttemplates'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+<% if h['platform'] -%>
+      "icon" : {
+        "name" : "<%= h['platform'] %>"
+      },
+<% end -%>
+      "ip" : "<%= h['ipaddress'] %>",
+<% if h['keywords'] -%>
+      "keywords" : [
+<% h['keywords'].each do |k| -%>
+        {
+          "name" : "<%= k %>"
+        }<% unless k == h['keywords'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% elsif node['opsview']['default_keywords'] -%>
+      "keywords" : [
+<% node['opsview']['default_keywords'].each do |k| -%>
+        {
+          "name" : "<%= k %>"
+        }<% unless k == node['opsview']['default_keywords'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+      "name" : "<%= h['name'] %>",
+      "notification_interval" : "1440",
+      "notification_options" : "d,u,r",
+      "notification_period" : {
+        "name" : "<%= h['notification_period'] || '24x7' %>"
+      },
+      "retry_check_interval" : "1"<% if h['exceptions'] -%>,<% end -%>
+<% if h['exceptions'] -%>
+      "servicechecks": [
+<% h['exceptions'].each do |e| -%>
+        {
+          "event_handler" : "<%= e['event_handler'] %>",
+          "exception" : "<%= e['exception'] %>",
+          "name" : "<%= e['name'] %>",
+          "remove_servicecheck" : "<%= e['remove_servicecheck'] || '0' %>",
+          "timed_exception" : "<%= e['timed_exception'] %>"
+        }<% unless e == h['exceptions'].last -%>,<% end -%>
+<% end -%>
+      ]
+<% end -%>
+    }<% unless h == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

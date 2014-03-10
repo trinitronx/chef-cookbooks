@@ -1,0 +1,17 @@
+{
+  "list": [
+<% @values.each do |tp| -%>
+    {
+      "name" : "<%= tp['name'] %>",
+      "alias" : "<%= tp['alias'] %>",
+      "sunday" : "<%= tp['sunday'] %>",
+      "monday" : "<%= tp['monday'] %>",
+      "tuesday" : "<%= tp['tuesday'] %>",
+      "wednesday" : "<%= tp['wednesday'] %>",
+      "thursday" : "<%= tp['thursday'] %>",
+      "friday" : "<%= tp['friday'] %>",
+      "saturday" : "<%= tp['saturday'] %>"
+    }<% unless tp == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "all_hostgroups" : "0",
+  "all_keywords" : "0",
+  "all_servicegroups" : "0",
+  "name" : "pagerduty-shared",
+  "fullname" : "PagerDuty",
+  "host_notification_options" : "d,r",
+<% if node['opsview']['default_keywords'].include? 'pagerduty' -%>
+  "keywords" : [
+    {
+      "name": "pagerduty"
+    }
+  ],
+<% end -%>
+  "notification_level" : "1",
+  "notification_period" : {
+    "name" : "24x7"
+  },
+  "notificationmethods" : [
+    {
+      "name" : "pagerduty"
+    }
+  ],
+  "role" : {
+    "name" : "View some, change none"
+  },
+  "service_notification_options" : "w,u,c,r"
+}

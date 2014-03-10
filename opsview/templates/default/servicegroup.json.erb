@@ -1,0 +1,9 @@
+{
+  "list": [
+<% @values.each do |sg| -%>
+    {
+      "name": "<%= sg['name'] %>"
+    }<% unless sg == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

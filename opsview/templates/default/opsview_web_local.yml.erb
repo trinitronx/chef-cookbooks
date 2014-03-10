@@ -1,0 +1,31 @@
+---
+authentication:
+  realms:
+    ldap:
+      credential:
+        class: Password
+        password_field: password
+        password_type: self_check
+      store:
+        class: LDAP
+        ldap_server: <%= node['opsview']['ldap']['ldap_server'] %>
+        ldap_server_options:
+          timeout: 30
+        binddn: <%= @ldap_bind_account['ldap_bind_dn'] %>
+        bindpw: <%= @ldap_bind_account['ldap_password'] %>
+        start_tls: <%= node['opsview']['ldap']['start_tls'] || 0 %>
+        start_tls_options:
+          verify: require
+          cafile: <%= node['opsview']['ldap']['tls_cafile'] %>
+        user_basedn: <%= node['opsview']['ldap']['user_basedn'] %>
+        user_filter: <%= node['opsview']['ldap']['user_filter'] %>
+        user_scope: <%= node['opsview']['ldap']['user_scope'] %>
+        user_field: samaccountname
+        user_search_options:
+          deref: always
+        use_roles: 0
+        opsview_sync:
+          group_dir: <%= node['opsview']['ldap']['group_dir'] %>
+          group_basedn: <%= node['opsview']['ldap']['group_basedn'] %>
+          group_filter: <%= node['opsview']['ldap']['group_filter'] %>
+          group_scope: <%= node['opsview']['ldap']['group_scope'] %>

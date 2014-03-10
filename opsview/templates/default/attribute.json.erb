@@ -1,0 +1,14 @@
+{
+  "list": [
+<% @values.each do |a| -%>
+    {
+      "arg1" : "<%= a['arg1'] %>",
+      "arg2" : "<%= a['arg2'] %>",
+      "arg3" : "<%= a['arg3'] %>",
+      "arg4" : "<%= a['arg4'] %>",
+      "name" : "<%= a['name'] %>",
+      "value" : "<%= a['value'] %>"
+    }<% unless a == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

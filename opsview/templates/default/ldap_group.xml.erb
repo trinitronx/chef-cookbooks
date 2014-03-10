@@ -1,0 +1,8 @@
+<contact>
+<name>%NAME%</name>
+<username>%SAMACCOUNTNAME%</username>
+<comment>%USERPRINCIPALNAME%</comment>
+<role><name><%= @group['role'] || node['opsview']['ldap']['default_role'] %></name></role>
+<all_hostgroups><%= @group['all_hostgroups'] || node['opsview']['ldap']['default_allhostgroups'] %></all_hostgroups>
+<all_servicegroups><%= @group['all_servicegroups'] || node['opsview']['ldap']['default_allservicegroups'] %></all_servicegroups>
+</contact>

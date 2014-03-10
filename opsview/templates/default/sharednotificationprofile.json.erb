@@ -1,0 +1,38 @@
+{
+  "list": [
+<% @values.each do |np| -%>
+    {
+      "all_hostgroups" : "0",
+      "all_keywords" : "0",
+      "all_servicegroups" : "0",
+      "name" : "<%= np['name'] %>",
+      "fullname" : "<%= np['fullname'] %>",
+      "host_notification_options" : "d,r",
+<% if np['keywords'] -%>
+      "keywords" : [
+<% np['keywords'].each do |k| -%>
+        {
+          "name": "<%= k %>"
+        }<% unless k == np['keywords'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+      "notification_level" : "1",
+      "notification_period" : {
+        "name" : "24x7"
+      },
+      "notificationmethods" : [
+<% np['notificationmethods'].each do |nm| -%>
+        {
+          "name": "<%= nm %>"
+        }<% unless nm == np['notificationmethods'].last -%>,<% end -%>
+<% end -%>
+      ],
+      "role" : {
+        "name" : "<%= np['role'] || 'View some, change none' %>"
+      },
+      "service_notification_options" : "w,u,c,r"
+    }<% unless np == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

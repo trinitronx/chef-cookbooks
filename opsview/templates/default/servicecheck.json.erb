@@ -1,0 +1,68 @@
+{
+  "list": [
+<% @values.each do |sc| -%>
+    {
+      "args": "<%= sc['args'] %>",
+      "check_attempts": "3",
+      "check_interval": "3",
+      "checktype" : {
+        "name" : "Active Plugin"
+      },
+<% if sc['dependencies'] -%>
+      "dependencies" : [
+<% sc['dependencies'].each do |d| -%>
+        {
+          "name" : "<%= d %>"
+        }<% unless d == sc['dependencies'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+      "description" : "<%= sc['description'] %>",
+<% if sc['hosts'] -%>
+      "hosts" : [
+<% sc['hosts'].each do |h| -%>
+        {
+          "name" : "<%= h %>"
+        }<% unless h == sc['hosts'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+<% if sc['hosttemplates'] -%>
+      "hosttemplates" : [
+<% sc['hosttemplates'].each do |ht| -%>
+        {
+          "name" : "<%= ht %>"
+        }<% unless ht == sc['hosttemplates'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+<% if sc['keywords'] -%>
+      "keywords" : [
+<% sc['keywords'].each do |k| -%>
+        {
+          "name" : "<%= k %>"
+        }<% unless k == sc['keywords'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% elsif node['opsview']['default_keywords'] -%>
+      "keywords" : [
+<% node['opsview']['default_keywords'].each do |k| -%>
+        {
+          "name" : "<%= k %>"
+        }<% unless k == node['opsview']['default_keywords'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+      "name": "<%= sc['name'] %>",
+      "notification_options" : "w,c,r,u",
+      "plugin" : {
+        "name" : "<%= sc['plugin'] %>"
+      },
+      "retry_check_interval" : "1",
+      "servicegroup" : {
+        "name" : "<%= sc['servicegroup'] %>"
+      }
+    }<% unless sc == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}
