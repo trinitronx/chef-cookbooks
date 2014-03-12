@@ -63,7 +63,11 @@ check_cpuload=scripts\cpuload_nrpe_nt.exe $ARG1$
 check_memload=scripts\memload_nrpe_nt.exe $ARG1$
 win_service=scripts\service_nrpe_nt.exe $ARG1$
 check_sysinfo=scripts\check_sysinfo.exe
-
+<% if @scripts -%>
+<% @scripts.each do |s| -%>
+<%= s['name'] %>=scripts\<%= s['filename'] %> <%= s['arguments'] %>
+<% end -%>
+<% end -%>
 
 [External Alias]
 nsc_checkdrivesize=CheckDriveSize $ARG1$
@@ -83,3 +87,9 @@ win_check_sysinfo=check_sysinfo
 win_check_wmi=CheckWMI
 win_process=CheckProcState
 win_eventlog=CheckEventLog
+
+<% if @aliases -%>
+<% @aliases.each do |a| -%>
+<%= a['name'] %>=<%= a['module'] %> $ARG1$
+<% end -%>
+<% end -%>

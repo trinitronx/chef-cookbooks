@@ -20,11 +20,10 @@
 default['opsview']['nagios_user_home'] = "/var/lib/nagios"
 default['opsview']['conf_dir'] = "/usr/local/nagios/etc"
 default['opsview']['json_config_dir'] = "#{node['opsview']['nagios_user_home']}/json_config"
-default['opsview']['plugins_dir'] = "/usr/local/nagios/libexec"
 default['opsview']['icons_dir'] = "#{node['opsview']['nagios_user_home']}/icons"
 default['opsview']['opsview_rest_path'] = "/usr/local/nagios/bin/opsview_rest"
 default['opsview']['extra_packages'] = %w{ imagemagick }
-default['opsview']['default_keywords'] = ["pagerduty"]
+default['opsview']['default_keywords'] = [ "pagerduty" ]
 
 default['opsview']['use_ssl'] = false
 default['opsview']['ssl_certificate_file'] = '/etc/ssl/certs/ssl-cert-snakeoil.pem'

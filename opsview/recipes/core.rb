@@ -186,6 +186,14 @@ remote_directory node['opsview']['plugin_dir'] do
   notifies :run, "execute[reload opsview config]", :immediately
 end
 
+# Install custom server event handlers
+remote_directory "#{node['opsview']['plugin_dir']}/eventhandlers" do
+  source "eventhandlers"
+  files_owner "nagios"
+  files_group "nagios"
+  files_mode 00755
+end
+
 # Search for nodes to monitor
 Chef::Log.info('Searching for nodes to monitor...')
 nodes = []
@@ -235,9 +243,9 @@ objects.each do |object_type, values|
         # Get the object ID
         object_info = nil
         if object_type == 'unmanagedhost'
-          object_info = JSON.parse(`#{node['opsview']['opsview_rest_path']}  --username=admin --password=#{admin_password} --data-format=json --pretty GET 'config/host?json_filter={"name":"#{object_name}"}'`)
+          object_info = JSON.parse(`#{node['opsview']['opsview_rest_path']} --username=admin --password=#{admin_password} --data-format=json --pretty GET 'config/host?json_filter={"name":"#{object_name}"}'`)
         else
-          object_info = JSON.parse(`#{node['opsview']['opsview_rest_path']}  --username=admin --password=#{admin_password} --data-format=json --pretty GET 'config/#{object_type}?json_filter={"name":"#{object_name}"}'`)
+          object_info = JSON.parse(`#{node['opsview']['opsview_rest_path']} --username=admin --password=#{admin_password} --data-format=json --pretty GET 'config/#{object_type}?json_filter={"name":"#{object_name}"}'`)
         end
 
         # Delete the object
@@ -246,9 +254,9 @@ objects.each do |object_type, values|
             Chef::Log.info("Deleting #{object_name}...")
             execute "delete #{object_name}" do
               if object_type == 'unmanagedhost'
-                command "#{node['opsview']['opsview_rest_path']}  --username=admin --password=#{admin_password} DELETE config/host/#{object_info["list"].first["id"]}"
+                command "#{node['opsview']['opsview_rest_path']} --username=admin --password=#{admin_password} DELETE config/host/#{object_info["list"].first["id"]}"
               else
-                command "#{node['opsview']['opsview_rest_path']}  --username=admin --password=#{admin_password} DELETE config/#{object_type}/#{object_info["list"].first["id"]}"
+                command "#{node['opsview']['opsview_rest_path']} --username=admin --password=#{admin_password} DELETE config/#{object_type}/#{object_info["list"].first["id"]}"
               end
               notifies :run, "execute[reload opsview config]", :delayed
               action :run
@@ -269,9 +277,9 @@ objects.each do |object_type, values|
 
   execute "put #{object_type}" do
     if object_type == 'unmanagedhost'
-      command "#{node['opsview']['opsview_rest_path']}  --username=admin --password=#{admin_password} --content-file=#{node['opsview']['json_config_dir']}/#{object_type}.json --data-format=json --pretty PUT config/host"
+      command "#{node['opsview']['opsview_rest_path']} --username=admin --password=#{admin_password} --content-file=#{node['opsview']['json_config_dir']}/#{object_type}.json --data-format=json --pretty PUT config/host"
     else
-      command "#{node['opsview']['opsview_rest_path']}  --username=admin --password=#{admin_password} --content-file=#{node['opsview']['json_config_dir']}/#{object_type}.json --data-format=json --pretty PUT config/#{object_type}"
+      command "#{node['opsview']['opsview_rest_path']} --username=admin --password=#{admin_password} --content-file=#{node['opsview']['json_config_dir']}/#{object_type}.json --data-format=json --pretty PUT config/#{object_type}"
     end
     action :nothing
   end
@@ -279,6 +287,6 @@ end
 
 # Reload the Opsview config
 execute "reload opsview config" do
-  command "#{node['opsview']['opsview_rest_path']}  --username=admin --password=#{admin_password} POST reload"
+  command "#{node['opsview']['opsview_rest_path']} --username=admin --password=#{admin_password} POST reload"
   action :nothing
 end
