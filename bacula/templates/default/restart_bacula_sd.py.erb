@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+import pexpect
+from time import sleep
+import subprocess
+
+jobsrunning = True
+
+while jobsrunning:
+  child = pexpect.spawn('bconsole')
+  child.sendline('status 2')
+  try:
+    i = child.expect (['No Jobs running', 'Writing'])
+    if i==0:
+      sleep(4)
+      jobsrunning = False
+      child.sendline('exit')
+      child.close()
+    elif i==1:
+      child.sendline('exit')
+      child.close()
+      sleep(1200)
+  except:
+    # Didn't find an expected response
+    sleep(2)
+    child.sendline('exit')
+    child.close()
+
+subprocess.call(['/usr/sbin/service', 'bacula-sd', 'restart'])

@@ -1,0 +1,209 @@
+#
+# Default Bacula Director Configuration file
+#
+#  You might also want to change the default email address
+#   from root to your address.  See the "mail" and "operator"
+#   directives in the Messages resource.
+#
+
+Director {
+  Name = <%= node['fqdn'] %>-dir
+  DIRport = 9101
+  QueryFile = "/etc/bacula/scripts/query.sql"
+  WorkingDirectory = "/var/lib/bacula"
+  PidDirectory = "/var/run/bacula"
+  Maximum Concurrent Jobs = 1
+  Password = "<%= node['bacula']['dir']['password'] %>"
+  Messages = Daemon
+  DirAddress = <%= node['bacula']['dir']['address'] %>
+}
+
+
+<% @bacula_clients.each do |parms| -%>
+Client {
+  Name = <%= parms.first[0] %>-fd
+  Address = <%= parms.first[1]['ip'] %>
+  FDPort = 9102
+  Catalog = MyCatalog
+  Password = "<%= parms.first[1]['password'] %>"<% if parms.first[1]['options'] -%><% parms.first[1]['options'].each do |option| -%>
+  <%= option.first[0] %> = <%= option.first[1] %><% end -%><% end -%>
+}
+
+<% end -%>
+
+
+<% @bacula_clients.each do |clientparms| -%><% if clientparms.first[1]['filesets'] -%><% clientparms.first[1]['filesets'].each do |fileset| -%>
+FileSet {
+  Name = "<%= clientparms.first[0] %>-<%= fileset.first[0] %>"<% if clientparms.first[1]['platform_family'] == 'windows'-%>
+  Enable VSS = yes<% end -%>
+  Include {
+    Options {
+      signature = MD5<% if clientparms.first[1]['platform_family'] == 'windows'-%>
+      IgnoreCase = yes
+      Exclude = yes
+      # Some random bits of Windows we want to ignore 
+      WildDir = "[A-Z]:/WINDOWS/msdownld.tmp" 
+      WildDir = "[A-Z]:/WINDOWS/$Nt*Uninstall*" 
+      WildDir = "[A-Z]:/WINDOWS/SoftwareDistribution" 
+      WildDir = "[A-Z]:/WINDOWS/WinSxS" 
+      # Temporary directories & files 
+      WildDir = "[A-Z]:/WINDOWS/Temp" 
+      # Recycle bins 
+      WildDir = "[A-Z]:/RECYCLER" 
+      WildDir = "[A-Z]:/$Recycle.Bin" 
+      # Swap files 
+      WildFile = "[A-Z]:/pagefile.sys" 
+      WildFile = "[A-Z]:/hiberfil.sys"<% end -%>
+    }
+  <% fileset.first[1]['file'].each do |fileinclude| -%>File = <%= fileinclude %>
+<% end -%>
+  }
+}
+
+<% end -%><% end -%><% end -%>
+
+# Static catalog fileset
+# (needed for the static restore job)
+FileSet {
+  Name = "Catalog"
+  Include {
+    Options {
+    signature = MD5
+    }
+    File = "/var/lib/bacula/bacula.sql"
+  }
+}
+
+
+<% @bacula_clients.each do |clientparms| -%><% if clientparms.first[1]['schedules'] -%><% clientparms.first[1]['schedules'].each do |schedule| -%>
+Schedule {
+  Name = "<%= clientparms.first[0] %>-<%= schedule.first[0] %>"
+<% schedule.first[1].each do |runline| -%>  Run = <%= runline %>
+<% end -%>
+}
+
+<% end -%><% end -%><% end -%>
+
+
+<% @bacula_clients.each do |clientparms| -%><% if clientparms.first[1]['jobs'] -%><% clientparms.first[1]['jobs'].each do |job| -%>
+Job {
+  Name = "<%= clientparms.first[0] %>-<%= job.first[0] %>"
+  Client = <%= clientparms.first[0] %>-fd
+  Type = Backup
+  Accurate = yes
+  Level = Incremental
+  Messages = Standard
+  FileSet = <% if job.first[1]['fileset'] -%><%= "\"#{clientparms.first[0]}-#{job.first[1]['fileset']}\"" %><% else -%><%= "\"#{clientparms.first[0]}-#{job.first[0]}\"" %><% end -%>
+  Pool = <%= job.first[1]['pool'] || 'Default' %><% if job.first[1]['schedule'] -%>
+  Schedule = "<%= "#{clientparms.first[0]}-#{job.first[1]['schedule']}" %>"<% end -%>
+<% if job.first[1]['options'] -%><% job.first[1]['options'].each do |option| -%>
+  <%= option.first[0] %> = <%= option.first[1] %>
+<% end -%>
+<% end -%>
+}
+
+<% end -%><% end -%><% end -%>
+
+<% if @bacula_storage.first.first[1]['devices'].first.first[1]['Media Type'] -%>#
+# Standard Restore template, to be changed by Console program
+#  Only one such job is needed for all Jobs/Clients/Storage ...
+#
+Job {
+  Name = "RestoreFiles"
+  Type = Restore
+  Client = <%= node['fqdn'] %>-fd
+  FileSet = "Catalog"
+  Pool = Default
+  Messages = Standard
+  Storage = <%= "#{@bacula_storage.first.first[0]}-#{@bacula_storage.first.first[1]['devices'].first.first[0]}-#{@bacula_storage.first.first[1]['devices'].first.first[1]['Media Type']}" %>
+}<% end -%>
+
+
+
+<% @bacula_storage.each do |storageserver| -%><% if storageserver.first[1]['devices'] -%><% storageserver.first[1]['devices'].each do |device| -%>
+Storage {
+  Name = <%= storageserver.first[0] %>-<%= device.first[0] %>-<%= device.first[1]['Media Type'] %>
+  Address = <%= storageserver.first[1]['ipaddress'] %>
+  SDPort = 9103
+  Password = "<%= storageserver.first[1]['password'] %>"
+  Device = <%= device.first[0] %>
+  Media Type = <%= device.first[1]['Media Type'] %><% if device.first[1]['Autochanger'] -%>
+  Autochanger = yes<% else -%><% end -%>
+}
+
+<% end -%><% end -%><% end -%>
+
+<% if node['bacula']['dir']['pools'] -%><% node['bacula']['dir']['pools'].each do |pool| -%>
+Pool {
+  Name = <%= pool.first[0] %><% pool.first[1].each do |k,v| -%><% unless k == 'Description' -%>
+  <%= k %> = <%= v %><% end -%><% end -%>
+}
+
+<% end -%><% end -%>
+
+
+# Static default pool
+Pool {
+  Name = Default
+  Pool Type = Backup
+}
+
+
+# Static scratch pool
+Pool {
+  Name = Scratch
+  Pool Type = Backup
+}
+
+
+# Generic catalog service
+Catalog {
+  Name = MyCatalog
+# Uncomment the following line if you want the dbi driver
+# dbdriver = "dbi:sqlite3"; dbaddress = 127.0.0.1; dbport =  
+  dbname = "<%= node['bacula']['mysql_user'] %>"; DB Address = "localhost"; dbuser = "<%= node['bacula']['mysql_user'] %>"; dbpassword = "<%= node['bacula']['mysql_password'] %>"
+}
+
+# Reasonable message delivery -- send most everything to email address
+#  and to the console
+Messages {
+  Name = Standard
+#
+# NOTE! If you send to two email or more email addresses, you will need
+#  to replace the %r in the from field (-f part) with a single valid
+#  email address in both the mailcommand and the operatorcommand.
+#  What this does is, it sets the email address that emails would display
+#  in the FROM field, which is by default the same email as they're being
+#  sent to.  However, if you send email to more than one address, then
+#  you'll have to set the FROM address manually, to a single address. 
+#  for example, a 'no-reply@mydomain.com', is better since that tends to
+#  tell (most) people that its coming from an automated source.
+
+  mailcommand = "/usr/lib/bacula/bsmtp <%= "-h #{node['bacula']['messages']['relay']} " if node['bacula']['messages']['relay'] %>-f \"\(Bacula\) \< %r\ >\" -s \"Bacula: %t %e of %c %l\" %r"
+  operatorcommand = "/usr/lib/bacula/bsmtp <%= "-h #{node['bacula']['messages']['relay']} " if node['bacula']['messages']['relay'] %>-f \"\(Bacula\) \< %r \>\" -s \"Bacula: Intervention needed for %j\" %r"
+  mail = <%=node['bacula']['messages']['mail']%> = <%=node['bacula']['messages']['messagestomail']%>
+  operator = <%=node['bacula']['messages']['operator']%> = mount
+  console = all, !skipped, !saved
+  append = "/var/lib/bacula/log" = all, !skipped
+  catalog = all
+}
+
+
+#
+# Message delivery for daemon messages (no job).
+Messages {
+  Name = Daemon
+  mailcommand = "/usr/lib/bacula/bsmtp <%= "-h #{node['bacula']['messages']['relay']} " if node['bacula']['messages']['relay'] %>-f \"\(Bacula\) \< %r \>\" -s \"Bacula daemon message\" %r"
+  mail = <%=node['bacula']['messages']['mail']%> = <%=node['bacula']['messages']['messagestomail']%>
+  console = all, !skipped, !saved
+  append = "/var/lib/bacula/log" = all, !skipped
+}
+
+#
+# Restricted console used by tray-monitor to get the status of the director
+#
+Console {
+  Name = <%= node['fqdn'] %>-mon
+  Password = "<%= node['bacula']['dir']['password_monitor'] %>"
+  CommandACL = status, .status
+}

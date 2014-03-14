@@ -1,0 +1,92 @@
+#
+# Default Bacula Storage Daemon Configuration file
+#
+#  For Bacula release 5.2.5 (26 January 2012) -- ubuntu 12.04
+#
+# You may need to change the name of your tape drive
+#   on the "Archive Device" directive in the Device
+#   resource.  If you change the Name and/or the 
+#   "Media Type" in the Device resource, please ensure
+#   that dird.conf has corresponding changes.
+#
+
+##
+## This file is automatically managed by Chef -- changes
+## will be overwitten!
+##
+
+Storage {                             # definition of myself
+  Name = <%= node['fqdn'] %>-sd
+  SDPort = 9103                  # Director's port      
+  WorkingDirectory = "/var/lib/bacula"
+  Pid Directory = "/var/run/bacula"
+  Maximum Concurrent Jobs = 20
+  SDAddress = <%= node['bacula']['sd']['address'] %>
+}
+#
+# List Directors who are permitted to contact Storage daemon
+#<% @directors.each do |director| -%>
+Director {
+  Name = <%= director %>-dir
+  Password = "<%= node['bacula']['sd']['password'] %>"
+}
+<% end -%>
+
+#
+# Restricted Director, used by tray-monitor to get the
+#   status of the storage daemon
+#
+Director {
+  Name = <%= node['fqdn'] %>-mon
+  Password = "<%= node['bacula']['sd']['password_monitor'] %>"
+  Monitor = yes
+}
+
+
+#
+# Devices supported by this Storage daemon
+# To connect, the Director's bacula-dir.conf must have the
+#  same Name and MediaType. 
+#
+
+<% if node['bacula']['sd']['autochangers'] -%><% node['bacula']['sd']['autochangers'].each do |autochanger| -%>
+Autochanger {
+  Name = <%= autochanger.first[0] %>
+  Device = <% autochanger.first[1]['Devices'].each do |device| -%><%= device %><% unless autochanger.first[1]['Devices'].last == device -%>, <% end -%><% end -%>
+  Changer Command = "<%= autochanger.first[1]['Changer Command'] %>"
+  Changer Device = <%= autochanger.first[1]['Changer Device'] %>
+}
+<% end -%><% end -%>
+
+
+<% node['bacula']['sd']['devices'].each do |device| -%>
+Device {
+  Name = <%= device.first[0] %>
+<% device.first[1].each do |k,v| -%>
+  <%= k %> = <%= v %>
+<% end -%>}
+
+<% end -%>
+
+
+
+# If you have smartctl, enable this, it has more info than tapeinfo 
+# Alert Command = "sh -c 'smartctl -H -l error %c'"  
+
+
+# 
+# Send all messages to the Director, 
+# mount messages also are sent to the email address
+#
+Messages {
+  Name = Standard
+  # Director is ignored here; messages are sent back to originating director
+  director = <%= @directors.first %>-dir = all
+}
+
+#
+# Note, for a list of additional Device templates please
+#  see the directory <bacula-source>/examples/devices
+# Or follow the following link:
+#  http://bacula.svn.sourceforge.net/viewvc/bacula/trunk/bacula/examples/devices/
+#

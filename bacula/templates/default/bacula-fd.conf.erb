@@ -1,0 +1,44 @@
+#
+# Default  Bacula File Daemon Configuration file
+#
+# Tested with Bacula release 5.2.X
+#
+
+#
+# "Global" File daemon configuration specifications
+#
+FileDaemon {                            # this is me
+  Name = <%= node['fqdn'].downcase %>-fd
+  FDport = 9102 # where we listen for the director
+  WorkingDirectory = "<%= node['bacula']['client']['working_directory'] %>"
+  Pid Directory = "<%= node['bacula']['client']['pid_directory'] %>"
+  Maximum Concurrent Jobs = <%= node['bacula']['client']['max_con_jobs'] %>
+# Plugin Directory = "C:\\Program Files\\Bacula\\plugins" <- from Windows config; disabled by default
+}
+
+#
+# List Directors who are permitted to contact this File daemon
+#<% @bacula_servers.each do |server| -%>
+Director {
+  Name = <%= server %>-dir
+  Password = "<%= node['bacula']['client']['password'] %>"
+}
+<% end -%>
+
+##
+## Restricted Director, used by tray-monitor to get the
+##   status of the file daemon
+##
+#Director {
+#  Name = node-mon
+#  Password = ""
+#  Monitor = yes
+#}
+
+# Send all messages except skipped files back to Director<% @bacula_servers.each do |server| -%>
+Messages {
+  Name = Standard
+  director = <%= server %>-dir = all, !skipped, !restored
+}
+<% end -%>
+
