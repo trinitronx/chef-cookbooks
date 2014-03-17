@@ -129,7 +129,8 @@ Storage {
   SDPort = 9103
   Password = "<%= storageserver.first[1]['password'] %>"
   Device = <%= device.first[0] %>
-  Media Type = <%= device.first[1]['Media Type'] %><% if device.first[1]['Autochanger'] -%>
+  Media Type = <%= device.first[1]['Media Type'] %><% if device.first[1]['AllowCompression'] -%>
+  AllowCompression = device.first[1]['AllowCompression']<% else -%><% end -%><% if device.first[1]['Autochanger'] -%>
   Autochanger = yes<% else -%><% end -%>
 }
 
