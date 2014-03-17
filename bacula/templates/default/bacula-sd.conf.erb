@@ -61,10 +61,9 @@ Autochanger {
 
 <% node['bacula']['sd']['devices'].each do |device| -%>
 Device {
-  Name = <%= device.first[0] %>
-<% device.first[1].each do |k,v| -%>
-  <%= k %> = <%= v %>
-<% end -%>}
+  Name = <%= device.first[0] %><% device.first[1].each do |k,v| -%><% unless k == 'AllowCompression' -%>
+  <%= k %> = <%= v %><% end -%><% end -%>
+}
 
 <% end -%>
 
