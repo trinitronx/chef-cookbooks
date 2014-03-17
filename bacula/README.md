@@ -189,8 +189,47 @@ Autochangers however are listed under their own attribute, allowing them to be c
   }
 }
 ```
-**NOTE:** Because you are manually specifying your pool's `Storage` device (that was automatically defined in your director based on a Chef search of your storage devices), it needs to be done in the syntax of "`storagedaemonfqdn`-`storagedaemondevicename`-`storagedaemondevicemediatype`". Check your generated bacula-dir.conf's Storage devices if the exact value is unclear.
+**NOTE:** Because you are manually specifying your pool's `Storage` device (that was automatically defined in your director based on a Chef search of your storage devices), it needs to be done in the syntax of "`storagedaemonfqdn`-`storagedaemondevicename`-`storagedaemondevicemediatype`". The easiest way to get this exact name may be to copy it from your Chef generated director configuration file.
 
+### Misc Setup
+
+The above settings cover the essential configuration of your Bacula system. Additional tuning options follow.
+
+#### E-mail Alerts
+
+E-mail messages from the Bacula director can be configured with the following optional attributes:
+
+```json
+"bacula": {
+  "messages": {
+    "mail": "baculaalerts@example.org",
+    "relay": "example.org",
+    "messagestomail": "error, fatal"
+  }
+}
+```
+
+* `mail` sets the recipient of email alerts.
+* `relay` set the mail relay server; defaults to delivering to the localhost
+* `messagestomail` allows specific configuration of message types to be sent via email; see (the Bacula manual)[http://www.bacula.org/5.0.x-manuals/en/main/main/Messages_Resource.html] for more details.
+
+#### Tape Drive Compression
+
+Place your tape drive as an entry in the following array to enable hardware compression by default on that drive:
+
+```json
+"bacula": {
+  "sd": {
+    "hardware_compression_devices": [
+      "nst1"
+    ]
+  }
+}
+```
+
+#### Client Network Buffers
+
+Setting the `['bacula']['client']['max_network_buffer']` attribute on your Bacula client(s) allows you to manually set its `Maximum Network Buffer Size` setting (the same option can be set on your storage devices in the attribute form of `"Maximum Network Buffer Size": "65536"`); see (the Bacula manual)[http://www.bacula.org/5.0.x-manuals/en/main/main/Client_File_daemon_Configur.html#SECTION001910000000000000000] for further details.
 
 
 Contributing

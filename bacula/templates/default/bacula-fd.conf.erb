@@ -12,7 +12,8 @@ FileDaemon {                            # this is me
   FDport = 9102 # where we listen for the director
   WorkingDirectory = "<%= node['bacula']['client']['working_directory'] %>"
   Pid Directory = "<%= node['bacula']['client']['pid_directory'] %>"
-  Maximum Concurrent Jobs = <%= node['bacula']['client']['max_con_jobs'] %>
+  Maximum Concurrent Jobs = <%= node['bacula']['client']['max_con_jobs'] %><% if node['bacula']['client']['max_network_buffer'] -%>
+  Maximum Network Buffer Size = <%= node['bacula']['client']['max_network_buffer'] %><% end -%>
 # Plugin Directory = "C:\\Program Files\\Bacula\\plugins" <- from Windows config; disabled by default
 }
 

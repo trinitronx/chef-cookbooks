@@ -31,7 +31,6 @@ Client {
 
 <% end -%>
 
-
 <% @bacula_clients.each do |clientparms| -%><% if clientparms.first[1]['filesets'] -%><% clientparms.first[1]['filesets'].each do |fileset| -%>
 FileSet {
   Name = "<%= clientparms.first[0] %>-<%= fileset.first[0] %>"<% if clientparms.first[1]['platform_family'] == 'windows'-%>

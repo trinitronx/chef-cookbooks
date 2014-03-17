@@ -24,6 +24,9 @@ node.set_unless['bacula']['sd']['password'] = secure_password
 node.set_unless['bacula']['sd']['password_monitor'] = secure_password
 node.save
 
+# Setup tape drive hardware compression before package install
+include_recipe "bacula::hardwarecompression"
+
 package "bacula-sd-mysql"
 service "bacula-sd"
 
