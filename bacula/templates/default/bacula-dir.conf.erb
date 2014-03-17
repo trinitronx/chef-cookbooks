@@ -36,7 +36,10 @@ FileSet {
   Name = "<%= clientparms.first[0] %>-<%= fileset.first[0] %>"<% if clientparms.first[1]['platform_family'] == 'windows'-%>
   Enable VSS = yes<% end -%>
   Include {
-    Options {
+    Options {<% if fileset.first[1]['options'] -%><% fileset.first[1]['options'].each do |option| -%>
+      <%= option.first[0] %> = <%= option.first[1] %>
+<% end -%><% else -%>
+<% end -%>
       signature = MD5<% if clientparms.first[1]['platform_family'] == 'windows'-%>
       IgnoreCase = yes
       Exclude = yes
@@ -90,7 +93,7 @@ Job {
   Client = <%= clientparms.first[0] %>-fd
   Type = Backup
   Accurate = yes
-  Level = Incremental
+  Level = <%= job.first[1]['level'] || 'Incremental' %>
   Messages = Standard
   FileSet = <% if job.first[1]['fileset'] -%><%= "\"#{clientparms.first[0]}-#{job.first[1]['fileset']}\"" %><% else -%><%= "\"#{clientparms.first[0]}-#{job.first[0]}\"" %><% end -%>
   Pool = <%= job.first[1]['pool'] || 'Default' %><% if job.first[1]['schedule'] -%>

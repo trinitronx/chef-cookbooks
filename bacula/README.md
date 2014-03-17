@@ -69,17 +69,32 @@ Some general notes on this configuration syntax:
 * While Bacula configuration is generally director-centric (i.e. elements like schedules & filesets are centrally defined on the director and re-used by different clients), the node attribute system used in this cookbook makes the fileset and schedule definitions specific to each node.
   - The director configuration will automatically prepend the applicable node name to each fileset/schedule definition.
 * The `schedules` array contains hashes for each of the node's schedules. Each of the node's schedules is an array of `Run` statements -- see [the Bacula manual](http://www.bacula.org/5.2.x-manuals/en/main/main/Configuring_Director.html#SECTION001450000000000000000) for further details.
-* The `filesets` array elements are arranged in mostly the same manner as the FileSet resources detailed in [the Bacula manual](http://www.bacula.org/5.2.x-manuals/en/main/main/Configuring_Director.html#SECTION001470000000000000000). Sensible defaults are automatically added as appropriate (e.g. VSS is automatically enabled on Windows nodes).
-* `jobs` array members specifically look for the following 3 attributes:
+* The `filesets` array elements are arranged in mostly the same manner as the FileSet resources detailed in [the Bacula manual](http://www.bacula.org/5.2.x-manuals/en/main/main/Configuring_Director.html#SECTION001470000000000000000). Sensible defaults are automatically added as appropriate (e.g. MD5 signatures are checked for file comparisons).
+* `jobs` array members specifically look for the following attributes:
   - fileset
     - Optional; defaults to the name of the job (e.g. in our example above we could omit the `fileset` under `monthlydbbackup` and rename the `ddrive` fileset to `monthlydbbackup`)
   - pool
     - Optional; defaults to `Default`.
   - schedule
     - Optional; only required if you wish for your job to run automatically
-* Jobs are automatically defined as Incremental; override as desired in your `schedules`
-* `jobs` array members can also have an `options` array specified, to allow arbitrary 'key = value' lines to be added to the job; e.g.:
+  - level
+    - Optional; defaults to `Incremental`.
+* `jobs` & `filesets` array members can also have an `options` array specified, to allow arbitrary 'key = value' lines to be added to the job; e.g.:
 ```json
+"filesets": [
+  {
+    "ddrive": {
+      "file": [
+        "D:/"
+      ],
+      "options": [
+        {
+          "compression": "LZO"
+        }
+      ]
+    }
+  }
+],
 "jobs": [
   {
     "monthlydbbackup": {
