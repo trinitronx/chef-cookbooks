@@ -57,7 +57,7 @@ FileSet {
       WildFile = "[A-Z]:/pagefile.sys" 
       WildFile = "[A-Z]:/hiberfil.sys"<% end -%>
     }
-  <% fileset.first[1]['file'].each do |fileinclude| -%>File = <%= fileinclude %>
+<% fileset.first[1]['file'].each do |fileinclude| -%>  File = <%= fileinclude %>
 <% end -%>
   }
 }
@@ -91,18 +91,16 @@ Schedule {
 Job {
   Name = "<%= clientparms.first[0] %>-<%= job.first[0] %>"
   Client = <%= clientparms.first[0] %>-fd
-  Type = Backup
+  Type = <%= job.first[1]['type'] || 'Backup' %>
   Accurate = yes
   Level = <%= job.first[1]['level'] || 'Incremental' %>
   Messages = Standard
   FileSet = <% if job.first[1]['fileset'] -%><%= "\"#{clientparms.first[0]}-#{job.first[1]['fileset']}\"" %><% else -%><%= "\"#{clientparms.first[0]}-#{job.first[0]}\"" %><% end -%>
   Pool = <%= job.first[1]['pool'] || 'Default' %><% if job.first[1]['schedule'] -%>
-  Schedule = "<%= "#{clientparms.first[0]}-#{job.first[1]['schedule']}" %>"<% end -%>
-<% if job.first[1]['options'] -%><% job.first[1]['options'].each do |option| -%>
-  <%= option.first[0] %> = <%= option.first[1] %>
-<% end -%>
-<% end -%>
-}
+  Schedule = "<%= "#{clientparms.first[0]}-#{job.first[1]['schedule']}" %>"<% end -%><% if job.first[1]['options'] -%><% job.first[1]['options'].each do |option| -%>
+  <%= option.first[0] %> = <%= option.first[1] %><% end -%>
+}<% else -%>
+}<% end -%>
 
 <% end -%><% end -%><% end -%>
 
