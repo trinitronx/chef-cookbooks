@@ -2,7 +2,7 @@
 # Cookbook Name:: windows_firewall
 # Recipe:: default
 #
-# Copyright 2013, Biola University 
+# Copyright 2014, Biola University 
 # Copyright 2011, Opscode, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,20 @@
 # limitations under the License.
 #
 
-unless node['firewall'].nil?
+# Check for conditions which require this recipe to be skipped
+skipfirewall = false
+if node['firewall'].nil?
+  skipfirewall = true
+end
+# Disabled firewall on Server 2003 check
+if node['kernel']['name'] =~ /Server 2003/
+  cmd = Mixlib::ShellOut.shell_out!("sc query \"SharedAccess\"")
+  if cmd.stdout =~ /STATE\s*:\ 1\s*STOPPED/
+    skipfirewall = true
+  end
+end
+
+unless skipfirewall
   old_state = node['firewall']['state'] if node['firewall']['state']
   old_state ||= ""
   new_state = node['firewall']['rules'].to_s if node['firewall']['rules']

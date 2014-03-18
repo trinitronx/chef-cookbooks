@@ -246,6 +246,26 @@ Place your tape drive as an entry in the following array to enable hardware comp
 
 Setting the `['bacula']['client']['max_network_buffer']` attribute on your Bacula client(s) allows you to manually set its `Maximum Network Buffer Size` setting (the same option can be set on your storage devices in the attribute form of `"Maximum Network Buffer Size": "65536"`); see (the Bacula manual)[http://www.bacula.org/5.0.x-manuals/en/main/main/Client_File_daemon_Configur.html#SECTION001910000000000000000] for further details.
 
+#### Client Backup Scripts
+
+##### SQL Server 2000 Backup Script
+
+Define the following attributes on a client node to have the `bacula::client` recipe deploy a script to `C:\Program Files\Bacula\scripts\sqlserver2000backup.sql` that can be run with osql to export a node's databases for backup:
+
+```json
+"bacula": {
+  "client": {
+    "scripts": {
+      "sqlserver2000backup": {
+        "stagingdirectory": "D:\\backup\\",
+        "databasestoexclude": "\'tempdb\'"
+      }
+    }
+  }
+}
+```
+`stagingdirectory` is the only mandatory option; specifying it will cause the directory to be created and the backup script to be deployed to your node.
+
 
 Contributing
 ------------

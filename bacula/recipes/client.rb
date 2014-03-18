@@ -76,4 +76,11 @@ when "windows"
     variables :bacula_servers => bacula_servers
     notifies :restart, resources(:service => "Bacula-fd")
   end
+  # Setup additional backup scripts
+  directory "c:/program files/bacula/scripts"
+  # Sql server backup scripts
+  if node['bacula']['client']['scripts']['sqlserver2000backup']['stagingdirectory']
+    directory node['bacula']['client']['scripts']['sqlserver2000backup']['stagingdirectory']
+    template "c:/program files/bacula/scripts/sqlserver2000backup.sql"
+  end
 end

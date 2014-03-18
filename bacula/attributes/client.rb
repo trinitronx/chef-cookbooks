@@ -11,6 +11,8 @@ when 'windows'
   default['bacula']['client']['working_directory'] = 'C:\\\\Program Files\\\\Bacula\\\\working'
   default['bacula']['client']['pid_directory'] = 'C:\\\\Program Files\\\\Bacula\\\\working'
   default['bacula']['client']['max_con_jobs'] = '10'
+  default['bacula']['client']['scripts']['sqlserver2000backup']['stagingdirectory'] = nil
+  default['bacula']['client']['scripts']['sqlserver2000backup']['databasestoexclude'] = '\'tempdb\''
 else
   default['bacula']['client']['working_directory'] = '/var/lib/bacula'
   default['bacula']['client']['pid_directory'] = '/var/run/bacula'
