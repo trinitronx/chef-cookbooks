@@ -25,8 +25,7 @@ if node['firewall'].nil?
 end
 # Disabled firewall on Server 2003 check
 if node['kernel']['name'] =~ /Server 2003/
-  cmd = Mixlib::ShellOut.shell_out!("sc query \"SharedAccess\"")
-  if cmd.stdout =~ /STATE\s*:\ 1\s*STOPPED/
+  if `sc query "SharedAccess"` =~ /STATE\s*:\ 1\s*STOPPED/
     skipfirewall = true
   end
 end
