@@ -206,6 +206,8 @@ Autochangers however are listed under their own attribute, allowing them to be c
 ```
 **NOTE:** Because you are manually specifying your pool's `Storage` device (that was automatically defined in your director based on a Chef search of your storage devices), it needs to be done in the syntax of "`storagedaemonfqdn`-`storagedaemondevicename`-`storagedaemondevicemediatype`". The easiest way to get this exact name may be to copy it from your Chef generated director configuration file.
 
+* Optionally, define a string as the `['bacula']['dir']['max_con_jobs']` attribute in your director role to set the maximum number of concurrent jobs that can run on the director (defaults to one).
+
 ### Misc Setup
 
 The above settings cover the essential configuration of your Bacula system. Additional tuning options follow.

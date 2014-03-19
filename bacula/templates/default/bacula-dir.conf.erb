@@ -12,7 +12,7 @@ Director {
   QueryFile = "/etc/bacula/scripts/query.sql"
   WorkingDirectory = "/var/lib/bacula"
   PidDirectory = "/var/run/bacula"
-  Maximum Concurrent Jobs = 1
+  Maximum Concurrent Jobs = <%= node['bacula']['dir']['max_con_jobs'] || '1' %>
   Password = "<%= node['bacula']['dir']['password'] %>"
   Messages = Daemon
   DirAddress = <%= node['bacula']['dir']['address'] %>
