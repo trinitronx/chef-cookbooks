@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-ta_url = "https://github.com/biola/ta-biola_security_monitoring/tarball/v2.0"
+ta_url = "https://codeload.github.com/biola/ta-biola_security_monitoring/tar.gz/v2.0"
 ta_filename = "TA-biola_security_monitoring-v2.0.tar.gz"
 # SHA256 checksum
 ta_checksum = "f7b7d6bbe8457f3cf500349649ade7240dc51b677ada36cf725a99d0ab02f71b"
@@ -26,7 +26,7 @@ ta_checksum = "f7b7d6bbe8457f3cf500349649ade7240dc51b677ada36cf725a99d0ab02f71b"
 # the splunk install to work correctly; specify the directory name here so that Chef
 # will do it automatically.
 #
-ta_tardirectory = "biola-ta-biola_security_monitoring-e2471b1"
+ta_tardirectory = "ta-biola_security_monitoring-2.0"
 
 
 # Setup pre-req packages
