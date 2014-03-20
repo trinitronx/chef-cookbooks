@@ -68,7 +68,7 @@ when "windows"
     installer_type :custom
   end
   service "Bacula-fd" do
-    action :start
+    action :nothing
     supports :start => true, :stop => true, :restart => true
   end
   template "c:/program files/bacula/bacula-fd.conf" do
