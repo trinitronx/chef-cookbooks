@@ -128,10 +128,9 @@ Storage {
   Password = "<%= storageserver.first[1]['password'] %>"
   Device = <%= device.first[0] %>
   Media Type = <%= device.first[1]['Media Type'] %><% if device.first[1]['AllowCompression'] -%>
-  AllowCompression = device.first[1]['AllowCompression']<% else -%><% end -%><% if device.first[1]['Autochanger'] -%>
+  AllowCompression = <%= device.first[1]['AllowCompression'] %><% else -%><% end -%><% if device.first[1]['Autochanger'] -%>
   Autochanger = yes<% else -%><% end -%>
 }
-
 <% end -%><% end -%><% end -%>
 
 <% if node['bacula']['dir']['pools'] -%><% node['bacula']['dir']['pools'].each do |pool| -%>
@@ -160,8 +159,6 @@ Pool {
 # Generic catalog service
 Catalog {
   Name = MyCatalog
-# Uncomment the following line if you want the dbi driver
-# dbdriver = "dbi:sqlite3"; dbaddress = 127.0.0.1; dbport =  
   dbname = "<%= node['bacula']['mysql_user'] %>"; DB Address = "localhost"; dbuser = "<%= node['bacula']['mysql_user'] %>"; dbpassword = "<%= node['bacula']['mysql_password'] %>"
 }
 

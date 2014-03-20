@@ -153,6 +153,9 @@ bacula_storage_search.each do |nodeobj|
                 achashtoadd[acdevice.first[0]] = {}
                 achashtoadd[acdevice.first[0]]['Media Type'] = sddevice.first[1]['Media Type']
                 achashtoadd[acdevice.first[0]]['Autochanger'] = 'yes'
+                if sddevice.first[1]['AllowCompression']
+                  achashtoadd[acdevice.first[0]]['AllowCompression'] = sddevice.first[1]['AllowCompression']
+                end
                 hashtoadd[nodeobj.name]['devices'] << achashtoadd
               end
             end
