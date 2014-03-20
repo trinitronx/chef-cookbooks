@@ -48,13 +48,26 @@ mysql_users.each do |user_name|
 	# Grant permissions on each of the databases configured
 	if user['privileges']
 		user['privileges'].each do |db_name, db_privileges|
-			mysql_database_user user_name do
-				connection mysql_connection_info
-				host user['host']
-				database_name db_name
-				password user['password']
-				privileges db_privileges
-				action :grant
+			if user['host']
+				mysql_database_user user_name do
+					connection mysql_connection_info
+					host user['host']
+					database_name db_name
+					password user['password']
+					privileges db_privileges
+					action :grant
+				end
+			else
+				user['hosts'].each do |h|
+					mysql_database_user user_name do
+						connection mysql_connection_info
+						host h
+						database_name db_name
+						password user['password']
+						privileges db_privileges
+						action :grant
+					end
+				end
 			end
 		end
 	end

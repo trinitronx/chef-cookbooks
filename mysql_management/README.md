@@ -37,11 +37,11 @@ Items in the `mysql_users` data bag should be in the following format:
 
     {
       "id": "user_name",
-      "host": "localhost",
+      "hosts": [ "localhost" ],
       "password": "passwordgoeshere",
       "privileges": {
-        "db1": ["select", "insert"],
-        "db2": ["all"]
+        "db1": [ "select", "insert" ],
+        "db2": [ "all" ]
       }
     }
 
