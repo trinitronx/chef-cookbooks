@@ -37,8 +37,8 @@ STATUS=$?
 if [ ${STATUS} = ${ZERO} ] 
 then
   echo
-  echo "UID        PID  PPID  C STIME TTY          TIME ARGS"
-  echo "========================================================================"
+  echo "USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND"
+  echo "==================================================================================="
   cat /tmp/psglist|grep "${SEARCH}"
 else
   echo "${SEARCH} not found in process list."
