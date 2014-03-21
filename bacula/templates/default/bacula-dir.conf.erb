@@ -35,13 +35,21 @@ Client {
 FileSet {
   Name = "<%= clientparms.first[0] %>-<%= fileset.first[0] %>"<% if clientparms.first[1]['platform_family'] == 'windows'-%>
   Enable VSS = yes<% end -%>
-  Include {
-    Options {<% if fileset.first[1]['options'] -%><% fileset.first[1]['options'].each do |option| -%>
-      <%= option.first[0] %> = <%= option.first[1] %>
+  Include {<% if fileset.first[1]['options'] and fileset.first[1]['additionaloptionstanzas'] -%>
+    Options {<% fileset.first[1]['options'].each do |option| -%>
+      <%= option.first[0] %> = <%= option.first[1] %><% end -%>
+    }<% fileset.first[1]['additionaloptionstanzas'].each do |optionstanza| -%>
+    Options {<% optionstanza.first[1].each do |k,v| -%>
+      <%= k %> = <%= v %><% end -%>
+    }
 <% end -%><% else -%>
+    Options {<% customfilesetoptions = false -%><% if fileset.first[1]['options'] -%><% fileset.first[1]['options'].each do |option| -%>
+      <%= option.first[0] %> = <%= option.first[1] %><% if option.first[0].downcase == 'wilddir' -%><% customfilesetoptions = true -%><% end -%><% end -%>
+<% else -%>
+
 <% end -%>
       signature = MD5<% if clientparms.first[1]['platform_family'] == 'windows'-%>
-      IgnoreCase = yes
+      IgnoreCase = yes<% end -%><% unless customfilesetoptions -%>
       Exclude = yes
       # Some random bits of Windows we want to ignore 
       WildDir = "[A-Z]:/WINDOWS/msdownld.tmp" 
@@ -57,6 +65,7 @@ FileSet {
       WildFile = "[A-Z]:/pagefile.sys" 
       WildFile = "[A-Z]:/hiberfil.sys"<% end -%>
     }
+<% end -%>
 <% fileset.first[1]['file'].each do |fileinclude| -%>  File = <%= fileinclude %>
 <% end -%>
   }

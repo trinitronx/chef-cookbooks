@@ -69,7 +69,7 @@ Some general notes on this configuration syntax:
 * While Bacula configuration is generally director-centric (i.e. elements like schedules & filesets are centrally defined on the director and re-used by different clients), the node attribute system used in this cookbook makes the fileset and schedule definitions specific to each node.
   - The director configuration will automatically prepend the applicable node name to each fileset/schedule definition.
 * The `schedules` array contains hashes for each of the node's schedules. Each of the node's schedules is an array of `Run` statements -- see [the Bacula manual](http://www.bacula.org/5.2.x-manuals/en/main/main/Configuring_Director.html#SECTION001450000000000000000) for further details.
-* The `filesets` array elements are arranged in mostly the same manner as the FileSet resources detailed in [the Bacula manual](http://www.bacula.org/5.2.x-manuals/en/main/main/Configuring_Director.html#SECTION001470000000000000000). Sensible defaults are automatically added as appropriate (e.g. MD5 signatures are checked for file comparisons).
+* The `filesets` array elements are arranged in mostly the same manner as the FileSet resources detailed in [the Bacula manual](http://www.bacula.org/5.2.x-manuals/en/main/main/Configuring_Director.html#SECTION001470000000000000000). Sensible defaults are automatically added as appropriate (e.g. MD5 signatures are checked for file comparisons). See the example below and in the Misc Setup section for information on setting custom options or multiple option stanzas.
 * `jobs` array members specifically look for the following attributes:
   - fileset
     - Optional; defaults to the name of the job (e.g. in our example above we could omit the `fileset` under `monthlydbbackup` and rename the `ddrive` fileset to `monthlydbbackup`)
@@ -243,6 +243,47 @@ Place your tape drive as an entry in the following array to enable hardware comp
   }
 }
 ```
+
+#### Multiple Option Stanzas in FileSets
+
+Most FileSet configurations on clients can be accomplished with minimal (or zero) options specified. As noted in the client setup section, an `options` array in `filesets` attribute can be used to set additional options when needed (e.g. compression). This assumes though that only one `Options` stanza will be needed in the FileSet. For times where this is not sufficient, additional stanzas can be specified in the following manner:
+
+```json
+"bacula": {
+  "client": {
+    "filesets": [
+      {
+        "myfilesetname": {
+          "file": [
+            "D:/IRS",
+            "E:/Fanfic"
+          ],
+          "options": [
+            {
+              "compression": "LZO"
+            },
+            {
+              "wilddir": "\"D:/IRS/ThisYearsTaxStuff*\""
+            },
+            {
+              "wilddir": "\"E:/Fanfic/FireflyS2*\""
+            }
+          ],
+          "additionaloptionstanzas": [
+            {
+              "irrelevantnamehere": {
+                "Exclude": "yes",
+                "RegexDir": "\".*\""
+              }
+            }
+          ]
+        }
+      }
+    ],
+  }
+}
+```
+The example above will produce a FileSet configuration similar to the example listed below the text _"An alternative would be to include the two subdirectories desired and exclude everything else"_ (in the Bacula manual)[http://www.bacula.org/5.2.x-manuals/en/main/main/Configuring_Director.html].
 
 #### Client Network Buffers
 
