@@ -243,6 +243,27 @@ Place your tape drive as an entry in the following array to enable hardware comp
   }
 }
 ```
+#### Disabling VSS in FileSets
+
+Disabling the `Enable VSS` option for a fileset can be accomplished via the `disablevss` attribute as shown below.
+
+```json
+"bacula": {
+  "client": {
+    "filesets": [
+      {
+        "myfilesetname": {
+          "file": [
+            "D:/IRS",
+            "E:/Fanfic"
+          ],
+          "disablevss": true
+        }
+      }
+    ],
+  }
+}
+```
 
 #### Multiple Option Stanzas in FileSets
 
