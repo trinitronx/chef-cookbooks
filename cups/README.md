@@ -42,7 +42,10 @@ SAMPLE format for printer entries:
   "printers": [
     {
       "printer1": {
-        "uri": "lpd://FQDN"
+        "uri": "lpd://FQDN",
+        "desc": "HP LaserJet xx",
+        "model": "textonly.ppd",    #textonly.ppd is set as the default by the recipe.
+        "location": "Front Office"
       }
     },
     {

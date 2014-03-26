@@ -49,13 +49,25 @@ end
 
 node['cups']['printers'].each do |newprinter|
   # newprinter.first[0] is the printer name
+  cmdline = "lpadmin -p #{newprinter.first[0]} -E -v #{newprinter.first[1]['uri']}"
+  if newprinter.first[1]['model']
+    cmdline << " -m #{newprinter.first[1]['model']}"
+  else
+    cmdline << " -m textonly.ppd"
+  end
+  if newprinter.first[1]['location']
+    cmdline << " -L \"#{newprinter.first[1]['location']}\""
+  end
+  if newprinter.first[1]['desc']
+    cmdline << " -D \"#{newprinter.first[1]['desc']}\""
+  end
   unless oldprinters.include?(newprinter.first[0])
-    execute "lpadmin -p #{newprinter.first[0]} -E -v #{newprinter.first[1]['uri']} -m textonly.ppd"
+    execute cmdline
   else
     printers.each do |oldprinterhash|
       if oldprinterhash['name'] == newprinter.first[0]
         unless oldprinterhash['uri'] == newprinter.first[1]['uri']
-          execute "lpadmin -p #{newprinter.first[0]} -E -v #{newprinter.first[1]['uri']} -m textonly.ppd"
+          execute cmdline
         end
       end
     end
