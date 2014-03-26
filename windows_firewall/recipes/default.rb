@@ -48,26 +48,27 @@ unless skipfirewall
     end
     Chef::Log.info "Firewall rules updated."
     node.set['firewall']['state'] = new_state
-  
-    node['firewall']['rules'].each do |rule_mash|
-      rule_mash.keys.each do |rule|
-        params = rule_mash[rule]
-        name = params['name'] if params['name']
-        name ||= rule
-        protocol = params['protocol'].upcase if params['protocol']
-        protocol ||= "TCP"
-        direction = params['direction'].to_sym if params['direction']
-        interface = params['interface'] if params['interface']
-        logging = params['logging'].to_sym if params['logging']
-        port = params['port'].to_i if params['port']
-        source = params['source'] if params['source']
-        source ||= "any"
-        destination = params['destination'] if params['destination']
-        dest_port = params['dest_port'].to_i if params['dest_port']
-        profile = params['profile'] if params['profile']
-        profile ||= "domain"
-        execute "netsh advfirewall firewall add rule name=\"#{name}\" dir=in action=allow protocol=#{protocol} localport=#{port} remoteip=#{source} profile=#{profile}" do
-          not_if {CheckOpenPort.is_port_open?(node['ipaddress'], port)}
+    if node['firewall']['rules']
+      node['firewall']['rules'].each do |rule_mash|
+        rule_mash.keys.each do |rule|
+          params = rule_mash[rule]
+          name = params['name'] if params['name']
+          name ||= rule
+          protocol = params['protocol'].upcase if params['protocol']
+          protocol ||= "TCP"
+          direction = params['direction'].to_sym if params['direction']
+          interface = params['interface'] if params['interface']
+          logging = params['logging'].to_sym if params['logging']
+          port = params['port'].to_i if params['port']
+          source = params['source'] if params['source']
+          source ||= "any"
+          destination = params['destination'] if params['destination']
+          dest_port = params['dest_port'].to_i if params['dest_port']
+          profile = params['profile'] if params['profile']
+          profile ||= "domain"
+          execute "netsh advfirewall firewall add rule name=\"#{name}\" dir=in action=allow protocol=#{protocol} localport=#{port} remoteip=#{source} profile=#{profile}" do
+            not_if {CheckOpenPort.is_port_open?(node['ipaddress'], port)}
+          end
         end
       end
     end
