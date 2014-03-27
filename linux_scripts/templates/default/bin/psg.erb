@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 #
-#   ## Does a 'ps aux | grep SEARCH'
+#   ## Does a 'ps -ef | grep SEARCH'
 #
 if [ $# -ne 1 ]; then
   echo
@@ -31,13 +31,13 @@ SCRIPT=$0
 SEARCH=$1
 ZERO=0
 
-ps aux|grep -v ${SCRIPT}|grep -v grep|grep "${SEARCH}" > /tmp/psglist
+ps -ef|grep -v ${SCRIPT}|grep -v grep|grep "${SEARCH}" > /tmp/psglist
 STATUS=$?
 
 if [ ${STATUS} = ${ZERO} ] 
 then
   echo
-  echo "USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND"
+  echo "UID        PID  PPID  C STIME TTY          TIME CMD"
   echo "==================================================================================="
   cat /tmp/psglist|grep "${SEARCH}"
 else
