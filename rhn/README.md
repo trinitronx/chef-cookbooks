@@ -8,7 +8,7 @@ Requirements
 ------------
 
 #### distro
-- Tested on RHEL 5
+- Tested on RHEL 5/6
 
 Attributes
 ----------
@@ -35,6 +35,22 @@ Attributes
   </tr>
 </table>
 
+#### rhn::optionalchannel
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td><tt>['rhn']['operating_system']</tt></td>
+    <td>string</td>
+    <td>Operating system type for optional channel registration; should be workstation, client or server</td>
+    <td><tt>server</tt></td>
+  </tr>
+</table>
+
 Usage
 -----
 #### rhn::default
@@ -51,10 +67,15 @@ Usage
 }
 ```
 
+#### rhn::optionalchannel
+
+Include this recipe in a node's run_list to have it add the Optional channel on RHN.
+
+
 
 License and Authors
 -------------------
- Copyright 2013, Biola University 
+ Copyright 2014, Biola University 
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
