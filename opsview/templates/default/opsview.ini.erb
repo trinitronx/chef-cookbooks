@@ -65,7 +65,7 @@ win_service=scripts\service_nrpe_nt.exe $ARG1$
 check_sysinfo=scripts\check_sysinfo.exe
 <% if @scripts -%>
 <% @scripts.each do |s| -%>
-<%= s['name'] %>=scripts\<%= s['filename'] %> <%= s['arguments'] %>
+<%= s['name'] %>=<%= s['script_handler'] %> scripts\<%= s['filename'] %> <%= s['arguments'] %>
 <% end -%>
 <% end -%>
 
