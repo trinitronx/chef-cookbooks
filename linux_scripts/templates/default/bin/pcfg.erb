@@ -1,0 +1,109 @@
+#!/bin/bash
+#
+# Copyright 2013, Biola University 
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Script accepts the device name of a network printer (or 'all') and returns
+# information about the specific configuration parameters.
+#
+
+# Get the printer devicename
+DEVNAME=$1
+
+if [ $# -ne 1 ]; then
+   echo
+   echo "usage: pcfg DEVNAME (or 'all' to list all printers)"
+   echo
+   echo "Example: To identify the configuration file for printer '201' do:"
+   echo "   pcfg 201"
+   echo
+   echo "Example: To identify the configuration file for all printers do:"
+   echo "   pcfg all"
+   echo
+   exit 1
+fi
+
+PSTATOUT="/tmp/PSTATOUT"
+PLIST="/tmp/PRINTERLIST"
+TEMP1="/tmp/${DEVNAME}-options"
+TEMP2="/tmp/${DEVNAME}-path"
+TEMP3="/tmp/${DEVNAME}-mfg"
+TEMP3="/tmp/${DEVNAME}-model"
+TEMP4="/tmp/${DEVNAME}-pcifile"
+TEMP5="/tmp/${DEVNAME}-state"
+PPD="${DEVNAME}.ppd"
+
+>${PSTATOUT}
+
+if [ ${DEVNAME} = "all" ]; then
+  >${PLIST}
+  lpstat -p > ${PSTATOUT}
+  while read JUNK1 PNAME JUNK2
+  do
+    echo ${PNAME}>>${PLIST}
+  done<${PSTATOUT}
+else
+  lpstat -p${DEVNAME}>/dev/null 2>&1
+  STATUS=$?
+  if [ $STATUS -ne 0 ]; then
+     echo "No configuration found for printer device $DEVNAME."
+     exit
+  fi
+  echo ${DEVNAME}>${PLIST}
+fi
+echo
+echo "------------------------------------------------------------------------------------------"
+
+while read DEVNAME 
+  do 
+    PPD="${DEVNAME}.ppd"
+    echo "Configuration information for device ${DEVNAME}:"
+    echo "------------------------------------------------------------------------------------------"
+    echo
+
+    lpoptions -d ${DEVNAME}>/${TEMP1}
+    lpstat -v ${DEVNAME}>${TEMP2}
+
+    cat /etc/cups/ppd/${PPD}|grep "ModelName:">${TEMP3}
+    cat /etc/cups/ppd/${PPD}|grep "PCFileName:">${TEMP4}
+    lpstat -p${DEVNAME}>${TEMP5}
+
+    IFS="'"
+    read -r JUNK1 PRINTERINFO JUNK2 LOCATION JUNK3 < ${TEMP1}
+
+    IFS=" "
+    read D1 D2 DEVNUM PRINTPATH XX <${TEMP2}
+    read X1 MODELNAME < ${TEMP3}
+    read Z1 Z2 Z3 STATE ENABLE DATE<${TEMP5}
+
+    echo "Description:    ${PRINTERINFO}"
+    echo "Location:       ${LOCATION}"
+    echo "Driver:         ${MODELNAME}"
+    echo "Printer State:  ${STATE} ${ENABLE} "
+    echo "Path:           ${PRINTPATH}"
+    echo "Active script:  /etc/cups/ppd/${DEVNAME}.ppd"
+    echo
+    echo "------------------------------------------------------------------------------------------"
+
+  done<${PLIST}
+
+rm ${TEMP1} 2>&1
+rm ${TEMP2} 2>&1
+rm ${TEMP3} 2>&1
+rm ${TEMP4} 2>&1
+rm ${TEMP5} 2>&1
+rm ${PSTATOUT} 2>&1
+rm ${PLIST} 2>&1
+
+exit 0
