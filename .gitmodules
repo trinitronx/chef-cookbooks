@@ -178,3 +178,6 @@
 [submodule "chef-vault"]
 	path = chef-vault
 	url = git@github.com:opscode-cookbooks/chef-vault.git
+[submodule "ntp"]
+	path = ntp
+	url = https://github.com/gmiranda23/ntp.git
