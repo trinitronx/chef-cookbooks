@@ -139,7 +139,7 @@ if File.exists? apps_dir
     # Write config files for each app
     if data_bag(conf_data_bag_name).include? app.name
       conf_data_bag_item = Chef::EncryptedDataBagItem.load(conf_data_bag_name, app.name, data_bag_secret)
-      app_conf = RubyApp::Config.new(conf_data_bag_item.to_hash, node.chef_environment)
+      app_conf = RubyApp::Config.new(conf_data_bag_item.to_hash, node)
 
       app_conf.files.each do |file_name, file_content|
         path = File.expand_path("#{app_dir}/#{file_name}")

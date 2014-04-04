@@ -66,6 +66,15 @@ Per-Application User Steps
             },
             "prod": {
               "files": {
+                "config/settings.local.yml": {
+                  "secret_token": "*********************"
+                }
+              }
+            }
+          },
+          "nodes": {
+            "ruby1.prod.biola.edu": {
+              "files": {
                 "config/newrelic.yml": {
                   "production": {
                     "license_key": "*********************"
