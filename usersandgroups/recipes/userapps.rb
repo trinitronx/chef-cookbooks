@@ -35,7 +35,7 @@ pkgsAllSystems = ['screen','rsync']
 pkgsDebSystems = ['bash-completion','vim','nano','curl','ncdu','htop','lsof']
 
 # Packages for Ubuntu systems
-pkgsUbuSystems = ['run-one','byobu','bash-completion','vim','nano','curl','ncdu','htop','lsof']
+pkgsUbuSystems = ['run-one','byobu','bash-completion','vim','nano','curl','ncdu','htop','lsof','gdisk']
 
 # Packages for RHEL systems
 pkgsRHELSystems = ['vim-enhanced']
@@ -58,4 +58,8 @@ when 'redhat', 'centos'
   pkgsRHELSystems.each do |i|
     package i
   end
+end
+
+if node['platform_family'] == 'rhel' and node['platform_version'].to_i > 5
+  package 'gdisk'
 end
