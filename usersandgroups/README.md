@@ -25,7 +25,7 @@ Include `usersandgroups` in your node's `run_list`:
 ```
 
 Users and groups can now be defined in the following format:
-
+```
 node
   'usersandgroups'
     'users':[
@@ -51,6 +51,19 @@ node
         group_name = optional. Allows a different group to be searched for in the databag than the name of the group on the node.
         }
       }
+```
+
+Windows nodes can also have basic group managment performed; currently this is limited to appending members to groups:
+```
+node
+  'usersandgroups'
+    'groups':[
+      {
+      'examplegroup':{
+        append = Array of users/groups to be added to examplegroup
+        }
+      }
+```
 
 #### usersandgroups::userapps
 
