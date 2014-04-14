@@ -70,6 +70,34 @@ Attributes
   </tr>
 </table>
 
+#### windows_software::winscp
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td><tt>['windows_software']['winscp']['download_url']</tt></td>
+    <td>String</td>
+    <td>Download URL for your hosted winpcap installer</td>
+    <td><tt>http://sourceforge.net/projects/winscp/files/WinSCP/5.5.3/winscp553setup.exe/download</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['windows_software']['winscp']['displayname']</tt></td>
+    <td>String</td>
+    <td>DisplayName string from Windows registry uninstall info</td>
+    <td><tt>WinSCP 5.5.3</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['windows_software']['winscp']['checksum']</tt></td>
+    <td>String</td>
+    <td>Optional SHA-256 checksum of the installer</td>
+    <td><tt>2e921bbf950606c5b0c9a1e1bd701139abc61606933c07d8dfb03b7febdea066</tt></td>
+  </tr>
+</table>
+
 Usage
 -----
 #### windows_software::wireshark
@@ -77,6 +105,10 @@ Usage
 Upload installers for WinPcap & Wireshark to your web server, set the attributes noted above, and include `windows_software::wireshark` in your node's `run_list`
 
 NOTE: Most WinPcap installers are not capable of silent installation. We recommend using the one bundled with the Windows version of nmap.
+
+#### windows_software::winscp
+
+Upload the WinSCP installer to your web server, set the attributes noted above, and include `windows_software::winscp` in your node's `run_list`
 
 Contributing
 ------------
@@ -90,7 +122,7 @@ Contributing
 
 License and Authors
 -------------------
- Copyright 2013, Biola University 
+ Copyright 2014, Biola University 
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.

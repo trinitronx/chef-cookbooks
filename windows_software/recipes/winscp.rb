@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: windows_software
-# Recipe:: default
+# Recipe:: winscp
 #
 # Copyright 2014, Biola University 
 #
@@ -16,3 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+if node['platform'] == "windows" then
+  include_recipe "windows::default"
+  windows_package node['windows_software']['winscp']['displayname'] do
+    source node['windows_software']['winscp']['download_url']
+    checksum node['windows_software']['winscp']['checksum']
+    installer_type :custom
+    options '/VERYSILENT /NORESTART'
+    action :install
+  end
+end
