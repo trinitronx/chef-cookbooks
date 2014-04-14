@@ -81,7 +81,7 @@ Attributes
   <tr>
     <td><tt>['windows_software']['winscp']['download_url']</tt></td>
     <td>String</td>
-    <td>Download URL for your hosted winpcap installer</td>
+    <td>Download URL for your hosted installer</td>
     <td><tt>http://sourceforge.net/projects/winscp/files/WinSCP/5.5.3/winscp553setup.exe/download</tt></td>
   </tr>
   <tr>
@@ -98,6 +98,28 @@ Attributes
   </tr>
 </table>
 
+#### windows_software::python2
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td><tt>['windows_software']['python2']['download_url']</tt></td>
+    <td>String</td>
+    <td>Download URL for your hosted installer</td>
+    <td><tt>https://www.python.org/ftp/python/2.7.6/python-2.7.6.amd64.msi</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['windows_software']['python2']['checksum']</tt></td>
+    <td>String</td>
+    <td>Optional SHA-256 checksum of the installer</td>
+    <td><tt>3793cb8874f5e156a161239fea04ad98829d4ecf623d52d43513780837eb4807</tt></td>
+  </tr>
+</table>
+
 Usage
 -----
 #### windows_software::wireshark
@@ -109,6 +131,12 @@ NOTE: Most WinPcap installers are not capable of silent installation. We recomme
 #### windows_software::winscp
 
 Upload the WinSCP installer to your web server, set the attributes noted above, and include `windows_software::winscp` in your node's `run_list`
+
+#### windows_software::python2
+
+**NOTE:** Requires chef-client >= 11.12.0
+
+Upload the Python2 installer to your web server, set the attributes noted above, and include `windows_software::python2` in your node's `run_list`
 
 Contributing
 ------------

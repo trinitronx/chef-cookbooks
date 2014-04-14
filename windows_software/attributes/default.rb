@@ -11,3 +11,6 @@ default['windows_software']['wireshark']['winpcap_checksum'] = 'e435984f0a52ec78
 default['windows_software']['winscp']['download_url'] = 'http://sourceforge.net/projects/winscp/files/WinSCP/5.5.3/winscp553setup.exe/download'
 default['windows_software']['winscp']['displayname'] = 'WinSCP 5.5.3'
 default['windows_software']['winscp']['checksum'] = '2e921bbf950606c5b0c9a1e1bd701139abc61606933c07d8dfb03b7febdea066'
+
+default['windows_software']['python2']['download_url'] = 'https://www.python.org/ftp/python/2.7.6/python-2.7.6.amd64.msi'
+default['windows_software']['python2']['checksum'] = '3793cb8874f5e156a161239fea04ad98829d4ecf623d52d43513780837eb4807'
