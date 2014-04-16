@@ -6,6 +6,25 @@ This is a very simple cookbook which contains recipes for directory management. 
 Usage
 =====
 
+directory_management::win_dir
+--------------------------------
+
+This recipe can be applied to all of your Windows nodes, and when attributes like the following are specified it will configure your specified ACLs on them.
+
+
+```json
+"windows": {
+  "directories": {
+    "E:\\Folder\\Cat Pics": {
+      "rights": {
+        "ENCOM\\Domain Admins": "full_control",
+        "ENCOM\\CatFactsSubcribers": "read_execute"
+      }
+    }
+  }
+}
+```
+
 directory_management::win_shares
 --------------------------------
 
