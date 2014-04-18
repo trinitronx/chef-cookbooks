@@ -49,7 +49,7 @@ Per-Application User Steps
     The data bag item should be in the following format:
 
         {
-          "id": "course-pallet",
+          "id": "boring-blog",
           "environments": {
             "all": {
               "files": {
