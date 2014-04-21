@@ -216,6 +216,7 @@ objects['servicegroup'] = opsview_databags.get(node['opsview']['servicegroups_da
 objects['hosttemplate'] = opsview_databags.get(node['opsview']['hosttemplates_databag'])
 objects['hostgroup'] = opsview_databags.get(node['opsview']['hostgroups_databag'])
 objects['sharednotificationprofile'] = opsview_databags.get(node['opsview']['sharednotificationprofiles_databag'])
+objects['role'] = opsview_databags.get(node['opsview']['roles_databag'])
 objects['contact'] = opsview_databags.get(node['opsview']['contacts_databag'])
 objects['timeperiod'] = opsview_databags.get(node['opsview']['timeperiods_databag'])
 objects['host'] = nodes

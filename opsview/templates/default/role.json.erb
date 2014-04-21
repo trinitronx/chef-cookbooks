@@ -1,0 +1,31 @@
+{
+  "list": [
+<% @values.each do |r| -%>
+    {
+<% if r['access_keywords'] -%>
+      "access_keywords" : [
+<% r['access_keywords'].each do |k| -%>
+        {
+          "name" : "<%= k %>"
+        }<% unless k == r['access_keywords'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+<% if r['accesses'] -%>
+      "accesses" : [
+<% r['accesses'].each do |k| -%>
+        {
+          "name" : "<%= k %>"
+        }<% unless k == r['accesses'].last -%>,<% end -%>
+<% end -%>
+      ],
+<% end -%>
+      "all_hostgroups" : "<%= r['all_hostgroups'] || 0 %>",
+      "all_keywords" : "<%= r['all_keywords'] || 0 %>",
+      "all_servicegroups" : "<%= r['all_servicegroups'] || 0 %>",
+      "description" : "<%= r['description'] %>",
+      "name" : "<%= r['name'] %>"
+    }<% unless r == @values.last -%>,<% end -%>
+<% end -%>
+  ]
+}

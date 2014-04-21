@@ -31,6 +31,6 @@ default['opsview']['ldap']['group_basedn'] = "cn=Users,dc=ldap,dc=company,dc=com
 default['opsview']['ldap']['group_filter'] = "(&(objectClass=group)(sAMAccountName=%s))"
 default['opsview']['ldap']['group_scope'] = "sub"
 
-default['opsview']['ldap']['default_role'] = "Administrator"
-default['opsview']['ldap']['default_allhostgroups'] = "1"
-default['opsview']['ldap']['default_allservicegroups'] = "1"
+default['opsview']['ldap']['default_role'] = "Public"
+default['opsview']['ldap']['default_allhostgroups'] = "0"
+default['opsview']['ldap']['default_allservicegroups'] = "0"

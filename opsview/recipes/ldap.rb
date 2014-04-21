@@ -41,16 +41,18 @@ directory node['opsview']['ldap']['group_dir'] do
   action :create
 end
 
-node['opsview']['ldap']['groups'].each do |group|
-  template "#{node['opsview']['ldap']['group_dir']}/#{group}.xml" do
-    source "ldap_group.xml.erb"
-    owner "nagios"
-    group "nagios"
-    mode 00644
-    variables(
-      :group => group
-    )
-    notifies :run, "execute[Sync LDAP accounts]"
+if node['opsview']['ldap']['groups']
+  node['opsview']['ldap']['groups'].first.each do |group_name, group|
+    template "#{node['opsview']['ldap']['group_dir']}/#{group_name}.xml" do
+      source "ldap_group.xml.erb"
+      owner "nagios"
+      group "nagios"
+      mode 00644
+      variables(
+        :group => group
+      )
+      notifies :run, "execute[Sync LDAP accounts]"
+    end
   end
 end
 
