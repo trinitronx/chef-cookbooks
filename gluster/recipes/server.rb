@@ -17,40 +17,51 @@
 # limitations under the License.
 #
 
-# Include the repository recipe to pull in 3.4 packages
 include_recipe "gluster::repository"
 
+# Install dependencies
+node['gluster']['server']['dependencies'].each do |d|
+	package d
+end
+
 # Install the server package
-package "glusterfs-server"
+package node['gluster']['server']['package']
+
+# Make sure the service is started
+service "glusterd" do
+  action [:enable, :start]
+end
 
 # Loop through each configured partition
-node['gluster']['server']['disks'].each do |d|
-	# If a partition doesn't exist, create it
-	if `fdisk -l 2> /dev/null | grep '/dev/#{d}1'`.empty?
-		# Pass commands to fdisk to create a new partition
-		bash "create partition" do
-			code "(echo n; echo p; echo 1; echo; echo; echo w) | fdisk /dev/#{d}"
-			action :run
+if node['gluster']['server'].attribute?('disks')
+	node['gluster']['server']['disks'].each do |d|
+		# If a partition doesn't exist, create it
+		if `fdisk -l 2> /dev/null | grep '/dev/#{d}1'`.empty?
+			# Pass commands to fdisk to create a new partition
+			bash "create partition" do
+				code "(echo n; echo p; echo 1; echo; echo; echo w) | fdisk /dev/#{d}"
+				action :run
+			end
+			
+			# Format the new partition
+			execute "format partition" do
+				command "mkfs.xfs -i size=512 /dev/#{d}1"
+				action :run
+			end
 		end
-		
-		# Format the new partition
-		execute "format partition" do
-			command "mkfs.ext4 /dev/#{d}1"
-			action :run
+
+		# Create a mount point
+		directory "#{node['gluster']['server']['brick_mount_path']}/#{d}1" do
+			recursive true
+			action :create
 		end
-	end
 
-	# Create a mount point
-	directory "#{node['gluster']['server']['brick_mount_path']}/#{d}1" do
-		recursive true
-		action :create
-	end
-
-	# Mount the partition and add to /etc/fstab
-	mount "#{node['gluster']['server']['brick_mount_path']}/#{d}1" do
-		device "/dev/#{d}1"
-		fstype "ext4"
-		action [:mount, :enable]
+		# Mount the partition and add to /etc/fstab
+		mount "#{node['gluster']['server']['brick_mount_path']}/#{d}1" do
+			device "/dev/#{d}1"
+			fstype "xfs"
+			action [:mount, :enable]
+		end
 	end
 end
 
@@ -59,13 +70,25 @@ bricks = Array.new
 node['gluster']['server']['volumes'].each do |volume_name, volume_values|
 	# If the node is configured as a peer for the volume, create directories to use as bricks
 	if volume_values['peers'].include? node['fqdn']
-		# Use either configured disks or default disks
-		disks = volume_values.attribute?('disks') ? volume_values['disks'] : node['gluster']['server']['disks'].take(volume_values['replica_count'])
-		disks.each do |d|
-			directory "#{node['gluster']['server']['brick_mount_path']}/#{d}1/#{volume_name}" do
-				action :create
+		# If using LVM
+		if volume_values.attribute?('lvm_volumes') || node['gluster']['server'].attribute?('lvm_volumes')
+			# Use either configured LVM volumes or default LVM volumes
+			lvm_volumes = volume_values.attribute?('lvm_volumes') ? volume_values['lvm_volumes'] : node['gluster']['server']['lvm_volumes'].take(volume_values['replica_count'])
+			lvm_volumes.each do |v|
+				directory "#{node['gluster']['server']['brick_mount_path']}/#{v}/#{volume_name}" do
+					action :create
+				end
+				bricks << "#{node['gluster']['server']['brick_mount_path']}/#{v}/#{volume_name}"
 			end
-			bricks << "#{node['gluster']['server']['brick_mount_path']}/#{d}1/#{volume_name}"
+		else
+			# Use either configured disks or default disks
+			disks = volume_values.attribute?('disks') ? volume_values['disks'] : node['gluster']['server']['disks'].take(volume_values['replica_count'])
+			disks.each do |d|
+				directory "#{node['gluster']['server']['brick_mount_path']}/#{d}1/#{volume_name}" do
+					action :create
+				end
+				bricks << "#{node['gluster']['server']['brick_mount_path']}/#{d}1/#{volume_name}"
+			end
 		end
 	end
 

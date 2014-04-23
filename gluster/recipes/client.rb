@@ -17,11 +17,10 @@
 # limitations under the License.
 #
 
-# Include the repository recipe to pull in 3.4 packages
 include_recipe "gluster::repository"
 
 # Install the client package
-package "glusterfs-client"
+package node['gluster']['client']['package']
 
 # Mount any configured volumes
 node["gluster"]['client']["volumes"].each do |volume_name, volume_values|
