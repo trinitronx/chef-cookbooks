@@ -62,7 +62,7 @@ else
       end
 
       # Create the rule using the iptables_ng_rule LWRP
-      iptables_ng_rule parameters.keys[0].to_s.downcase.tr(" ", "_") do
+      iptables_ng_rule rule_name.to_s.downcase.tr(" ", "_") do
         chain parameters[rule_name]['chain'] if parameters[rule_name]['chain']
         table parameters[rule_name]['table'] if parameters[rule_name]['table']
         ip_version 4
