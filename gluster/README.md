@@ -2,14 +2,13 @@ gluster Cookbook
 ================
 This cookbook is used to install and configure Gluster on both servers and clients. This cookbook makes several assumptions when configuring Gluster servers:
 
-1. Each disk will contain a single partition dedicated for Gluster
-2. If the cookbook will be used to manage disks, each partition will be formatted with the ext4 filesystem rather than the recommended xfs filesystem to allow partitions to be resized (xfs filesystems cannot be resized on Ubuntu 12.04 systems without a newer kernel installed)
-3. Non-replicated volume types are not supported
-4. All peers for a volume will be configured with the same number of bricks
+1. If using the cookbook to format disks, each disk will contain a single partition dedicated for Gluster
+2. Non-replicated volume types are not supported
+3. All peers for a volume will be configured with the same number of bricks
 
 Requirements
 ------------
-This cookbook requires Ubuntu version 12.04 or higher. All testing has been performed on Ubuntu 12.04.
+This cookbook has been tested on Ubuntu 12.04 and CentOS 6.5.
 
 Attributes
 ----------
@@ -66,6 +65,12 @@ Attributes
     <td><tt>['gluster']['server']['volumes'][VOLUME_NAME]['disks']</tt></td>
     <td>Array</td>
     <td>An optional array of disks to put bricks on (for example, ['sdb', 'sdc']); by default the cookbook will use the first x number of disks, equal to the replica count</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td><tt>['gluster']['server']['volumes'][VOLUME_NAME]['lvm_volumes']</tt></td>
+    <td>Array</td>
+    <td>An optional array of logical volumes to put bricks on (for example, ['LogVolGlusterBrick1', 'LogVolGlusterBrick2']); by default the cookbook will use the first x number of volumes, equal to the replica count</td>
     <td>None</td>
   </tr>
   <tr>
