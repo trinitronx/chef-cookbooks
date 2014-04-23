@@ -66,7 +66,9 @@ unless skipfirewall
           dest_port = params['dest_port'].to_i if params['dest_port']
           profile = params['profile'] if params['profile']
           profile ||= "domain"
-          execute "netsh advfirewall firewall add rule name=\"#{name}\" dir=in action=allow protocol=#{protocol} localport=#{port} remoteip=#{source} profile=#{profile}" do
+          description = " description=\"#{params['description']}\"" if params['description']
+          description ||= ""
+          execute "netsh advfirewall firewall add rule name=\"#{name}\" dir=in action=allow protocol=#{protocol} localport=#{port} remoteip=#{source} profile=#{profile}#{description}" do
             not_if {CheckOpenPort.is_port_open?(node['ipaddress'], port)}
           end
         end
