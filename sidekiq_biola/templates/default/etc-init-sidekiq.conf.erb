@@ -30,5 +30,5 @@ instance <%= name %>-${index}
 script
   logger -t sidekiq "Starting process: <%= name %>-$index as <%= user %>"
 
-  /bin/bash -l -c 'cd <%= dir %>; bundle exec sidekiq <%= "--require #{require_path}" if require_path %> --index $index --pidfile /tmp/sidekiq-<%= name %>-$index.pid --logfile /var/log/sidekiq/<%= name %>-$index.log'
+  /bin/bash -l -c 'cd <%= dir %>; bundle exec sidekiq <%= "--require #{require_path}" if require_path %> --index $index --tag <%= name %> --pidfile /tmp/sidekiq-<%= name %>-$index.pid --logfile /var/log/sidekiq/<%= name %>-$index.log'
 end script
