@@ -1,0 +1,26 @@
+#!/bin/bash
+# William Lam
+# http://engineering.ucsb.edu/~duonglt/vmware/
+# hot-add memory to LINUX system using vSphere ESX(i) 4.0
+# 08/09/2009
+
+if [ "$UID" -ne "0" ]
+	then
+ 	echo -e "You must be root to run this script.\nYou can 'sudo' to get root access"
+ 	exit 1
+fi
+
+
+for MEMORY in $(ls /sys/devices/system/memory/ | grep memory)
+do
+	SPARSEMEM_DIR="/sys/devices/system/memory/${MEMORY}"
+	echo "Found sparsemem: \"${SPARSEMEM_DIR}\" ..."
+	SPARSEMEM_STATE_FILE="${SPARSEMEM_DIR}/state"
+	STATE=$(cat "${SPARSEMEM_STATE_FILE}" | grep -i online)
+	if [ "${STATE}" == "online" ]; then
+		echo -e "\t${MEMORY} already online"
+	else
+		echo -e "\t${MEMORY} is new memory, onlining memory ..."
+		echo online > "${SPARSEMEM_STATE_FILE}"
+	fi
+done
