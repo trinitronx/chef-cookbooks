@@ -25,6 +25,9 @@ if node['windows']
         config['rights'].each_pair do |principal,permission|
           rights permission.to_sym, principal
         end
+        if config['disable_inherits']
+          inherits false
+        end
       end
     end
   end

@@ -20,6 +20,12 @@ This recipe can be applied to all of your Windows nodes, and when attributes lik
         "ENCOM\\Domain Admins": "full_control",
         "ENCOM\\CatFactsSubcribers": "read_execute"
       }
+    },
+    "E:\\Folder\\Cat Pics\Bit": {
+      "rights": {
+        "ENCOM\\Domain Admins": "full_control"
+      },
+      "disable_inherits": true
     }
   }
 }
