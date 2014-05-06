@@ -23,7 +23,11 @@ if node['windows']
     node['windows']['directories'].each_pair do |dir,config|
       directory dir do
         config['rights'].each_pair do |principal,permission|
-          rights permission.to_sym, principal
+          unless permission.is_a?(Array)
+            rights permission.to_sym, principal
+          else
+            rights permission[0].to_sym, principal, permission[1]
+          end
         end
         if config['disable_inherits']
           inherits false

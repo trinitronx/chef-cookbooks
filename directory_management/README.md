@@ -26,6 +26,17 @@ This recipe can be applied to all of your Windows nodes, and when attributes lik
         "ENCOM\\Domain Admins": "full_control"
       },
       "disable_inherits": true
+    },
+    "E:\\Folder\\Cat Pics\Byte": {
+      "rights": {
+        "ENCOM\\Iso": "read_execute",
+        "ENCOM\\Binary": [
+          "read_execute",
+          {
+            "applies_to_children": false
+          }
+        ]
+      }
     }
   }
 }
