@@ -77,7 +77,7 @@ def getoraclebase(dbhostname,dbuser,dbkey,profile='/home/oracle/.bashrc')
   end
 end
 
-def backupmodelogged?(dbhostname,dbuser,dbkey,timeobj,oraclebase)
+def runningdbs(dbhostname,dbuser,dbkey)
   # Gather a list of the autostarted databases
   oratabresult = openssh(dbhostname,dbuser,dbkey,'cat /etc/oratab')
   databases = []
@@ -96,6 +96,11 @@ def backupmodelogged?(dbhostname,dbuser,dbkey,timeobj,oraclebase)
       databases.delete(database)
     end
   end
+  log("Databases #{databases.to_s} appear to be autostarted and running")
+  return databases
+end
+
+def backupmodelogged?(dbhostname,dbuser,dbkey,timeobj,oraclebase,databases)
   # Now, to perform the checks. The logic is a little strange here since we're looking for the following three lines:
   #
   # Wed Apr 30 12:01:02 1984
@@ -109,23 +114,23 @@ def backupmodelogged?(dbhostname,dbuser,dbkey,timeobj,oraclebase)
       pendingcheck = true
       while (checksperformed < 5) and pendingcheck
         log("Starting check #{(checksperformed + 1).to_s} of diag log for database #{database}")
-        logresult = openssh(dbhostname,dbuser,dbkey,"tail -n 500 #{oraclebase}/diag/rdbms/#{database.downcase}/#{database}/trace/alert_#{database}.log")
+        logresult = openssh(dbhostname,dbuser,dbkey,"sudo -u oracle tail -n 500 #{oraclebase}/diag/rdbms/#{database.downcase}/#{database}/trace/alert_#{database}.log")
         lineofstanza = 0
         logresult.split(/\r?\n/).each do |line|
           if lineofstanza == 0
-            if line =~ /^Sun|^Mon|^Tue|^Wed|^Thu|^Fri|^Sat|/
-              if Time.parse(line) > (timeobj)
+            if line =~ /^Sun|^Mon|^Tue|^Wed|^Thu|^Fri|^Sat/
+              if Time.parse(line) >= timeobj
                 lineofstanza = 2
               end
             end
           elsif lineofstanza == 2
             lineofstanza = 3
           elsif lineofstanza == 3
-            if line == 'Completed: alter database begin backup'
+            if (line.chomp == 'Completed: alter database begin backup') or (line.chomp == 'ORA-1146 signalled during: alter database begin backup...')
               log("Successfully found the logged completion of the alter of database #{database}")
               pendingcheck = false
               break
-            elsif line =~ /^Sun|^Mon|^Tue|^Wed|^Thu|^Fri|^Sat|/
+            elsif line =~ /^Sun|^Mon|^Tue|^Wed|^Thu|^Fri|^Sat/
               lineofstanza == 2
             else
               lineofstanza = 0
@@ -151,21 +156,27 @@ def backupmodelogged?(dbhostname,dbuser,dbkey,timeobj,oraclebase)
   end
 end
 
-def backupmode(dbhostname,dbuser,dbkey,enableordisable)
-  # connect to db server and place it in backup mode
-  result = openssh(dbhostname,dbuser,dbkey,"sudo -i -u oracle /usr/local/bin/oracle_backup_mode_#{enableordisable}.sh")
-  unless $exceptions.include?(result)
-    log("Oracle backup mode #{enableordisable} script executed")
-    return result
-  else
-    log('Connection to host to toggle backup mode failed - exception is: ' + result)
-    if enableordisable == 'enable'
-      exit
+def backupmodetoggle(dbhostname,dbuser,dbkey,enableordisable,databases)
+  # connect to db server and place its databases in backup mode
+  databases.each do |database|
+    result = openssh(dbhostname,dbuser,dbkey,"sudo -u oracle -i env ORACLE_SID=#{database} /usr/local/bin/oracle_backup_mode_#{enableordisable}.sh")
+    unless $exceptions.include?(result)
+      unless result =~ /file\ \d\ is\ already\ in\ backup/i
+        log("Oracle backup mode #{enableordisable}d for database #{database}")
+      else
+        log("Warning - #{database} appears to already be in backup mode")
+      end
     else
-      log('Failed (CRITICAL) to disable backup mode - exception is: ' + result)
-      exit
+      log('Connection to host to toggle backup mode failed - exception is: ' + result)
+      if enableordisable == 'enable'
+        exit
+      else
+        log('Warning - failed to disable backup mode - exception is: ' + result)
+        exit
+      end
     end
   end
+  return 'success'
 end
 
 def takesnapshot(sanhostname,sanuser,sankeys,sanvolume,snapshotidentifier)
@@ -273,37 +284,32 @@ if __FILE__ == $0
   end
   # All options accounted for; proceed with the backup
   log('Beginning backup process')
-  # First, connect to the db server and get the ORACLE_BASE environment variable
   log("Connecting to #{options[:dbhostname]} and getting the ORACLE_BASE environment variable")
   oraclebase = getoraclebase(options[:dbhostname],options[:dbusername],options[:dbuserkey])
   log("ORACLE_BASE successfully retrieved as #{oraclebase}")
+  log("Connecting to #{options[:dbhostname]} and checking for running autostarted databases")
+  databases = runningdbs(options[:dbhostname],options[:dbusername],options[:dbuserkey])
   unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
     log("No recent (< #{(options[:minsnapshotgap].to_f / 60.0).round(2).to_s} minutes old) Nimble snapshots found; proceeding with backup")
     # Set t as the current time, to use in log verification later 
     t = Time.now
-    backupmodeenableresult = backupmode(options[:dbhostname],options[:dbusername],options[:dbuserkey],'enable')
-    if backupmodeenableresult =~ /file\ \d\ is\ already\ in\ backup/i
-      log('Database appears to have already been placed in backup mode; continuing')
-    end
-    if backupmodeenableresult =~ /file\ \d\ is\ already\ in\ backup|Database\ altered/i
-      # Verify the autostarted databases have logged the alter
-      unless backupmodelogged?(options[:dbhostname],options[:dbusername],options[:dbuserkey],t,oraclebase)
-        log('Warning - one or more databases did not log the successful completion of the database alter')
-      else
-        log('Databases appear to have successfully logged the start of backup mode')
-      end
-      takesnapshot(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier])
-      unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
-        log('Nimble snapshot requested, but subsequent check did not find it. Proceeding to cleanup')
-      end
+    sleep 1
+    log("Connecting to #{options[:dbhostname]} and toggling backup mode on")
+    backupmodeenableresult = backupmodetoggle(options[:dbhostname],options[:dbusername],options[:dbuserkey],'enable',databases)
+    # Verify the autostarted databases have logged the alter
+    unless backupmodelogged?(options[:dbhostname],options[:dbusername],options[:dbuserkey],t,oraclebase,databases)
+      log('Warning - one or more databases did not log the successful completion of the database alter')
     else
-      log('Request to place place DB in backup mode failed - failure message is: ' + backupmoderesult)
-      exit
+      log('Databases appear to have successfully logged the start of backup mode')
+    end
+    takesnapshot(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier])
+    unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
+      log('Warning - Nimble snapshot requested, but subsequent check did not find it. Proceeding to cleanup')
     end
   else
     log('Recent Nimble snapshot appears to already exist. Skipping to cleanup')
   end
-  backupmode(options[:dbhostname],options[:dbusername],options[:dbuserkey],'disable')
+  backupmodetoggle(options[:dbhostname],options[:dbusername],options[:dbuserkey],'disable',databases)
   log("Beginning cleanup; will remove snapshots created before #{(Time.now - options[:minsnapshotage]).to_s} until there are only #{options[:minsnapshotretain]} snapshots remaining")
   removeoldestbackup(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotretain],options[:minsnapshotage])
   log('Cleanup completed successfully. Backup process has completed.')
