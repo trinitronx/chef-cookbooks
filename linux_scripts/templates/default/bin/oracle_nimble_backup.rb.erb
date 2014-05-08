@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
+require 'time'
+
 # Exception messages
-$exceptions = ['Probable hostname lookup failure','Connection timed out','Unknown exception occured']
+$exceptions = ['Probable hostname lookup failure','Connection timed out','SSH key validation failed','Unknown exception occured']
 
 # Setup logging
 $outputtoconsole = false
@@ -26,12 +28,15 @@ def openssh(hostname,user,keys,command)
     result = $exceptions[0]
   rescue Errno::ETIMEDOUT 
     result = $exceptions[1]
+  rescue Net::SSH::HostKeyMismatch 
+    result = $exceptions[2]
+  rescue
+    result = $exceptions[3]
   end
   return result
 end
 
 def recentsnapshotexists?(sanhostname,sanusername,sanuserkey,sanvolume,snapshotidentifier,minsnapshotgap=3300)
-  require 'time'
   result = openssh(sanhostname,sanusername,sanuserkey,"snapcoll --list --volcoll #{sanvolume} | grep -i #{sanvolume}-#{snapshotidentifier}")
   unless $exceptions.include?(result) 
     # Isolate just the snapshot times
@@ -48,6 +53,101 @@ def recentsnapshotexists?(sanhostname,sanusername,sanuserkey,sanvolume,snapshoti
   else
     log('Snapshot check failure - exception is: ' + result)
     exit
+  end
+end
+
+def getoraclebase(dbhostname,dbuser,dbkey,profile='/home/oracle/.bashrc')
+  profilecontents = openssh(dbhostname,dbuser,dbkey,"sudo -u oracle -i /bin/cat #{profile}")
+  result = ''
+  unless $exceptions.include?(result)
+    profilecontents.split(/\r?\n/).each do |line|
+      if line.start_with?('export ORACLE_BASE')
+        result = line.split('=')[1]
+      end
+    end
+    unless result == ''
+      return result
+    else
+      log("FATAL - ORACLE_BASE not found in #{profile}")
+      exit
+    end
+  else
+    log('Retrieving ORACLE_BASE failed - exception is: ' + result)
+    exit
+  end
+end
+
+def backupmodelogged?(dbhostname,dbuser,dbkey,timeobj,oraclebase)
+  # Gather a list of the autostarted databases
+  oratabresult = openssh(dbhostname,dbuser,dbkey,'cat /etc/oratab')
+  databases = []
+  oratabresult.split(/\r?\n/).each do |line|
+    unless line.start_with?('#')
+      if line.end_with?('Y')
+        databases << line.split(':').first
+      end
+    end
+  end
+  log("Found autostarted databases #{databases.to_s}; checking each to see if they are running")
+  databases.each do |database|
+    dbprocess = openssh(dbhostname,dbuser,dbkey,"ps -efa | grep ora_lgwr_#{database} | grep -v 'grep ' | awk '{print $NF}'")
+    unless dbprocess.chomp == "ora_lgwr_#{database}"
+      log("Database #{database} does not appear to be running; ignoring its log check")
+      databases.delete(database)
+    end
+  end
+  # Now, to perform the checks. The logic is a little strange here since we're looking for the following three lines:
+  #
+  # Wed Apr 30 12:01:02 1984
+  # alter database begin backup
+  # Completed: alter database begin backup
+  #
+  failedchecks = false
+  databases.each do |database|
+    unless failedchecks
+      checksperformed = 0
+      pendingcheck = true
+      while (checksperformed < 5) and pendingcheck
+        log("Starting check #{(checksperformed + 1).to_s} of diag log for database #{database}")
+        logresult = openssh(dbhostname,dbuser,dbkey,"tail -n 500 #{oraclebase}/diag/rdbms/#{database.downcase}/#{database}/trace/alert_#{database}.log")
+        lineofstanza = 0
+        logresult.split(/\r?\n/).each do |line|
+          if lineofstanza == 0
+            if line =~ /^Sun|^Mon|^Tue|^Wed|^Thu|^Fri|^Sat|/
+              if Time.parse(line) > (timeobj)
+                lineofstanza = 2
+              end
+            end
+          elsif lineofstanza == 2
+            lineofstanza = 3
+          elsif lineofstanza == 3
+            if line == 'Completed: alter database begin backup'
+              log("Successfully found the logged completion of the alter of database #{database}")
+              pendingcheck = false
+              break
+            elsif line =~ /^Sun|^Mon|^Tue|^Wed|^Thu|^Fri|^Sat|/
+              lineofstanza == 2
+            else
+              lineofstanza = 0
+            end
+          end
+        end
+        if (checksperformed < 5) and pendingcheck
+          log("No success stanza was found logged for database #{database} on attempt #{(checksperformed + 1).to_s}; sleeping for 5 seconds and retrying")
+          sleep 5
+          checksperformed += 1
+        end
+      end
+      if pendingcheck
+        failedchecks = true
+      end
+    end
+    # Additional indent ends here
+  end
+  if failedchecks
+    return false
+  else
+    return true
   end
 end
 
@@ -70,7 +170,6 @@ end
 
 def takesnapshot(sanhostname,sanuser,sankeys,sanvolume,snapshotidentifier)
   # take the storage level snapshot
-  require 'time'
   sansnapshot = "#{sanvolume}-#{snapshotidentifier}-#{Time.now.strftime("%F::%T.%L")}"
   log("Creating Nimble snapshot #{sansnapshot}")
   result = openssh(sanhostname,sanuser,sankeys,"volcoll --snap #{sanvolume} --snapcoll_name #{sansnapshot}")
@@ -81,7 +180,6 @@ def takesnapshot(sanhostname,sanuser,sankeys,sanvolume,snapshotidentifier)
 end
 
 def removeoldestbackup(sanhostname,sanusername,sanuserkey,sanvolume,snapshotidentifier,snapshotstoretain,minimumsnapshotage=604740)
-  require 'time'
   result = openssh(sanhostname,sanusername,sanuserkey,"snapcoll --list --volcoll #{sanvolume} | grep -i #{sanvolume}")
   unless $exceptions.include?(result) 
     # Isolate just the snapshot times
@@ -92,7 +190,7 @@ def removeoldestbackup(sanhostname,sanusername,sanuserkey,sanvolume,snapshotiden
       if snapshots.length > snapshotstoretain
         if Time.parse(snapshot.scan(/\d\d\d\d-\d\d-\d\d::\d\d:\d\d:\d\d\.\d\d\d/)[0]) < (t - minimumsnapshotage)
           log("Deleting Nimble snapshot #{snapshot}")
-          openssh(sanhostname,sanusername,sanuserkey,"snapcoll --delete #{snapshot}")
+          openssh(sanhostname,sanusername,sanuserkey,"snapcoll --delete #{snapshot} --volcoll #{sanvolume}")
           # Remove from the generated array
           snapshots.delete(snapshot)
         end
@@ -175,13 +273,25 @@ if __FILE__ == $0
   end
   # All options accounted for; proceed with the backup
   log('Beginning backup process')
+  # First, connect to the db server and get the ORACLE_BASE environment variable
+  log("Connecting to #{options[:dbhostname]} and getting the ORACLE_BASE environment variable")
+  oraclebase = getoraclebase(options[:dbhostname],options[:dbusername],options[:dbuserkey])
+  log("ORACLE_BASE successfully retrieved as #{oraclebase}")
   unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
     log("No recent (< #{(options[:minsnapshotgap].to_f / 60.0).round(2).to_s} minutes old) Nimble snapshots found; proceeding with backup")
+    # Set t as the current time, to use in log verification later 
+    t = Time.now
     backupmodeenableresult = backupmode(options[:dbhostname],options[:dbusername],options[:dbuserkey],'enable')
     if backupmodeenableresult =~ /file\ \d\ is\ already\ in\ backup/i
       log('Database appears to have already been placed in backup mode; continuing')
     end
     if backupmodeenableresult =~ /file\ \d\ is\ already\ in\ backup|Database\ altered/i
+      # Verify the autostarted databases have logged the alter
+      unless backupmodelogged?(options[:dbhostname],options[:dbusername],options[:dbuserkey],t,oraclebase)
+        log('Warning - one or more databases did not log the successful completion of the database alter')
+      else
+        log('Databases appear to have successfully logged the start of backup mode')
+      end
       takesnapshot(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier])
       unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
         log('Nimble snapshot requested, but subsequent check did not find it. Proceeding to cleanup')
