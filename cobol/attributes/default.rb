@@ -1,0 +1,7 @@
+default['cobol']['microfocus']['download_url']      = 'replaceme'
+default['cobol']['microfocus']['download_checksum'] = 'replaceme'
+default['cobol']['microfocus']['express_serial_number'] = 'replaceme'
+default['cobol']['microfocus']['express_license_key'] = 'replaceme'
+default['cobol']['microfocus']['user_serial_number'] = 'replaceme'
+default['cobol']['microfocus']['user_license_key'] = 'replaceme'
+default['cobol']['microfocus']['default_system_mode'] = '64'
