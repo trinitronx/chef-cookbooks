@@ -31,7 +31,13 @@ service "cups" do
   subscribes :reload, "template[/etc/cups/cupsd.conf]"
 end
 
-lpstatcmd = Mixlib::ShellOut.new("lpstat -v")
+# Work around the lack of a lpstat command during first convergence
+if File.exists?('/usr/bin/lpstat')
+  lpstat = 'lpstat -v'
+else
+  lpstat = 'true'
+end
+lpstatcmd = Mixlib::ShellOut.new(lpstat)
 lpstatcmd.run_command
 printers = lpstatcmd.stdout.split(/\n/)
 printers.map! do |x|
