@@ -2,7 +2,7 @@
 # Cookbook Name:: hardware_support
 # Recipe:: default
 #
-# Copyright 2013, Biola University 
+# Copyright 2014, Biola University 
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,15 @@
 # limitations under the License.
 #
 
-if platform_family?('debian')
+if node['platform_family'] == 'debian'
   # GPT parititioning support
   package 'gdisk'
+end
+
+
+if node['platform_family'] == 'rhel'
+  # ext4 support offically added in v5.6
+  if node['platform_version'].to_f > 5.5
+    package 'e4fsprogs'
+  end
 end
