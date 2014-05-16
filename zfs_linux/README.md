@@ -50,6 +50,19 @@ The retention values (each are optional) dicate the number of the most recent sn
 #### zfs\_linux::auto-scrub
 Uses cron.d (via the cron cookbook) to setup cron jobs on Sunday morning for each zpool. If greater than 4 zpools are present, runs the checks once a month on the first Sunday.
 
+#### zfs\_linux::source
+Since the released version of ZoL is getting a little old, this recipe was developed to install it from source. Apply it to your Ubuntu node to pull down the ZFS revision from git (specified in your node's attributes).
+
+__WARNING:__ the current build method will disable automatic updates for your kernel because the ZoL packages will be built for the kernel that is running at the time of compilation. Do not apply this without a process in place for monitoring security updates and applying them manually in the following manner:
+1. Update your system kernel packages
+2. Disable the auto-start of any services that depend on your ZoL-mounted volumes
+3. Reboot into the new kernel
+4. Delete the zfs & spl directories in /var/chef/cache/
+5. Perform a chef-client run
+6. Enable auto-start again for your node's services
+7. Reboot
+
+
 Contributing
 ------------
 
