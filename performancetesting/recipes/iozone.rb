@@ -2,7 +2,7 @@
 # Cookbook Name:: performancetesting
 # Recipe:: iozone
 #
-# Copyright 2013, Biola University 
+# Copyright 2014, Biola University 
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,5 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-package "iozone3"
+case node['platform_family']
+when "debian"
+  package "iozone3"
+when "rhel"
+  unless File.exists?('/usr/bin/iozone')
+    remote_file 'iozone' do
+      path "#{Chef::Config[:file_cache_path]}/#{node['performancetesting']['iozone_rpm'].split('/').last}"
+      source node['performancetesting']['iozone_rpm']
+      checksum node['performancetesting']['iozone_checksum']
+    end
+    rpm_package "iozone" do
+      source node['performancetesting']['iozone_rpm']
+    end
+  end
+end
