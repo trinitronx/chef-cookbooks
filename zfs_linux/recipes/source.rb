@@ -131,19 +131,14 @@ when "ubuntu"
       path "#{Chef::Config[:file_cache_path]}/#{node['zol']['mountall_url'].split('/').last}"
       source node['zol']['mountall_url'] 
       checksum node['zol']['mountall_checksum'] 
-      #action :nothing
-      #notifies :install, "package[mountall]"
     end
     
     package "mountall" do
-      #action :nothing
       source "#{Chef::Config[:file_cache_path]}/#{node['zol']['mountall_url'].split('/').last}"
       provider Chef::Provider::Package::Dpkg
-      #notifies :run, "execute[echo mountall hold | dpkg --set-selections]"
     end
     
     execute "echo mountall hold | dpkg --set-selections" do
-      #action :nothing
       not_if "dpkg --get-selections | grep '^mountall' | grep -q 'hold'"
     end
   end

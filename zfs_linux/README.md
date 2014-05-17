@@ -62,6 +62,9 @@ __WARNING:__ the current build method will disable automatic updates for your ke
 6. Enable auto-start again for your node's services
 7. Reboot
 
+#### zfs\_linux::backblaze4
+Hardware support for the "Backblaze Storage Pod 4.0"
+
 
 Contributing
 ------------
