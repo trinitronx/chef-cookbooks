@@ -35,5 +35,28 @@ when "centos"
         cwd "#{Chef::Config[:file_cache_path]}/r750-centos-63"
       end
     end
+    
+    # Quick workound option for adding legacy header packages when the
+    # kernel version is pinned
+    if node['zol']['drivers']['centos_63']['custom_header_pkg']
+      remote_file node['zol']['drivers']['centos_63']['custom_header_pkg'].split('/').last do
+        path "#{Chef::Config[:file_cache_path]}/#{node['zol']['drivers']['centos_63']['custom_header_pkg'].split('/').last}"
+        source node['zol']['drivers']['centos_63']['custom_header_pkg'] 
+        checksum node['zol']['drivers']['centos_63']['custom_header_checksum'] 
+      end
+      remote_file node['zol']['drivers']['centos_63']['custom_devel_pkg'].split('/').last do
+        path "#{Chef::Config[:file_cache_path]}/#{node['zol']['drivers']['centos_63']['custom_devel_pkg'].split('/').last}"
+        source node['zol']['drivers']['centos_63']['custom_devel_pkg'] 
+        checksum node['zol']['drivers']['centos_63']['custom_devel_checksum'] 
+      end
+      package "kernel-headers" do
+        source "#{Chef::Config[:file_cache_path]}/#{node['zol']['drivers']['centos_63']['custom_header_pkg'].split('/').last}"
+        provider Chef::Provider::Package::Rpm
+      end
+      package "kernel-devel" do
+        source "#{Chef::Config[:file_cache_path]}/#{node['zol']['drivers']['centos_63']['custom_devel_pkg'].split('/').last}"
+        provider Chef::Provider::Package::Rpm
+      end
+    end
   end
 end

@@ -17,8 +17,25 @@
 # limitations under the License.
 #
 
-case node['platform']
-when "ubuntu"
+# Setup pre-reqs
+case node['platform_family']
+when "rhel"
+  # Setup required packaged from the Development Tools group
+  ['autoconf', 'automake', 'binutils', 'bison', 'flex', 'gcc', 'gcc-c++', 'gettext', 'libtool', 'make', 'patch', 'pkgconfig', 'redhat-rpm-config', 'rpm-build'].each do |rheldevtool|
+    package rheldevtool
+  end
+  # Additional required packages
+  # http://zfsonlinux.org/generic-rpm.html
+  ['zlib-devel', 'libuuid-devel', 'libblkid-devel', 'libselinux-devel', 'parted', 'lsscsi', 'wget', 'dkms', 'git'].each do |moredevtools|
+    package moredevtools
+  end
+
+  # If the custom header option in zfs_linux::backblaze4 is used, don't install the packages here
+  unless node['zol']['drivers']['centos_63']['custom_header_pkg']
+    package kernel-devel
+    package kernel-headers
+  end
+when 'debian'
   if node['platform_version'].to_f >= 12.04
     prereqpkgs = ['build-essential', 'gawk', 'alien', 'fakeroot', 'zlib1g-dev', 'uuid-dev', 'libblkid-dev', 'libselinux-dev', 'parted', 'lsscsi', 'wget', 'automake', 'libtool', 'git']
     # Find the version of the current kernel
@@ -50,6 +67,79 @@ when "ubuntu"
     unless File.directory?("/usr/src/linux-headers-#{krnver}")
       package "linux-headers-#{krnver}"
     end
+  end
+end
+
+# Perform the installation
+case node['platform_family']
+when "rhel"
+  # This will start the chain of download/compilation
+  # So it's always possible to start over by deleting
+  # /var/chef/cache/spl & /var/chef/cache/zfs
+  git "#{Chef::Config[:file_cache_path]}/spl" do
+    repository node['zol']['spl_repo']
+    revision node['zol']['spl_commit']
+    notifies :run, "execute[autogen_spl]"
+  end
+  
+  execute 'autogen_spl' do
+    command "#{Chef::Config[:file_cache_path]}/spl/autogen.sh"
+    cwd "#{Chef::Config[:file_cache_path]}/spl"
+    action :nothing
+    notifies :run, "execute[configure_spl]"
+  end
+  
+  execute 'configure_spl' do
+    command "#{Chef::Config[:file_cache_path]}/spl/configure --with-config=user"
+    cwd "#{Chef::Config[:file_cache_path]}/spl"
+    action :nothing
+    notifies :run, "execute[build_spl]"
+  end
+  
+  execute 'build_spl' do
+    command 'make rpm-utils rpm-dkms'
+    cwd "#{Chef::Config[:file_cache_path]}/spl"
+    action :nothing
+    notifies :sync, "git[#{Chef::Config[:file_cache_path]}/zfs]"
+  end
+  
+  git "#{Chef::Config[:file_cache_path]}/zfs" do
+    repository node['zol']['zfs_repo']
+    revision node['zol']['zfs_commit']
+    notifies :run, "execute[autogen_zfs]"
+    action :nothing
+  end
+  
+  execute 'autogen_zfs' do
+    command "#{Chef::Config[:file_cache_path]}/zfs/autogen.sh"
+    cwd "#{Chef::Config[:file_cache_path]}/zfs"
+    action :nothing
+    notifies :run, "execute[configure_zfs]"
+  end
+  
+  execute 'configure_zfs' do
+    command "#{Chef::Config[:file_cache_path]}/zfs/configure --with-config=user"
+    cwd "#{Chef::Config[:file_cache_path]}/zfs"
+    action :nothing
+    notifies :run, "execute[build_zfs]"
+  end
+  
+  execute 'build_zfs' do
+    command "make rpm-utils rpm-dkms"
+    cwd "#{Chef::Config[:file_cache_path]}/zfs"
+    action :nothing
+    notifies :run, "execute[install_zfs]"
+  end
+  
+  execute 'install_zfs' do
+    command 'yum install -y spl/spl-[0-9]*x86_64.rpm spl/spl-dkms-*noarch.rpm zfs/zfs-[0-9]*.x86_64.rpm zfs/zfs-dkms-*.noarch.rpm zfs/zfs-dracut-*.x86_64.rpm zfs/zfs-test*.x86_64.rpm'
+    cwd "#{Chef::Config[:file_cache_path]}"
+    action :nothing
+  end
+
+
+when "debian"
+  if node['platform_version'].to_f >= 12.04
     
     # This will start the chain of download/compilation
     # So it's always possible to start over by deleting
