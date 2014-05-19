@@ -8,6 +8,9 @@ $exceptions = ['Probable hostname lookup failure','Connection timed out','SSH ke
 # Setup logging
 $outputtoconsole = false
 
+# Debug logging
+$debuglogging = false
+
 # Setup a toggle for bypassing SSH on local command execution
 $skipssh = false
 
@@ -226,6 +229,9 @@ def backupandverify(dbhostname,dbuser,dbkey,oraclebase,databases)
   t = Time.now
   sleep 1
   log("Toggling backup mode on")
+  if $debuglogging
+    log("Calling: backupmodetoggle(#{dbhostname},#{dbuser},#{dbkey},'enable',#{databases.to_s})")
+  end
   backupmodeenableresult = backupmodetoggle(dbhostname,dbuser,dbkey,'enable',databases)
   # Verify the autostarted databases have logged the alter
   unless backupmodelogged?(dbhostname,dbuser,dbkey,t,oraclebase,databases)
@@ -318,6 +324,9 @@ if __FILE__ == $0
       opts.on( '-c', '--console', 'Send logging data to console in addition to syslog' ) do
         $outputtoconsole = true
       end
+      opts.on( '-D', '--debug', 'Output additional debug logging' ) do
+        $debuglogging = true
+      end
       opts.on( '-h', '-?', '--help', 'Display this screen' ) do
         puts opts
         exit
@@ -347,7 +356,7 @@ if __FILE__ == $0
   if !options[:thawonly] and !options[:freezeonly]
     unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
       log("No recent (< #{(options[:minsnapshotgap].to_f / 60.0).round(2).to_s} minutes old) Nimble snapshots found; proceeding with backup")
-      backupandverify(options[:dbhostname],options[:dbhostname],options[:dbuserkey],oraclebase,databases)
+      backupandverify(options[:dbhostname],options[:dbusername],options[:dbuserkey],oraclebase,databases)
       takesnapshot(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier])
       unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
         log('Warning - Nimble snapshot requested, but subsequent check did not find it. Proceeding to cleanup')
