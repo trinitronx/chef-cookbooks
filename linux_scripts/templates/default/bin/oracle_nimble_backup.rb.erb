@@ -7,6 +7,10 @@ $exceptions = ['Probable hostname lookup failure','Connection timed out','SSH ke
 
 # Setup logging
 $outputtoconsole = false
+
+# Setup a toggle for bypassing SSH on local command execution
+$skipssh = false
+
 def log(message)
   require 'syslog'
   # $0 is the current script name
@@ -18,20 +22,24 @@ end
 
 # Execute SSH
 def openssh(hostname,user,keys,command)
-  require 'net/ssh'
-  result = ""
-  begin
-    Net::SSH.start(hostname, user, :keys => keys) do |ssh|
-      result = ssh.exec!(command)
+  unless $skipssh
+    require 'net/ssh'
+    result = ""
+    begin
+      Net::SSH.start(hostname, user, :keys => keys) do |ssh|
+        result = ssh.exec!(command)
+      end
+    rescue Errno::ENOENT
+      result = $exceptions[0]
+    rescue Errno::ETIMEDOUT 
+      result = $exceptions[1]
+    rescue Net::SSH::HostKeyMismatch 
+      result = $exceptions[2]
+    rescue
+      result = $exceptions[3]
     end
-  rescue Errno::ENOENT
-    result = $exceptions[0]
-  rescue Errno::ETIMEDOUT 
-    result = $exceptions[1]
-  rescue Net::SSH::HostKeyMismatch 
-    result = $exceptions[2]
-  rescue
-    result = $exceptions[3]
+  else
+    result = `#{command}`
   end
   return result
 end
@@ -213,6 +221,22 @@ def removeoldestbackup(sanhostname,sanusername,sanuserkey,sanvolume,snapshotiden
   end
 end
 
+def backupandverify(dbhostname,dbuser,dbkey,oraclebase,databases)
+  # Set t as the current time, to use in log verification later 
+  t = Time.now
+  sleep 1
+  log("Toggling backup mode on")
+  backupmodeenableresult = backupmodetoggle(dbhostname,dbuser,dbkey,'enable',databases)
+  # Verify the autostarted databases have logged the alter
+  unless backupmodelogged?(dbhostname,dbuser,dbkey,t,oraclebase,databases)
+    log('Warning - one or more databases did not log the successful completion of the database alter')
+    return false
+  else
+    log('Databases appear to have successfully logged the start of backup mode')
+    return true
+  end
+end
+
 
 if __FILE__ == $0
     require 'optparse'
@@ -266,6 +290,31 @@ if __FILE__ == $0
       opts.on( '-f', '--dbuserkey FILE', 'SSH keyfile for connecting to Oracle DB server' ) do |parsopt|
         options[:dbuserkey] = parsopt
       end
+      # Support running the script in two parts: freeze & thaw
+      options[:freezeonly] = false
+      opts.on( '-F', '--freezeonly', 'Stop the process at the backup mode step; i.e. snapshots will be handled separately' ) do |parsopt|
+        options[:freezeonly] = true
+        options[:sanhostname] = 'unuseddefault'
+        options[:sanuserkey] = 'unuseddefault'
+        options[:sanvolume] = 'unuseddefault'
+        options[:minsnapshotretain] = 'unuseddefault'
+        options[:dbhostname] = 'unuseddefault'
+        options[:dbusername] = 'unuseddefault'
+        options[:dbuserkey] = 'unuseddefault'
+        $skipssh = true
+      end
+      options[:thawonly] = false
+      opts.on( '-T', '--thawonly', 'Only disable backup mode (assume snapshotting & cleanup is handled elsewhere)' ) do |parsopt|
+        options[:thawonly] = true
+        options[:sanhostname] = 'unuseddefault'
+        options[:sanuserkey] = 'unuseddefault'
+        options[:sanvolume] = 'unuseddefault'
+        options[:minsnapshotretain] = 'unuseddefault'
+        options[:dbhostname] = 'unuseddefault'
+        options[:dbusername] = 'unuseddefault'
+        options[:dbuserkey] = 'unuseddefault'
+        $skipssh = true
+      end
       opts.on( '-c', '--console', 'Send logging data to console in addition to syslog' ) do
         $outputtoconsole = true
       end
@@ -283,34 +332,37 @@ if __FILE__ == $0
     end
   end
   # All options accounted for; proceed with the backup
-  log('Beginning backup process')
-  log("Connecting to #{options[:dbhostname]} and getting the ORACLE_BASE environment variable")
+  # Ensure that we aren't being called just to thaw
+  unless options[:thawonly]
+    log('Beginning backup process')
+  else
+    log('Thaw-only end-of-backup process beginning')
+  end
+  log("Retrieving the ORACLE_BASE environment variable")
   oraclebase = getoraclebase(options[:dbhostname],options[:dbusername],options[:dbuserkey])
   log("ORACLE_BASE successfully retrieved as #{oraclebase}")
-  log("Connecting to #{options[:dbhostname]} and checking for running autostarted databases")
+  log("Checking for running, autostarted databases")
   databases = runningdbs(options[:dbhostname],options[:dbusername],options[:dbuserkey])
-  unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
-    log("No recent (< #{(options[:minsnapshotgap].to_f / 60.0).round(2).to_s} minutes old) Nimble snapshots found; proceeding with backup")
-    # Set t as the current time, to use in log verification later 
-    t = Time.now
-    sleep 1
-    log("Connecting to #{options[:dbhostname]} and toggling backup mode on")
-    backupmodeenableresult = backupmodetoggle(options[:dbhostname],options[:dbusername],options[:dbuserkey],'enable',databases)
-    # Verify the autostarted databases have logged the alter
-    unless backupmodelogged?(options[:dbhostname],options[:dbusername],options[:dbuserkey],t,oraclebase,databases)
-      log('Warning - one or more databases did not log the successful completion of the database alter')
-    else
-      log('Databases appear to have successfully logged the start of backup mode')
-    end
-    takesnapshot(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier])
+  # With common data collected, run through the process unless either shortcut option was enabled
+  if !options[:thawonly] and !options[:freezeonly]
     unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
-      log('Warning - Nimble snapshot requested, but subsequent check did not find it. Proceeding to cleanup')
+      log("No recent (< #{(options[:minsnapshotgap].to_f / 60.0).round(2).to_s} minutes old) Nimble snapshots found; proceeding with backup")
+      backupandverify(options[:dbhostname],options[:dbhostname],options[:dbuserkey],oraclebase,databases)
+      takesnapshot(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier])
+      unless recentsnapshotexists?(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotgap])
+        log('Warning - Nimble snapshot requested, but subsequent check did not find it. Proceeding to cleanup')
+      end
+    else
+      log('Recent Nimble snapshot appears to already exist. Skipping to cleanup')
     end
-  else
-    log('Recent Nimble snapshot appears to already exist. Skipping to cleanup')
+    backupmodetoggle(options[:dbhostname],options[:dbusername],options[:dbuserkey],'disable',databases)
+    log("Beginning cleanup; will remove snapshots created before #{(Time.now - options[:minsnapshotage]).to_s} until there are only #{options[:minsnapshotretain]} snapshots remaining")
+    removeoldestbackup(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotretain],options[:minsnapshotage])
+    log('Cleanup completed successfully. Backup process has completed.')
+  elsif options[:freezeonly]
+    backupandverify(options[:dbhostname],options[:dbhostname],options[:dbuserkey],oraclebase,databases)
+  elsif options[:thawonly]
+    log("Toggling backup mode off")
+    backupmodetoggle(options[:dbhostname],options[:dbusername],options[:dbuserkey],'disable',databases)
   end
-  backupmodetoggle(options[:dbhostname],options[:dbusername],options[:dbuserkey],'disable',databases)
-  log("Beginning cleanup; will remove snapshots created before #{(Time.now - options[:minsnapshotage]).to_s} until there are only #{options[:minsnapshotretain]} snapshots remaining")
-  removeoldestbackup(options[:sanhostname],options[:sanusername],options[:sanuserkey],options[:sanvolume],options[:snapshotidentifier],options[:minsnapshotretain],options[:minsnapshotage])
-  log('Cleanup completed successfully. Backup process has completed.')
 end
