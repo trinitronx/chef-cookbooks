@@ -6,6 +6,29 @@ This is a very simple cookbook which contains recipes for directory management. 
 Usage
 =====
 
+directory_management::unix_dir
+--------------------------------
+
+This recipe can be applied to all of your *nix nodes, and when attributes like the following are specified it will apply the Chef directory resource to them.
+
+
+```json
+"directories": [
+  {
+    "/catfacts": {
+      "owner": "meowmeowbeans",
+      "group": "subscribers",
+      "mode": "0775"
+    }
+  },
+  {
+    "/catfacts/egyptian": {
+      "owner": "kingcat"
+    }
+  }
+]
+```
+
 directory_management::win_dir
 --------------------------------
 
