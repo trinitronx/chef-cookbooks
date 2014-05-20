@@ -18,57 +18,8 @@
 #
 
 # Setup pre-reqs
-case node['platform_family']
-when "rhel"
-  # Setup required packaged from the Development Tools group
-  ['autoconf', 'automake', 'binutils', 'bison', 'flex', 'gcc', 'gcc-c++', 'gettext', 'libtool', 'make', 'patch', 'pkgconfig', 'redhat-rpm-config', 'rpm-build'].each do |rheldevtool|
-    package rheldevtool
-  end
-  # Additional required packages
-  # http://zfsonlinux.org/generic-rpm.html
-  ['zlib-devel', 'libuuid-devel', 'libblkid-devel', 'libselinux-devel', 'parted', 'lsscsi', 'wget', 'dkms', 'git'].each do |moredevtools|
-    package moredevtools
-  end
-
-  # If the custom header option in zfs_linux::backblaze4 is used, don't install the packages here
-  unless node['zol']['drivers']['centos_63']['custom_header_pkg']
-    package kernel-devel
-    package kernel-headers
-  end
-when 'debian'
-  if node['platform_version'].to_f >= 12.04
-    prereqpkgs = ['build-essential', 'gawk', 'alien', 'fakeroot', 'zlib1g-dev', 'uuid-dev', 'libblkid-dev', 'libselinux-dev', 'parted', 'lsscsi', 'wget', 'automake', 'libtool', 'git']
-    # Find the version of the current kernel
-    krnvercmd = Mixlib::ShellOut.new('uname -r')
-    krnvercmd.run_command
-    krnver = krnvercmd.stdout.chomp
-    # Compiled modules will be build against and installed to specific kernels
-    # Hold the kernel packages here accordingly
-    if node['platform_version'] == '12.04'
-      kernelpkgs = ['linux-server', 'linux-image-server']
-      prereqpkgs << 'linux-headers-server'
-    else
-      kernelpkgs = ['linux-generic', 'linux-image-generic']
-      prereqpkgs << 'linux-headers-generic'
-    end
-    kernelpkgs.each do |kernelpkg|
-      execute "echo #{kernelpkg} hold | dpkg --set-selections" do
-        not_if "dpkg --get-selections | grep '^#{kernelpkg}' | grep -q 'hold'"
-      end
-    end
-    
-    # Install pre-reqs
-    prereqpkgs.each do |pkg|
-      package pkg
-    end
-    
-    # linux-headers package could depend on a newer version of this package;
-    # explicity install the version for the current kernel just in case
-    unless File.directory?("/usr/src/linux-headers-#{krnver}")
-      package "linux-headers-#{krnver}"
-    end
-  end
-end
+include_recipe 'zfs_linux::hold_kernel'
+include_recipe 'zfs_linux::build_tools'
 
 # Perform the installation
 case node['platform_family']

@@ -51,9 +51,9 @@ The retention values (each are optional) dicate the number of the most recent sn
 Uses cron.d (via the cron cookbook) to setup cron jobs on Sunday morning for each zpool. If greater than 4 zpools are present, runs the checks once a month on the first Sunday.
 
 #### zfs\_linux::source
-Since the released version of ZoL is getting a little old, this recipe was developed to install it from source. Apply it to your Ubuntu node to pull down the ZFS revision from git (specified in your node's attributes).
+Since the released version of ZoL is getting a little old, this recipe was developed to install it from source. Apply it to your node to pull down the ZFS revision from git (specified in your node's attributes).
 
-__WARNING:__ the current build method will disable automatic updates for your kernel because the ZoL packages will be built for the kernel that is running at the time of compilation. Do not apply this without a process in place for monitoring security updates and applying them manually in the following manner:
+__WARNING:__ On Debian-family systems, the current build method will disable automatic updates for your kernel because the ZoL packages will be built for the kernel that is running at the time of compilation. Do not apply this without a process in place for monitoring security updates and applying them manually in the following manner:
 1. Update your system kernel packages
 2. Disable the auto-start of any services that depend on your ZoL-mounted volumes
 3. Reboot into the new kernel
@@ -63,7 +63,7 @@ __WARNING:__ the current build method will disable automatic updates for your ke
 7. Reboot
 
 #### zfs\_linux::backblaze4
-Hardware support for the "Backblaze Storage Pod 4.0"
+Hardware support for the "Backblaze Storage Pod 4.0", notably the R750 HBA. See warning in zfs\_linux::source regarding the hold on kernel updates this may place on your system.
 
 
 Contributing

@@ -13,9 +13,5 @@ when '14.04'
 end
 
 # zfs_linux::backblaze4
-default['zol']['drivers']['r750_centos_63']                       = "http://www.highpoint-tech.com/BIOS_Driver/R750/Linux/Binary/CentOS/r750-rhel_centos-6u3-x86_64-v1.0.13.0104.tgz"
-default['zol']['drivers']['r750_centos_63_checksum']              = "2bfaa7ef4fb2f4dbebdc8c376028c51bb3c5e54a2ea6281cca3cce5292b3cd60"
-default['zol']['drivers']['centos_63']['custom_header_pkg']       = nil
-default['zol']['drivers']['centos_63']['custom_header_checksum']  = nil
-default['zol']['drivers']['centos_63']['custom_devel_pkg']        = nil
-default['zol']['drivers']['centos_63']['custom_devel_checksum']   = nil
+default['zol']['drivers']['r750_source']                          = "http://www.highpoint-tech.com/BIOS_Driver/R750/Linux/R750-Linux-Src-v1.0-121225-0750.tar.gz"
+default['zol']['drivers']['r750_source_checksum']                 = "7068ee32473c90c92c3c4d0f79cbad23aa4802888f6303f5482cda56526c5807"
