@@ -21,6 +21,7 @@ if node['platform_family'] == 'debian'
   # GPT parititioning support
   package 'gdisk'
   package 'sysstat'
+  package 'iftop'
 end
 
 
