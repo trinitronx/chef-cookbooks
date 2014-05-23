@@ -177,6 +177,7 @@ when "debian"
     package "mountall" do
       source "#{Chef::Config[:file_cache_path]}/#{node['zol']['mountall_url'].split('/').last}"
       provider Chef::Provider::Package::Dpkg
+      not_if "dpkg --get-selections | grep '^mountall' | grep -q 'hold'"
     end
     
     execute "echo mountall hold | dpkg --set-selections" do
