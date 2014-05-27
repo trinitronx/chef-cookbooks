@@ -24,7 +24,7 @@ when "rhel"
   #
   # This could be reduced to ['make','binutils','gcc','libaio','glibc-common','libstdc++','libXtst','sysstat','glibc'] for Enterprise Manager (plus the i686 version of glibc-devel), but just leaving one single list here for simplicity
 
-  ['binutils','elfutils-libelf','elfutils-libelf-devel','gcc','gcc-c++','glibc-common','glibc-headers','ksh','libstdc++-devel','make','sysstat','libXtst'].each do |packagename|
+  ['binutils','elfutils-libelf','elfutils-libelf-devel','gcc','gcc-c++','glibc-common','glibc-headers','ksh','libstdc++-devel','make','sysstat','libXtst','at'].each do |packagename|
     yum_package packagename
   end
 
