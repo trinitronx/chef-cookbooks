@@ -65,6 +65,17 @@ __WARNING:__ On Debian-family systems, the current build method will disable aut
 #### zfs\_linux::backblaze4
 Hardware support for the "Backblaze Storage Pod 4.0", notably the R750 HBA. See warning in zfs\_linux::source regarding the hold on kernel updates this may place on your system.
 
+Support has been added for the optional installation of the "Non-RAID Web Management GUI" from (HighPoint Technologies, Inc.)[http://www.highpoint-tech.com/USA_new/series_r750-Download.htm]. To enable this, perform the following:
+
+1. Download the (Linux Web GUI package)[http://www.highpoint-tech.com/USA_new/series_r750-Download.htm].
+2. (Optionally) - convert the package into an appropriate format for your system. E.g., Debian-family systems should execute `sudo alien --scripts hptsvr-https-1.0.0-13.0111.x86_64.rpm`.
+3. Note the SHA-256 checksum of the package.
+3. Upload the installation package to your deployment web server.
+4. Set the `['zol']['drivers']['r750_management_pkg']` & `['zol']['drivers']['r750_management_pkg_checksum']` attributes on your node/role to point to the url & checksum for the package.
+5. (Optionally) After you've configured your mail settings in the web gui, copy the generated /etc/hptmailset.dat file to your deployment web server and set the `['zol']['drivers']['r750_management_mailsettings']` & `['zol']['drivers']['r750_management_mailsettings_checksum']` attributes to sync mail settings across your nodes.
+
+See the (help site)[http://www.highpoint-tech.com/help/] for more information on using the software.
+
 
 Contributing
 ------------
@@ -78,7 +89,7 @@ Contributing
 
 License and Authors
 -------------------
- Copyright 2013, Biola University 
+ Copyright 2014, Biola University 
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.

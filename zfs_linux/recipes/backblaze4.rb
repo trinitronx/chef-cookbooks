@@ -38,3 +38,30 @@ unless File.exists?("/lib/modules/#{node['os_version']}/kernel/drivers/scsi/r750
     cwd "#{Chef::Config[:file_cache_path]}/r750_source/product/r750/linux"
   end
 end
+
+# Optionally, deploy the web management daemon
+if node['zol']['drivers']['r750_management_pkg']
+  if node['zol']['drivers']['r750_management_mailsettings']
+    remote_file '/etc/hptmailset.dat' do
+      source node['zol']['drivers']['r750_management_mailsettings']
+      if node['zol']['drivers']['r750_management_mailsettings_checksum']
+        checksum node['zol']['drivers']['r750_management_mailsettings_checksum']
+      end
+      mode "0600"
+    end
+  end
+  remote_file "#{Chef::Config[:file_cache_path]}/#{node['zol']['drivers']['r750_management_pkg'].split('/').last}" do
+    source node['zol']['drivers']['r750_management_pkg']
+    if node['zol']['drivers']['r750_management_pkg_checksum']
+      checksum node['zol']['drivers']['r750_management_pkg_checksum']
+    end
+  end
+  package 'hptsvr-https' do
+    source "#{Chef::Config[:file_cache_path]}/#{node['zol']['drivers']['r750_management_pkg'].split('/').last}"
+    if node['platform_family'] == 'debian'
+      provider Chef::Provider::Package::Dpkg
+    else
+      provider Chef::Provider::Package::Rpm
+    end
+  end
+end
