@@ -98,6 +98,34 @@ Attributes
   </tr>
 </table>
 
+#### windows_software::nmap
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td><tt>['windows_software']['nmap']['download_url']</tt></td>
+    <td>String</td>
+    <td>Download URL for your hosted installer</td>
+    <td><tt>http://nmap.org/dist/nmap-6.46-setup.exe</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['windows_software']['nmap']['displayname']</tt></td>
+    <td>String</td>
+    <td>DisplayName string from Windows registry uninstall info</td>
+    <td><tt>Nmap 6.46</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['windows_software']['nmap']['checksum']</tt></td>
+    <td>String</td>
+    <td>Optional SHA-256 checksum of the installer</td>
+    <td><tt>c80789be9a1609b3bc22e4c649ca904a5477dfd1fc38a473d2dc1a0c2bba1821</tt></td>
+  </tr>
+</table>
+
 #### windows_software::python2
 <table>
   <tr>
@@ -131,6 +159,10 @@ NOTE: Most WinPcap installers are not capable of silent installation. We recomme
 #### windows_software::winscp
 
 Upload the WinSCP installer to your web server, set the attributes noted above, and include `windows_software::winscp` in your node's `run_list`
+
+#### windows_software::nmap
+
+Upload the Nmap installer to your web server, set the attributes noted above, and include `windows_software::nmap` in your node's `run_list`
 
 #### windows_software::python2
 
