@@ -2,7 +2,7 @@
 # Cookbook Name:: usersandgroups
 # Recipe:: userapps
 #
-# Copyright 2013, Biola University
+# Copyright 2014, Biola University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,11 @@ if node['platform'] == 'ubuntu' and node['platform_version'].to_i < 12
     keyserver "keyserver.ubuntu.com"
     key "DC68C79C61E668B4D505C77326FB1781A5163C88"
   end
+end
+
+# Include epel on rhel systems
+if node['platform_family'] == 'rhel'
+  include_recipe 'yum::epel'
 end
 
 # Packages to install on every system
