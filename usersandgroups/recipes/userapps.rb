@@ -29,13 +29,13 @@ if node['platform'] == 'ubuntu' and node['platform_version'].to_i < 12
 end
 
 # Packages to install on every system
-pkgsAllSystems = ['screen','rsync']
+pkgsAllSystems = ['screen','rsync','ncdu']
 
 # Packages for Debian systems
-pkgsDebSystems = ['bash-completion','vim','nano','curl','ncdu','htop','lsof']
+pkgsDebSystems = ['bash-completion','vim','nano','curl','htop','lsof']
 
 # Packages for Ubuntu systems
-pkgsUbuSystems = ['run-one','byobu','bash-completion','vim','nano','curl','ncdu','htop','lsof','gdisk']
+pkgsUbuSystems = ['run-one','byobu','bash-completion','vim','nano','curl','htop','lsof','gdisk']
 
 # Packages for RHEL systems
 pkgsRHELSystems = ['vim-enhanced']
