@@ -68,3 +68,7 @@ end
 if node['platform_family'] == 'rhel' and node['platform_version'].to_i > 5
   package 'gdisk'
 end
+
+if node['platform'] == 'ubuntu' and node['platform_version'].to_i >= 12
+  package 'git'
+end
