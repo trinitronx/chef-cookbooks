@@ -31,6 +31,14 @@ if node['directories']
           owner value['mode']
         end
       end
+      # The directory resource will not enforce directory permissions on existing directories
+      # So, we'll manually apply those here
+      if value['owner'] and value['group']
+        execute "chown #{value['owner']}:#{value['group']} #{key}"
+      end
+      if value['mode']
+        execute "chmod #{value['mode']} #{key}"
+      end
     end
   end
 end
