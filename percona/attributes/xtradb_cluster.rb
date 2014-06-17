@@ -18,8 +18,8 @@
 #
 
 default['percona']['xtradb_cluster_package'] = "percona-xtradb-cluster-server-5.5"
-default['percona']['xtradb_cluster_client_packages'] = %w{percona-xtradb-cluster-client-5.5 libmysqlclient18-dev}
+default['percona']['xtradb_cluster_client_packages'] = %w{percona-xtradb-cluster-client-5.5 libperconaserverclient18-dev}
 default['percona']['cluster_name'] = "percona_xtradb_cluster"
-default['percona']['sst_method'] = "xtrabackup"
+default['percona']['sst_method'] = "xtrabackup-v2"
 default['percona']['sst_user'] = "xtrabackup_user"
 default['percona']['cluster_role'] = ""

@@ -17,7 +17,7 @@ binlog_format=ROW
 
 # MyISAM storage engine has only experimental support
 default_storage_engine=InnoDB
-#enforce_storage_engine=InnoDB
+enforce_storage_engine=InnoDB
 
 # This is a recommended tuning variable for performance
 innodb_locks_unsafe_for_binlog=1
@@ -34,7 +34,7 @@ wsrep_node_name=<%= node['hostname'] %>
 # SST method
 wsrep_sst_method=<%= node['percona']['sst_method'] %>
 
-<% if node['percona']['sst_method'] == "xtrabackup" %>
+<% if node['percona']['sst_method'] == "xtrabackup" || node['percona']['sst_method'] == "xtrabackup-v2" %>
 # Authentication for SST method
 wsrep_sst_auth="<%= node['percona']['sst_user'] %>:<%= @sst_password %>"
 <% end %>
