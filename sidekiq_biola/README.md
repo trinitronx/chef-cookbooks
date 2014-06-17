@@ -12,18 +12,21 @@ Attributes
 
       "apps": [
         // Minimal Rails app config
-        {"name": "classifieds", "user": "classifieds"},
+        {"name": "app-a", "user": "app_a"},
 
         // Minimal non-rails app config
-        {name: 'rack-detour', user: 'rack_detour', require: './config/environment.rb'},
+        {name: "app-b", user: "app_b", require: "./config/environment.rb"},
 
         // App with multiple workers
-        {name: 'timecard', user: 'timecard', workers: 2},
+        {name: "app-c", user: "app_c", workers: 2},
+
+        // App with customized concurrency (or number of threads)
+        {name: "app-d", user: "app_d", concurrency: 50},
 
         // App with multiple queues
         // Format: {name => weight}
         // Use null for default weight
-        {name: "announcement-publisher", user: "announcement_publisher", queues: {"critical": 2, "default": 1}}
+        {name: "app-e", user: "app_e", queues: {"critical": 2, "default": 1}}
       ]
     }
 
@@ -45,5 +48,9 @@ Notes
 -----
 
 - If an application is not found by it's name in the `app_root` directory, no worker will be created.
+
+- Default `app_root` is `/srv/rack`
+
+- Default `concurrency` is 25
 
 - All PIDs are stored in `/tmp/sidekiq/[appname]-[index].pid`
