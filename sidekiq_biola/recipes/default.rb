@@ -16,6 +16,9 @@ deployed_apps.each do |app|
     group 'root'
     mode '0644'
     variables app_root: node[:sidekiq_biola][:app_root], app: app
+
+    notifies :stop, 'service[sidekiq-all]', :delayed
+    notifies :start, 'service[sidekiq-all]', :delayed
   end
 end
 
