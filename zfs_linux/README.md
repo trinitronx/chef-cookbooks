@@ -76,6 +76,9 @@ Support has been added for the optional installation of the "Non-RAID Web Manage
 
 See the (help site)[http://www.highpoint-tech.com/help/] for more information on using the software.
 
+#### zfs\_linux::hold_samba
+Simple support recipe to support custom integrations with Samba (not at all directly related to ZoL, but perhaps more common to large fileservers running ZoL) -- applying this recipe to Debian-family nodes will keep them from auto-updating their Samba packages.
+
 
 Contributing
 ------------
