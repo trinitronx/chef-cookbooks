@@ -1,7 +1,7 @@
 default['zol']['zfs_repo']                                         = "https://github.com/zfsonlinux/zfs.git"
 default['zol']['spl_repo']                                         = "https://github.com/zfsonlinux/spl.git"
-default['zol']['zfs_commit']                                       = "bc25c9325b0e5ced897b9820dad239539d561ec9"
-default['zol']['spl_commit']                                       = "ad3412efd7cc2debb0f9f354d3f5e105a99d97e1"
+default['zol']['zfs_commit']                                       = "07dabd234dd51a1e5adc5bd21cddf5b5fdc70732"
+default['zol']['spl_commit']                                       = "31cb5383bff0fddc5058973e32a6f2c446d45e59"
 
 case node['platform_version']
 when '12.04'
