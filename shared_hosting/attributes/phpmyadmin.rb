@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: shared_hosting
-# Attributes:: change_password
+# Attributes:: phpmyadmin
 #
 # Copyright 2013, Biola University
 #
@@ -17,8 +17,7 @@
 # limitations under the License.
 #
 
-default['shared_hosting']['change_password']['script_path'] = "/usr/local/bin"
-# Dummy user for changing passwords via SSH
-default['shared_hosting']['change_password']['dummy_user'] = "passwd"
-# Default is 'passwd'
-default['shared_hosting']['change_password']['dummy_password'] = "$6$n/Nr4nfwkx51$uNXz6J5/2mJGyUDzSIzwnxsK1FLlPN51QU825OvjIyEmagr1xBz9/FOIS8aQl7Si5oRgRex4pBjYc.7CdPsyQ/"
+# Include the phpmyadmin.inc nginx configuration for the default site
+if node.run_list.expand(node.chef_environment).recipes.include?("shared_hosting::phpmyadmin")
+	default['shared_hosting']['nginx']['include'] << "phpmyadmin.inc"
+end

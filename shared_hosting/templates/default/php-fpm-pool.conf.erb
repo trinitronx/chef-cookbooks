@@ -14,6 +14,7 @@ pm.start_servers = 4
 pm.min_spare_servers = 2
 pm.max_spare_servers = 6
 pm.max_requests = 50
+pm.status_path = /<%= @site_name %>-status
 
 <% if @php_restrict_basedir == true -%>
 php_admin_value[open_basedir] = <%= @sites_dir %>/<%= @site_name %>:/tmp

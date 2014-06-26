@@ -1,0 +1,13 @@
+<% @sites.each do |site| -%>
+<% site.each do |site_key, site_value| -%>
+location /<%= site_key.to_s %>-status {
+  access_log off;
+  <% node['shared_hosting']['php']['status_page_allow'].each do |host| -%>
+  allow <%= host %>;
+  <% end -%>
+  deny all;
+  include fastcgi_params;
+  fastcgi_pass unix:<%= node['shared_hosting']['php']['socket_dir'] %>/<%= site_key.to_s %>.sock;
+}
+<% end -%>
+<% end -%>

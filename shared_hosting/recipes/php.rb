@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: shared_hosting
-# Attributes:: usermin
+# Recipe:: php
 #
 # Copyright 2013, Biola University
 #
@@ -17,5 +17,28 @@
 # limitations under the License.
 #
 
-default['shared_hosting']['usermin']['user_acl'] = "changepass cron file updown"
-default['shared_hosting']['usermin']['home_only'] = 1
+# Install PHP
+include_recipe "php::default"
+
+# Install required PHP packages
+%w{ php5-fpm php5-mysql php5-suhosin }.each do |pkg|
+  package pkg
+end
+
+# Install extra PHP packages
+node['shared_hosting']['php']['extra_packages'].each do |pkg|
+  package pkg
+end
+
+# Remove the default php-fpm pool configuration
+file "/etc/php5/fpm/pool.d/www.conf" do
+  action :delete
+end
+
+# Create a directory to hold Unix sockets for the php-fpm pools
+directory node['shared_hosting']['php']['socket_dir'] do
+  owner "root"
+  group "root"
+  mode 00755
+  action :create
+end

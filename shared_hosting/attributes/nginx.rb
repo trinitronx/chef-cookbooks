@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: shared_hosting
-# Attributes:: usermin
+# Attributes:: nginx
 #
 # Copyright 2013, Biola University
 #
@@ -17,5 +17,9 @@
 # limitations under the License.
 #
 
-default['shared_hosting']['usermin']['user_acl'] = "changepass cron file updown"
-default['shared_hosting']['usermin']['home_only'] = 1
+default['shared_hosting']['nginx']['sites_dir'] = "/srv/nginx"
+default['shared_hosting']['nginx']['include'] = Array.new
+
+default['shared_hosting']['nginx']['ssl_cert_file'] = "#{node['nginx']['dir']}/certs/selfsigned.crt"
+default['shared_hosting']['nginx']['ssl_cert_key']  = "#{node['nginx']['dir']}/certs/selfsigned.key"
+default['shared_hosting']['nginx']['ssl_req'] = "/C=US/ST=Several/L=Locality/O=Example/OU=Operations/CN=#{node.name}/emailAddress=ops@#{node.name}"

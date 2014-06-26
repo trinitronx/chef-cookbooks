@@ -26,8 +26,8 @@ pam=usermin
 premodules=WebminCore
 server=MiniServ/1.590
 userfile=/etc/usermin/miniserv.users
-certfile=<%= node['shared_hosting']['ssl_cert_file'] %>
-keyfile=<%= node['shared_hosting']['ssl_cert_key'] %>
+certfile=<%= node['shared_hosting']['nginx']['ssl_cert_file'] %>
+keyfile=<%= node['shared_hosting']['nginx']['ssl_cert_key'] %>
 passwd_file=/etc/shadow
 passwd_uindex=0
 passwd_pindex=1

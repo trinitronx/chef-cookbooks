@@ -70,7 +70,7 @@ template "/etc/usermin/changepass/config" do
 end
 
 # Restrict the file manager to home directories
-if node['shared_hosting']['usermin_home_only'] == 1
+if node['shared_hosting']['usermin']['home_only'] == 1
   execute "update file manager" do
     command "sed -i 's/home_only=0/home_only=1/' /etc/usermin/file/config"
     not_if "grep 'home_only=1' /etc/usermin/file/config"

@@ -17,7 +17,9 @@
 # limitations under the License.
 #
 
-default['shared_hosting']['wordpress']['php_packages'] = %w{ php5-curl php5-gd php5-mcrypt }
-default['shared_hosting']['wordpress']['socket_dir'] = "/var/run/php5-fpm"
-default['shared_hosting']['wordpress']['chroot_group'] = "sftp"
 default['shared_hosting']['wordpress']['subdirectory'] = nil
+
+# Include the php-status.inc nginx configuration for the default site
+if node.run_list.expand(node.chef_environment).recipes.include?("shared_hosting::wordpress")
+	default['shared_hosting']['nginx']['include'] << "php-status.inc"
+end

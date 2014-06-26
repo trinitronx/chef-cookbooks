@@ -17,4 +17,4 @@
 # limitations under the License.
 #
 
-default['shared_hosting']['sites_dir'] = "/srv/nginx"
+default['shared_hosting']['chroot_group'] = "sftp"
