@@ -120,14 +120,36 @@ if File.exists? apps_dir
       code "find . ! -group #{dev_group} -exec chgrp #{dev_group} {} +"
     end
 
+    bash "set group on files in #{app_dir}/log" do
+      cwd app_dir
+      code "find -L ./log ! -group #{dev_group} -exec chgrp #{dev_group} {} +"
+    end
+
+    bash "set group on files in #{app_dir}/public/assets" do
+      cwd app_dir
+      code "find -L ./public/assets ! -group #{dev_group} -exec chgrp #{dev_group} {} +"
+      only_if { Dir.exists? "#{app_dir}/public/assets" }
+    end
+
     bash "set onwer on files in #{app_dir}/log and #{app_dir}/tmp" do
       cwd app_dir
-      code "find ./log ./tmp ! -user #{username} -exec chown #{username} {} +"
+      code "find -L ./log ./tmp ! -user #{username} -exec chown #{username} {} +"
     end
 
     bash "make files in #{app_dir} group writable" do
       cwd app_dir
       code 'find . ! -perm -g=w -exec chmod g+w {} +'
+    end
+
+    bash "make files in #{app_dir}/log group writable" do
+      cwd app_dir
+      code 'find -L ./log ! -perm -g=w -exec chmod g+w {} +'
+    end
+
+    bash "make files in #{app_dir}/public/assets group writable" do
+      cwd app_dir
+      code 'find -L ./public/assets ! -perm -g=w -exec chmod g+w {} +'
+      only_if { Dir.exists? "#{app_dir}/public/assets" }
     end
 
     bash "set git repo in #{app_dir} to sharedRepository = true" do
