@@ -1,0 +1,26 @@
+{
+  "java": {
+    "install_flavor": "oracle",
+    "jdk": {
+      "<%= node['java_alt']['jdk_version'] %>": {
+        "bin_cmds": [],
+        "i586": {
+          "checksum": "<%= node['java_alt']['jdk'][node['java_alt']['jdk_version']]['i586']['checksum'] %>",
+          "url": "<%= node['java_alt']['jdk'][node['java_alt']['jdk_version']]['i586']['url'] %>"
+        },
+        "x86_64": {
+          "checksum": "<%= node['java_alt']['jdk'][node['java_alt']['jdk_version']]['x86_64']['checksum'] %>",
+          "url": "<%= node['java_alt']['jdk'][node['java_alt']['jdk_version']]['x86_64']['url'] %>"
+        }
+      }
+    },
+    "jdk_version": "<%= node['java_alt']['jdk_version'] %>",
+    "set_default": false<% if @accept_oracle_download_terms -%>,
+    "oracle": {
+      "accept_oracle_download_terms": true
+    }<% end -%>
+  },
+  "run_list": [
+    "recipe[java::default]"
+  ]
+}
