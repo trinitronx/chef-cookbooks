@@ -35,6 +35,7 @@ Client {
 FileSet {
   Name = "<%= clientparms.first[0] %>-<%= fileset.first[0] %>"<% if fileset.first[1]['disablevss'] -%>
   Enable VSS = no<% end -%>
+  Ignore FileSet Changes = yes
   Include {<% if fileset.first[1]['options'] and fileset.first[1]['additionaloptionstanzas'] -%>
     Options {<% fileset.first[1]['options'].each do |option| -%>
       <%= option.first[0] %> = <%= option.first[1] %><% end -%>
