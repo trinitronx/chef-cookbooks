@@ -3,8 +3,8 @@
 <% @values.each do |sc| -%>
     {
       "args": "<%= sc['args'] %>",
-      "check_attempts": "3",
-      "check_interval": "3",
+      "check_attempts": "<%= sc['check_attempts'] || node['opsview']['check_attempts_default'] %>",
+      "check_interval": "<%= sc['check_interval'] || node['opsview']['check_interval_default'] %>",
       "checktype" : {
         "name" : "Active Plugin"
       },
@@ -55,11 +55,11 @@
       ],
 <% end -%>
       "name": "<%= sc['name'] %>",
-      "notification_options" : "w,c,r,u",
+      "notification_options" : "<%= sc['notification_options'] || node['opsview']['notification_options_default'] %>",
       "plugin" : {
         "name" : "<%= sc['plugin'] %>"
       },
-      "retry_check_interval" : "1",
+      "retry_check_interval" : "<%= sc['retry_check_interval'] || node['opsview']['retry_check_interval_default'] %>",
       "servicegroup" : {
         "name" : "<%= sc['servicegroup'] %>"
       }

@@ -25,6 +25,11 @@ default['opsview']['opsview_rest_path'] = "/usr/local/nagios/bin/opsview_rest"
 default['opsview']['extra_packages'] = %w{ imagemagick }
 default['opsview']['default_keywords'] = [ "pagerduty" ]
 
+default['opsview']['check_attempts_default'] = '3'
+default['opsview']['check_interval_default'] = '3'
+default['opsview']['notification_options_default'] = 'w,c,r,u'
+default['opsview']['retry_check_interval_default'] = '1'
+
 default['opsview']['use_ssl'] = false
 default['opsview']['ssl_certificate_file'] = '/etc/ssl/certs/ssl-cert-snakeoil.pem'
 default['opsview']['ssl_certificate_keyfile'] = '/etc/ssl/private/ssl-cert-snakeoil.key'
