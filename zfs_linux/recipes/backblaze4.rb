@@ -64,4 +64,11 @@ if node['zol']['drivers']['r750_management_pkg']
       provider Chef::Provider::Package::Rpm
     end
   end
+  template "/etc/hptcfg" do
+    source "hptcfg.erb"
+    mode "0644"
+  end
+  service 'hptdaemon' do
+    action [:start, :enable]
+  end
 end
