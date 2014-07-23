@@ -102,7 +102,8 @@ else
     variables(
       :monitoring_hosts => monitoring_hosts,
       :aliases => node["opsview"]["aliases"],
-      :scripts => node["opsview"]["scripts"]
+      :scripts => node["opsview"]["scripts"],
+      :wrapped_scripts => node["opsview"]["wrapped_scripts"]
     )
     notifies :restart, resources(:service => "NSClientpp")
   end

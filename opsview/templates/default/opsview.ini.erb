@@ -55,6 +55,15 @@ allow_nasty_meta_chars=1
 ;  This option controls if SSL should be used on the socket.
 use_ssl=1
 
+[Script Wrappings]
+ps1=cmd /c echo %SCRIPT% %ARGS%; exit($lastexitcode) | powershell.exe -command -
+
+[Wrapped Scripts]
+<% if @wrapped_scripts -%>
+<% @wrapped_scripts.each do |w| -%>
+<%= w['name'] %>=scripts\<%= w['filename'] %> <%= w['arguments'] %>
+<% end -%>
+<% end -%>
 
 [External Scripts]
 ; The old plugins we'll deprecate
