@@ -1,0 +1,7 @@
+name             'pbis-open'
+maintainer       'Biola University'
+maintainer_email 'jared.king@biola.edu'
+license          'Apache 2.0'
+description      'Installs and configures PowerBroker Identity Services Open Edition'
+version          '1.0.0'
+depends          'chef-vault'
