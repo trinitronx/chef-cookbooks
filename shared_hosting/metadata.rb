@@ -3,10 +3,8 @@ maintainer_email "jared.king@biola.edu"
 license          "Apache 2.0"
 description      "Configures nodes for shared hosting environments"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "2.0.1"
-supports 				 "ubuntu", "12.04"
-depends          "database"
-depends          "mysql"
-depends          "nginx"
-depends          "openssl"
-depends          "php"
+version          "2.1.0"
+supports         "ubuntu", "12.04"
+%w{ apache2 database mysql nginx openssl php }.each do |cb|
+  depends cb
+end
