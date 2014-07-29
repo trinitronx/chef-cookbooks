@@ -1,12 +1,15 @@
 <VirtualHost *:80>
+  ServerName <%= @server_name %>
   ServerAdmin webmaster@localhost
 
-  DocumentRoot <%= node['shared_hosting']['apache2']['sites_dir'] %>/apache2-default
+  UserDir public_html
+
+  DocumentRoot <%= @document_root %>
   <Directory />
     Options FollowSymLinks
     AllowOverride None
   </Directory>
-  <Directory <%= node['shared_hosting']['apache2']['sites_dir'] %>/apache2-default/>
+  <Directory <%= @document_root %>/>
     Options -Indexes FollowSymLinks MultiViews
     AllowOverride None
     Order allow,deny
@@ -21,13 +24,13 @@
     Allow from all
   </Directory>
 
-  ErrorLog ${APACHE_LOG_DIR}/error.log
+  ErrorLog /var/log/apache2/error.log
 
   # Possible values include: debug, info, notice, warn, error, crit,
   # alert, emerg.
   LogLevel warn
 
-  CustomLog ${APACHE_LOG_DIR}/access.log combined
+  CustomLog /var/log/apache2/access.log combined
   ServerSignature On
 
   Alias /doc/ "/usr/share/doc/"

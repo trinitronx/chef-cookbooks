@@ -46,6 +46,7 @@ end
 # Create a group for users that need to be chrooted when using SFTP
 group node['shared_hosting']['chroot_group'] do
   action :create
+  not_if "getent group | grep #{node['shared_hosting']['chroot_group'].downcase}"
 end
 
 # Configure openssh to chroot users in the group specified in the ['shared_hosting']['chroot_group'] attribute
@@ -55,7 +56,7 @@ template "/etc/ssh/sshd_config" do
   mode 00644
   source "sshd_config.erb"
   variables(
-    :chroot_group => node['shared_hosting']['chroot_group']
+    :chroot_group => node['shared_hosting']['chroot_group'].downcase
   )
   notifies :restart, "service[ssh]"
 end
