@@ -55,11 +55,13 @@ Get-VM | Sort Name | ForEach {
 }
 
 if ($OutdatedBackups.count -gt 0) {
-  Write-Output "The following VMs have outdated backups:"
+  Write-Output "WARNING: The following VMs have outdated backups:"
   ForEach ($VM in $OutdatedBackups) {
     Write-Output "$($VM[0]): $($VM[1])"
   }
+  Exit 1
 }
 else {
   Write-Output "OK: All virtual machines have current backups."
+  Exit 0
 }
