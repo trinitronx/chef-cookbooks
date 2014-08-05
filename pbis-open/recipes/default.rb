@@ -43,24 +43,26 @@ rescue
 	log 'Unable to load chef vault item. Skipping domain join.'
 end
 
+# Determine if the computer is joined to the domain
+domain_member = `domainjoin-cli query | egrep -ic 'Domain = #{node['pbis-open']['ad_domain'].upcase}'`.to_i
+
+# Set configuration options if joined
+if (File.exists?('/usr/bin/domainjoin-cli') && domain_member)
+  execute "reload-config" do
+    command "/opt/pbis/bin/config --file #{node['pbis-open']['config_file']}"
+    action :nothing
+  end
+
+  template node['pbis-open']['config_file'] do
+    source "pbis.conf.erb"
+    notifies :run, resources(:execute => "reload-config")
+  end
 # Join the computer to the domain if needed
-if (bind_credentials)
+elsif (bind_credentials)
   execute "join-domain" do
     command "domainjoin-cli join #{node['pbis-open']['ad_domain'].upcase} #{bind_credentials['username']} '#{bind_credentials['password']}'"
     action :run
-    not_if "domainjoin-cli query | egrep -i 'Domain = #{node['pbis-open']['ad_domain'].upcase}'"
   end
-end
-
-# Set configuration options
-execute "reload-config" do
-  command "/opt/pbis/bin/config --file #{node['pbis-open']['config_file']}"
-  action :nothing
-end
-
-template node['pbis-open']['config_file'] do
-  source "pbis.conf.erb"
-  notifies :run, resources(:execute => "reload-config")
 end
 
 # Disable the Ohai passwd plugin to avoid pulling LDAP information
