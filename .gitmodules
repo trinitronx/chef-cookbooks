@@ -184,3 +184,7 @@
 [submodule "newrelic"]
 	path = newrelic
 	url = git@github.com:escapestudios-cookbooks/newrelic.git
+[submodule "apache2"]
+	path = apache2
+	url = https://github.com/onehealth-cookbooks/apache2.git
+	branch = master
