@@ -188,3 +188,7 @@
 	path = apache2
 	url = https://github.com/onehealth-cookbooks/apache2.git
 	branch = master
+[submodule "pacman"]
+	path = pacman
+	url = https://github.com/jesseadams/pacman.git
+	branch = master
