@@ -1,0 +1,7 @@
+#!/bin/bash
+# Passes an NRPE command to the monitored host
+NRPE_COMMAND=$1
+
+if [ "$NAGIOS_SERVICESTATE" = "WARNING" ] && [ "$NAGIOS_SERVICESTATETYPE" = "HARD" ]; then
+  /usr/local/nagios/libexec/check_nrpe -H $NAGIOS_HOSTADDRESS -c $NRPE_COMMAND >/dev/null 2>&1
+fi
