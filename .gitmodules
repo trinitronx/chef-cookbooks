@@ -192,3 +192,7 @@
 	path = pacman
 	url = https://github.com/jesseadams/pacman.git
 	branch = master
+[submodule "omnibus_updater"]
+	path = omnibus_updater
+	url = https://github.com/hw-cookbooks/omnibus_updater.git
+	branch = master
