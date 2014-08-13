@@ -24,17 +24,17 @@ default['splunk']['windows_ta']['url'] = 'http://download.contoso.com/splunk/spl
 default['splunk']['windows_ta']['application_log'] = {
   "disabled" => "1",
   "checkpointInterval" => "5",
-  "index" => "wineventlog"
+  "index" => "winevents"
 }
 default['splunk']['windows_ta']['security_log'] = {
   "disabled" => "1",
   "checkpointInterval" => "5",
-  "index" => "wineventlog"
+  "index" => "winevents"
 }
 default['splunk']['windows_ta']['system_log'] = {
   "disabled" => "1",
   "checkpointInterval" => "5",
-  "index" => "wineventlog"
+  "index" => "winevents"
 }
 
 # Performance Counters
