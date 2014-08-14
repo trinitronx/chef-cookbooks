@@ -196,3 +196,7 @@
 	path = omnibus_updater
 	url = https://github.com/hw-cookbooks/omnibus_updater.git
 	branch = master
+[submodule "chef-splunk"]
+	path = chef-splunk
+	url = https://github.com/opscode-cookbooks/chef-splunk.git
+	branch = master
