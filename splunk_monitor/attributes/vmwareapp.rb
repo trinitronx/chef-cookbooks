@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: splunk_monitor
-# Attributes:: default
+# Attributes:: vmwareapp
 #
 # Copyright 2014, Biola University
 #
@@ -17,11 +17,5 @@
 # limitations under the License.
 #
 
-default['splunk']['forwarder']['base_url'] = "http://download.splunk.com/releases"
-default['splunk']['forwarder']['version'] = "6.1.3"
-default['splunk']['forwarder']['build'] = "220630"
-
-# Set forwarder home for Linux systems
-if node["os"] == "linux"
-  default['splunk']['forwarder']['home'] = '/opt/splunkforwarder'
-end
+default['splunk']['apps']['vmwareapp_url']             = "replacewithappdownloadurl"
+default['splunk']['apps']['vmwareapp_checksum']             = "replacewithsha256sumoffile"
