@@ -37,6 +37,30 @@ service servicename do
   action :nothing
 end
 
+# Override download URL
+download_path = "#{node['splunk']['forwarder']['version']}/universalforwarder/#{node['os']}/splunkforwarder-#{node['splunk']['forwarder']['version']}-#{node['splunk']['forwarder']['build']}" + 
+  case node['platform']
+  when "centos","redhat","fedora"
+    if node['kernel']['machine'] == "x86_64"
+      "-linux-2.6-x86_64.rpm"
+    else
+      ".i386.rpm"
+    end
+  when "debian","ubuntu"
+    if node['kernel']['machine'] == "x86_64"
+      "-linux-2.6-amd64.deb"
+    else
+      "-linux-2.6-intel.deb"
+    end
+  when "windows"
+    if node['kernel']['machine'] == "x86_64"
+      "-x64-release.msi"
+    else
+      "-x86-release.msi"
+    end
+  end
+node.default['splunk']['forwarder']['url'] = "#{node['splunk']['forwarder']['base_url']}/#{download_path}"
+
 case node['os']
 # Skipping Linux installation until the cookbook is updated to wrap chef-splunk
 =begin
@@ -67,30 +91,6 @@ when "windows"
     variables :splunk_servers => splunk_servers
   end
 end
-
-# Override download URL
-download_path = "#{node['splunk']['forwarder']['version']}/universalforwarder/#{node['os']}/splunkforwarder-#{node['splunk']['forwarder']['version']}-#{node['splunk']['forwarder']['build']}" + 
-  case node['platform']
-  when "centos","redhat","fedora"
-    if node['kernel']['machine'] == "x86_64"
-      "-linux-2.6-x86_64.rpm"
-    else
-      ".i386.rpm"
-    end
-  when "debian","ubuntu"
-    if node['kernel']['machine'] == "x86_64"
-      "-linux-2.6-amd64.deb"
-    else
-      "-linux-2.6-intel.deb"
-    end
-  when "windows"
-    if node['kernel']['machine'] == "x86_64"
-      "-x64-release.msi"
-    else
-      "-x86-release.msi"
-    end
-  end
-node.default['splunk']['forwarder']['url'] = "#{node['splunk']['forwarder']['base_url']}/#{download_path}"
 
 # To avoid confusion between systems with the same hostname, add the subdomain if configured
 case node['splunk']['hostname_source']
