@@ -44,6 +44,7 @@ if File.directory?("#{node['splunk']['forwarder']['home']}/etc/apps")
   if File.directory?("#{node['splunk']['forwarder']['home']}/etc/apps/Splunk_TA_windows")
     # Create a local directory
     directory "#{node['splunk']['forwarder']['home']}/etc/apps/Splunk_TA_windows/local" do
+      inherits true
       action :create
     end
 

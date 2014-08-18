@@ -26,7 +26,7 @@ checkpointInterval = <%= node['splunk']['windows_ta']['system_log']['checkpointI
 index = <%= node['splunk']['windows_ta']['system_log']['index'] %>
 
 ###### Performance Counters ######
-[perfmon://CPU Load]
+[perfmon://CPUTime]
 disabled = <%= node['splunk']['windows_ta']['perfmon_cpu']['disabled'] %>
 counters = % Processor Time;% User Time
 instances = _Total
@@ -41,7 +41,7 @@ interval = <%= node['splunk']['windows_ta']['perfmon_memory']['interval'] %>
 object = Memory
 index = <%= node['splunk']['windows_ta']['perfmon_memory']['index'] %>
 
-[perfmon://Free Disk Space]
+[perfmon://FreeDiskSpace]
 disabled = <%= node['splunk']['windows_ta']['perfmon_disk']['disabled'] %>
 counters = Free Megabytes;% Free Space
 instances = _Total
@@ -49,7 +49,7 @@ interval = <%= node['splunk']['windows_ta']['perfmon_disk']['interval'] %>
 object = LogicalDisk
 index = <%= node['splunk']['windows_ta']['perfmon_disk']['index'] %>
 
-[perfmon://Network Interface]
+[perfmon://LocalNetwork]
 disabled = <%= node['splunk']['windows_ta']['perfmon_network']['disabled'] %>
 counters = Bytes Received/sec;Bytes Sent/sec
 instances = *
