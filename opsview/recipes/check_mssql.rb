@@ -20,12 +20,17 @@
 # Install DBD::Sybase Perl module
 package "libdbd-sybase-perl"
 
+# Search for SQL Servers to monitor
+mssql_servers = search(:node, "roles:#{node['opsview']['check_mssql']['monitored_server_role']}")
+mssql_servers.sort! { |a, b| a.name <=> b.name }
+
 # Replace the default FreeTDS config
 template "/etc/freetds/freetds.conf" do
   source "freetds.conf.erb"
   owner "root"
   group "root"
   mode "0644"
+  variables(:mssql_servers => mssql_servers)
 end
 
 # Build and install the check_mssql_health plugin
