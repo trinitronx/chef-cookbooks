@@ -25,11 +25,18 @@
   text size = 64512
 
 <% @mssql_servers.each do |server|%>
+<% if server.attribute?("freetds") && server['freetds'].attribute?("hostname") -%>
+[<%= server['freetds']['hostname'] %>]
+  host = <%= server['freetds']['hostname'] %>
+<% else %>
 [<%= server['fqdn'].downcase %>]
   host = <%= server['fqdn'].downcase %>
+<% end %>
 <% if server.attribute?("freetds") && server['freetds'].attribute?("port") -%>
   port = <%= server['freetds']['port'] %>
-<% else -%>
+<% elsif server.attribute?("freetds") && server['freetds'].attribute?("instance") -%>
+  instance = <%= server['freetds']['instance'] %>
+<% else %>
   port = 1433
 <% end %>
 <% if server.attribute?("freetds") && server['freetds'].attribute?("tds_version") -%>  
