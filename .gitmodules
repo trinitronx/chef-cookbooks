@@ -200,3 +200,9 @@
 	path = chef-splunk
 	url = https://github.com/opscode-cookbooks/chef-splunk.git
 	branch = master
+[submodule "vsphere_perl_sdk"]
+	path = vsphere_perl_sdk
+	url = git@github.com:biola/chef-vsphere_perl_sdk.git
+[submodule "7-zip"]
+	path = 7-zip
+	url = git@github.com:sneal/7-zip.git
