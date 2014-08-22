@@ -61,31 +61,42 @@ download_path = "#{node['splunk']['forwarder']['version']}/universalforwarder/#{
   end
 node.default['splunk']['forwarder']['url'] = "#{node['splunk']['forwarder']['base_url']}/#{download_path}"
 
+# Override search for Splunk servers to exclude the environment
+splunk_servers = search(
+  :node,
+  "splunk_is_server:true"
+).sort! do
+  |a, b| a.name <=> b.name
+end
+
 case node['os']
-# Skipping Linux installation until the cookbook is updated to wrap chef-splunk
-=begin
 when "linux"
-  include_recipe "splunk::forwarder"
-  # Splunk forwarder package installation will generate a new user
-  user "splunk" do
-    action :remove
-    ignore_failure true
+  include_recipe "chef-splunk::install_forwarder"
+
+  directory "/opt/splunkforwarder/etc/system/local" do
+    recursive true
+    owner 'root'
+    group 'root'
   end
-  # This user removal can leave directories stranded -- will reset
-  # back to root user
-  execute "chown --recursive root:root #{node['splunk']['forwarder']['home']}"
-=end
+
+  template "/opt/splunkforwarder/etc/system/local/outputs.conf" do
+    source 'outputs.conf.erb'
+    cookbook 'chef-splunk'
+    mode 0644
+    variables :splunk_servers => splunk_servers
+    notifies :restart, 'service[splunk]'
+  end
+  
+  # Accept license when upgrading Splunk
+  execute "#{splunk_cmd} enable boot-start --accept-license --answer-yes && echo true > /opt/splunk_license_accepted_#{node['splunk']['forwarder']['version']}" do
+    not_if { ::File.exist?("/opt/splunk_license_accepted_#{node['splunk']['forwarder']['version']}") }
+    notifies :start, 'service[splunk]'
+  end
+
+  include_recipe 'chef-splunk::setup_auth'
 when "windows"
   include_recipe "chef-splunk-windows::default"
   include_recipe "chef-splunk-windows::windows_ta"
-
-  # Override search for Splunk servers to exclude the environment
-  splunk_servers = search(
-    :node,
-    "splunk_is_server:true"
-  ).sort! do
-    |a, b| a.name <=> b.name
-  end
 
   rewind "template[#{node['splunk']['forwarder']['home']}/etc/system/local/outputs.conf]" do
     variables :splunk_servers => splunk_servers

@@ -1,15 +1,13 @@
 Description
 ===========
 
-This cookbook extends the splunk cookbook to add variables for controlling which data sources are monitored and forwarded. It is dependent on the splunk cookbook.
-
-Notes:
-* Splunk universal forwarder package installation creates a "splunk" user with a uid incremented by one above the highest existing uid. If you are managing uid's with another system (e.g. a chef-user's cookbook), this can conflict with existing or future uid's.  Accordingly, this cookbook will systematically delete the "splunk" user each time it is run, and is hardcoded to run the Splunk Universal Forwarder as root.
+This cookbook extends the chef-splunk and chef-splunk-windows cookbooks to add variables for controlling which data sources are monitored and forwarded. It is dependent on the chef-splunk and chef-splunk-windows cookbooks.
 
 Requirements
 ============
 
- ['splunk' cookbook](https://github.com/bestbuycom/splunk_cookbook)
+ ['chef-splunk' cookbook](https://supermarket.getchef.com/cookbooks/chef-splunk)
+ ['chef-splunk-windows' cookbook](https://github.com/biola/chef-cookbooks/tree/master/chef-splunk-windows)
 
 Attributes
 ==========
@@ -27,21 +25,9 @@ Attributes
 Usage
 =====
 
-Same dependencies as the splunk::forwarder recipe:
-
-\* One or more splunk servers (that will be receiving the data) need to have the "splunk-server" role attached to them (the role can be empty; simply used by the forwarders to programatically find splunk servers)
-\* Attributes for the splunk cookbook need to be defined; minimally:
->     [splunk][server_config_folder] (e.g. prod)
->     [splunk][forwarder_config_folder] (e.g. prod)
->     [splunk][auth] (e.g. admin:securepassword)
->     [splunk][forwarder_role] (e.g. whatever template folder name)
->     [splunk][indexer_name] (e.g. name for the indexer splunk.biola.edu)
-
 \* Add a 'monitors' array to node[splunk]. Populate it with 1 or more values. The following is an example from a knife role edit:
 >  "override_attributes": {
 >    "splunk": {
->      "server_config_folder": "prod",
->      "forwarder_config_folder": "prod",
 >      "monitors": [
 >        {
 >          "thisistheshortlogname": {
