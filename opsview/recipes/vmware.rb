@@ -18,5 +18,5 @@
 #
 
 # Install dependencies for vmware plugin
-include_recipe "vmware::perlsdk"
+include_recipe "vsphere_perl_sdk"
 package "libnagios-plugin-perl"
