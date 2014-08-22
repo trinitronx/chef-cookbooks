@@ -206,3 +206,7 @@
 [submodule "7-zip"]
 	path = 7-zip
 	url = git@github.com:sneal/7-zip.git
+[submodule "git"]
+	path = git
+	url = git@github.com:jssjr/git.git
+	branch = master
