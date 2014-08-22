@@ -237,7 +237,7 @@ if File.exists? apps_dir
       end
 
       bash "merge #{app_public_path} with #{shared_static_path}" do
-        code "rsync -abviu #{app_public_path}/* #{shared_static_path}"
+        code "rsync -abviu #{app_public_path}/ #{shared_static_path}"
         only_if { File.exists?(app_public_path) && !File.symlink?(app_public_path) }
       end
 
